@@ -2,15 +2,17 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { GameManager, GameState } from './GameManager';
+import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function HelixGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const managerRef = useRef<GameManager | null>(null);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>('START');
+  const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
 
   // Initialize GameManager once on mount
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function HelixGame() {
     };
   }, []);
 
-  // Handle Input separately to avoid re-initializing the game on state changes
+  // Handle Input
   useEffect(() => {
     const manager = managerRef.current;
     if (!manager) return;
@@ -45,12 +47,9 @@ export default function HelixGame() {
 
     const onMove = (x: number, e: MouseEvent | TouchEvent) => {
         if (!isDragging) return;
-        
-        // Prevent default behavior like scrolling while playing
         if (e.cancelable) e.preventDefault();
 
         const delta = x - lastX;
-        // Sensitivity adjustment: using a smaller multiplier for more precise control
         manager.rotateTower(delta * 2.5); 
         lastX = x;
     };
@@ -84,9 +83,9 @@ export default function HelixGame() {
     };
   }, []);
 
-  const handleStart = () => {
+  const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
-        managerRef.current.startGame();
+        managerRef.current.startGame(diff);
     }
   };
 
@@ -104,11 +103,45 @@ export default function HelixGame() {
 
         {/* Start Screen */}
         {gameState === 'START' && (
-          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto">
-            <h1 className="text-5xl font-extrabold text-primary tracking-tighter">HELIX SMASH</h1>
-            <p className="text-muted-foreground text-center max-w-xs">Rotate the tower to guide the ball through the gaps. Avoid the red zones!</p>
-            <Button size="lg" onClick={handleStart} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground group shadow-xl hover:scale-105 transition-all">
-                <Play className="mr-2 fill-current" /> PLAY NOW
+          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full">
+            <h1 className="text-4xl font-extrabold text-primary tracking-tighter text-center">HELIX SMASH</h1>
+            
+            <div className="flex flex-col gap-3 w-full">
+                <button 
+                    onClick={() => setDifficulty('EASY')}
+                    className={cn(
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        difficulty === 'EASY' ? "bg-primary/20 border-primary shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <Shield className="w-6 h-6 text-primary" />
+                        <div className="text-left">
+                            <div className="font-bold">EASY</div>
+                            <div className="text-xs opacity-70">Shorter tower, more gaps</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button 
+                    onClick={() => setDifficulty('HARD')}
+                    className={cn(
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        difficulty === 'HARD' ? "bg-orange-500/20 border-orange-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <Zap className="w-6 h-6 text-orange-500" />
+                        <div className="text-left">
+                            <div className="font-bold">HARD</div>
+                            <div className="text-xs opacity-70">Tall tower, high danger</div>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
+            <Button size="lg" onClick={() => handleStart()} className="w-full h-16 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground group shadow-xl hover:scale-105 transition-all">
+                <Play className="mr-2 fill-current" /> PLAY
             </Button>
           </div>
         )}
@@ -124,8 +157,11 @@ export default function HelixGame() {
                 <p className="text-muted-foreground">Final Score</p>
                 <p className="text-5xl font-black text-accent">{score}</p>
             </div>
-            <Button size="lg" onClick={handleStart} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
+            <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
                 TRY AGAIN
+            </Button>
+            <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground">
+                BACK TO MENU
             </Button>
           </div>
         )}
@@ -137,13 +173,16 @@ export default function HelixGame() {
                 <Trophy className="w-12 h-12 text-primary" />
             </div>
             <h2 className="text-4xl font-extrabold text-foreground">YOU SMASHED IT!</h2>
-            <p className="text-muted-foreground">You reached the bottom!</p>
+            <p className="text-muted-foreground">Level completed on {difficulty} mode!</p>
             <div className="text-center">
                 <p className="text-muted-foreground">Final Score</p>
                 <p className="text-5xl font-black text-accent">{score}</p>
             </div>
-            <Button size="lg" onClick={handleStart} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
+            <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
                 PLAY AGAIN
+            </Button>
+            <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground">
+                BACK TO MENU
             </Button>
           </div>
         )}

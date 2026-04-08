@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 
 export type GameState = 'START' | 'PLAYING' | 'GAMEOVER' | 'WON';
+export type Difficulty = 'EASY' | 'HARD';
 
 interface GameOptions {
   onScoreUpdate: (score: number) => void;
@@ -19,6 +20,7 @@ export class GameManager {
 
   private score: number = 0;
   private gameState: GameState = 'START';
+  private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
 
   // Ball physics
@@ -29,11 +31,11 @@ export class GameManager {
   private towerRotation: number = 0;
   private targetTowerRotation: number = 0;
 
-  // Configuration
+  // Configuration (dynamic based on difficulty)
   private platformGap: number = 4;
-  private numLevels: number = 20;
   private platformRadius: number = 2.5;
   private platformThickness: number = 0.3;
+  private numLevels: number = 20;
 
   constructor(options: GameOptions) {
     this.options = options;
@@ -71,18 +73,25 @@ export class GameManager {
     this.ball.position.set(0, 2, 2);
     this.scene.add(this.ball);
 
-    this.createTower();
     this.animate();
 
     window.addEventListener('resize', this.onWindowResize.bind(this));
   }
 
   private createTower() {
+    // Clear existing tower
+    while(this.towerGroup.children.length > 0) { 
+        this.towerGroup.remove(this.towerGroup.children[0]); 
+    }
+
     // Center Pole
-    const poleGeo = new THREE.CylinderGeometry(0.8, 0.8, this.numLevels * this.platformGap + 10, 32);
+    const poleHeight = this.numLevels * this.platformGap + 10;
+    const poleGeo = new THREE.CylinderGeometry(0.8, 0.8, poleHeight, 32);
     const poleMat = new THREE.MeshStandardMaterial({ color: 0x999999 });
     const pole = new THREE.Mesh(poleGeo, poleMat);
     pole.receiveShadow = true;
+    // Offset pole so it stays centered around the platforms
+    pole.position.y = -(poleHeight / 2) + 5;
     this.towerGroup.add(pole);
 
     // Platforms
@@ -91,24 +100,37 @@ export class GameManager {
       levelGroup.position.y = -i * this.platformGap;
       this.towerGroup.add(levelGroup);
 
-      // Procedural platform pieces (12 segments of 30 degrees)
       const numSegments = 12;
       const segmentAngle = (Math.PI * 2) / numSegments;
       
-      // Randomly decide gaps
       const gapIndices = new Set<number>();
-      const numGaps = i === 0 ? 1 : Math.floor(Math.random() * 3) + 2; 
+      let numGaps = 2;
+      let dangerZonesPerLevel = 1;
+
+      if (this.difficulty === 'EASY') {
+          numGaps = i === 0 ? 2 : Math.floor(Math.random() * 2) + 2; // 2-3 gaps
+          dangerZonesPerLevel = i > 5 ? 1 : 0;
+      } else {
+          numGaps = i === 0 ? 1 : Math.floor(Math.random() * 2) + 1; // 1-2 gaps
+          dangerZonesPerLevel = i > 2 ? Math.floor(Math.random() * 2) + 1 : 0; // 1-2 danger zones
+      }
+
       while (gapIndices.size < numGaps) {
         gapIndices.add(Math.floor(Math.random() * numSegments));
       }
 
-      // Randomly add a danger zone
-      const dangerIndex = i > 2 ? Math.floor(Math.random() * numSegments) : -1;
+      const dangerIndices = new Set<number>();
+      while (dangerIndices.size < dangerZonesPerLevel) {
+          const idx = Math.floor(Math.random() * numSegments);
+          if (!gapIndices.has(idx)) {
+              dangerIndices.add(idx);
+          }
+      }
 
       for (let j = 0; j < numSegments; j++) {
         if (gapIndices.has(j)) continue;
 
-        const isDanger = j === dangerIndex;
+        const isDanger = dangerIndices.has(j);
         const geo = new THREE.CylinderGeometry(
           this.platformRadius, 
           this.platformRadius, 
@@ -136,12 +158,17 @@ export class GameManager {
     this.towerGroup.add(finish);
   }
 
-  public startGame() {
+  public startGame(difficulty: Difficulty = 'EASY') {
+    this.difficulty = difficulty;
+    this.numLevels = difficulty === 'EASY' ? 15 : 30;
     this.gameState = 'PLAYING';
     this.options.onGameStateChange(this.gameState);
     this.score = 0;
     this.options.onScoreUpdate(this.score);
+    
+    this.createTower();
     this.resetBall();
+    
     this.towerGroup.rotation.y = 0;
     this.targetTowerRotation = 0;
   }
@@ -180,13 +207,8 @@ export class GameManager {
     this.ball.position.y += this.ballVelocityY;
 
     // Ball interaction with platforms
-    // Check which level the ball is at
     const relativeBallY = this.ball.position.y;
-    const towerRotation = this.towerGroup.rotation.y % (Math.PI * 2);
-
-    // Ball is roughly at Z=2. We need to check the angle of the ball relative to tower
-    // Since ball is fixed at Z=2, X=0, its angle is 0. 
-    // We check the segment of the tower at angle -towerRotation
+    
     let checkAngle = (-this.towerGroup.rotation.y) % (Math.PI * 2);
     if (checkAngle < 0) checkAngle += Math.PI * 2;
 
@@ -194,25 +216,21 @@ export class GameManager {
     
     // Collision detection
     if (this.ballVelocityY < 0 && this.ball.position.y <= currentLevelY + 0.35) {
-      // Check if we hit a platform or a gap
-      const numSegments = 12;
-      const segmentAngle = (Math.PI * 2) / numSegments;
-      const segmentIdx = Math.floor(checkAngle / segmentAngle);
-
       const levelGroup = this.towerGroup.children[this.currentLevelIndex + 1] as THREE.Group; // +1 because of pole
       let hitSomething = false;
 
       if (levelGroup && levelGroup.children) {
           for (const segment of levelGroup.children) {
               const mesh = segment as THREE.Mesh;
-              // Geometry parameters for CylinderGeometry are [radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength]
               const params = (mesh.geometry as any).parameters;
               const start = params.thetaStart;
               const length = params.thetaLength;
               const end = start + length;
 
-              // Check if checkAngle is within [start, end]
-              if (checkAngle >= start && checkAngle <= end) {
+              // Angle wrap check (the segment might cross the 0/2PI line)
+              const isInRange = checkAngle >= start && checkAngle <= end;
+
+              if (isInRange) {
                   if (mesh.userData.isDanger) {
                       this.gameOver();
                   } else {
@@ -229,7 +247,7 @@ export class GameManager {
           // It's a gap! Check if we passed a level
           if (this.ball.position.y < currentLevelY - 0.5) {
               this.currentLevelIndex++;
-              this.score += 10;
+              this.score += this.difficulty === 'HARD' ? 20 : 10;
               this.options.onScoreUpdate(this.score);
 
               if (this.currentLevelIndex >= this.numLevels) {
