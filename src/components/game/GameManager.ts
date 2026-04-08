@@ -75,8 +75,14 @@ export class GameManager {
     this.scene.add(this.ball);
 
     this.animate();
-    window.addEventListener('resize', this.onWindowResize.bind(this));
+    window.addEventListener('resize', this.onWindowResize);
   }
+
+  private onWindowResize = () => {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  };
 
   private createTower() {
     while(this.towerGroup.children.length > 0) { 
@@ -267,6 +273,6 @@ export class GameManager {
   public dispose() {
     this.renderer.dispose();
     this.audio.stopMusic();
-    window.removeEventListener('resize', this.onWindowResize.bind(this));
+    window.removeEventListener('resize', this.onWindowResize);
   }
 }
