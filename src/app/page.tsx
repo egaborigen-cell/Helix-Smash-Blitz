@@ -1,3 +1,10 @@
+
+import HelixGame from '@/components/game/HelixGame';
+
 export default function Home() {
-  return <></>;
+  return (
+    <main className="w-screen h-screen">
+      <HelixGame />
+    </main>
+  );
 }
