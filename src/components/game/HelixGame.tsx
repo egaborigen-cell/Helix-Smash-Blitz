@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function HelixGame() {
@@ -13,8 +13,8 @@ export default function HelixGame() {
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>('START');
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
+  const [isMuted, setIsMuted] = useState(false);
 
-  // Initialize GameManager once on mount
   useEffect(() => {
     if (!containerRef.current || managerRef.current) return;
 
@@ -32,7 +32,6 @@ export default function HelixGame() {
     };
   }, []);
 
-  // Handle Input (Mouse, Touch, Keyboard)
   useEffect(() => {
     const manager = managerRef.current;
     if (!manager) return;
@@ -49,29 +48,19 @@ export default function HelixGame() {
     const onMove = (x: number, e: MouseEvent | TouchEvent) => {
         if (!isDragging) return;
         if (e.cancelable) e.preventDefault();
-
         const delta = x - lastX;
         manager.rotateTower(delta * 2.5); 
         lastX = x;
     };
 
-    const onEnd = () => {
-        isDragging = false;
-    };
+    const onEnd = () => { isDragging = false; };
+    const handleKeyDown = (e: KeyboardEvent) => keysPressed.add(e.key);
+    const handleKeyUp = (e: KeyboardEvent) => keysPressed.delete(e.key);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      keysPressed.add(e.key);
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.delete(e.key);
-    };
-
-    // Continuous rotation loop for keyboard
     let rafId: number;
     const updateKeyboard = () => {
       if (gameState === 'PLAYING') {
-        const rotationSpeed = 15; // Speed for keyboard rotation
+        const rotationSpeed = 15;
         if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
           manager.rotateTower(rotationSpeed);
         }
@@ -95,7 +84,7 @@ export default function HelixGame() {
     window.addEventListener('mousemove', mouseMove, { passive: false });
     window.addEventListener('mouseup', mouseUp);
     window.addEventListener('touchstart', touchStart, { passive: false });
-    window.addEventListener('touchMove', touchMove, { passive: false });
+    window.addEventListener('touchmove', touchMove, { passive: false });
     window.addEventListener('touchend', touchEnd);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
@@ -119,16 +108,30 @@ export default function HelixGame() {
     }
   };
 
+  const toggleMute = () => {
+    if (managerRef.current) {
+      const muted = managerRef.current.toggleMute();
+      setIsMuted(muted);
+    }
+  };
+
   return (
     <div className="game-container touch-none select-none">
       <div ref={containerRef} className="w-full h-full" />
       
       {/* UI Overlay */}
       <div className="absolute inset-0 ui-overlay flex flex-col items-center justify-between p-8 pointer-events-none">
+        
         {/* HUD */}
-        <div className="flex flex-col items-center gap-2 pointer-events-auto">
-            <div className="text-sm font-semibold text-muted-foreground tracking-widest uppercase">Score</div>
-            <div className="text-6xl font-extrabold text-accent drop-shadow-lg">{score}</div>
+        <div className="w-full flex justify-between items-start pointer-events-auto">
+            <div className="flex flex-col items-start gap-1">
+                <div className="text-xs font-semibold text-muted-foreground tracking-widest uppercase">Score</div>
+                <div className="text-4xl font-extrabold text-accent drop-shadow-lg">{score}</div>
+            </div>
+            
+            <Button variant="outline" size="icon" onClick={toggleMute} className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40">
+                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </Button>
         </div>
 
         {/* Start Screen */}

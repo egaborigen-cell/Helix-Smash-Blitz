@@ -1,5 +1,6 @@
 
 import * as THREE from 'three';
+import { AudioManager } from './AudioManager';
 
 export type GameState = 'START' | 'PLAYING' | 'GAMEOVER' | 'WON';
 export type Difficulty = 'EASY' | 'HARD';
@@ -17,6 +18,7 @@ export class GameManager {
   private towerGroup: THREE.Group;
   private ball: THREE.Mesh;
   private clock: THREE.Clock;
+  private audio: AudioManager;
 
   private score: number = 0;
   private gameState: GameState = 'START';
@@ -31,7 +33,7 @@ export class GameManager {
   private towerRotation: number = 0;
   private targetTowerRotation: number = 0;
 
-  // Configuration (dynamic based on difficulty)
+  // Configuration
   private platformGap: number = 4;
   private platformRadius: number = 2.5;
   private platformThickness: number = 0.3;
@@ -41,6 +43,7 @@ export class GameManager {
     this.options = options;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xdbe0d1);
+    this.audio = new AudioManager();
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.set(0, 5, 10);
@@ -56,7 +59,6 @@ export class GameManager {
     this.towerGroup = new THREE.Group();
     this.scene.add(this.towerGroup);
 
-    // Initial Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambientLight);
 
@@ -65,7 +67,6 @@ export class GameManager {
     directionalLight.castShadow = true;
     this.scene.add(directionalLight);
 
-    // Create Ball
     const ballGeo = new THREE.SphereGeometry(0.3, 32, 32);
     const ballMat = new THREE.MeshStandardMaterial({ color: 0xb8f53d, roughness: 0.3 });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
@@ -74,27 +75,22 @@ export class GameManager {
     this.scene.add(this.ball);
 
     this.animate();
-
     window.addEventListener('resize', this.onWindowResize.bind(this));
   }
 
   private createTower() {
-    // Clear existing tower
     while(this.towerGroup.children.length > 0) { 
         this.towerGroup.remove(this.towerGroup.children[0]); 
     }
 
-    // Center Pole
     const poleHeight = this.numLevels * this.platformGap + 10;
     const poleGeo = new THREE.CylinderGeometry(0.8, 0.8, poleHeight, 32);
     const poleMat = new THREE.MeshStandardMaterial({ color: 0x999999 });
     const pole = new THREE.Mesh(poleGeo, poleMat);
     pole.receiveShadow = true;
-    // Offset pole so it stays centered around the platforms
     pole.position.y = -(poleHeight / 2) + 5;
     this.towerGroup.add(pole);
 
-    // Platforms
     for (let i = 0; i < this.numLevels; i++) {
       const levelGroup = new THREE.Group();
       levelGroup.position.y = -i * this.platformGap;
@@ -108,11 +104,11 @@ export class GameManager {
       let dangerZonesPerLevel = 1;
 
       if (this.difficulty === 'EASY') {
-          numGaps = i === 0 ? 2 : Math.floor(Math.random() * 2) + 2; // 2-3 gaps
+          numGaps = i === 0 ? 2 : Math.floor(Math.random() * 2) + 2;
           dangerZonesPerLevel = i > 5 ? 1 : 0;
       } else {
-          numGaps = i === 0 ? 1 : Math.floor(Math.random() * 2) + 1; // 1-2 gaps
-          dangerZonesPerLevel = i > 2 ? Math.floor(Math.random() * 2) + 1 : 0; // 1-2 danger zones
+          numGaps = i === 0 ? 1 : Math.floor(Math.random() * 2) + 1;
+          dangerZonesPerLevel = i > 2 ? Math.floor(Math.random() * 2) + 1 : 0;
       }
 
       while (gapIndices.size < numGaps) {
@@ -150,7 +146,6 @@ export class GameManager {
       }
     }
 
-    // Finish Platform
     const finishGeo = new THREE.CylinderGeometry(this.platformRadius + 1, this.platformRadius + 1, 0.5, 32);
     const finishMat = new THREE.MeshStandardMaterial({ color: 0xb8f53d });
     const finish = new THREE.Mesh(finishGeo, finishMat);
@@ -171,6 +166,11 @@ export class GameManager {
     
     this.towerGroup.rotation.y = 0;
     this.targetTowerRotation = 0;
+    this.audio.startMusic();
+  }
+
+  public toggleMute() {
+    return this.audio.toggleMute();
   }
 
   private resetBall() {
@@ -186,19 +186,13 @@ export class GameManager {
 
   private animate = () => {
     requestAnimationFrame(this.animate);
-    
     if (this.gameState === 'PLAYING') {
       this.updatePhysics();
     }
-
-    // Smooth tower rotation
     this.towerGroup.rotation.y += (this.targetTowerRotation - this.towerGroup.rotation.y) * 0.1;
-
-    // Camera follow ball
     const targetCamY = this.ball.position.y + 3;
     this.camera.position.y += (targetCamY - this.camera.position.y) * 0.05;
     this.camera.lookAt(0, this.ball.position.y - 1, 0);
-
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -206,17 +200,12 @@ export class GameManager {
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
-    // Ball interaction with platforms
-    const relativeBallY = this.ball.position.y;
-    
+    const currentLevelY = -this.currentLevelIndex * this.platformGap;
     let checkAngle = (-this.towerGroup.rotation.y) % (Math.PI * 2);
     if (checkAngle < 0) checkAngle += Math.PI * 2;
 
-    const currentLevelY = -this.currentLevelIndex * this.platformGap;
-    
-    // Collision detection
     if (this.ballVelocityY < 0 && this.ball.position.y <= currentLevelY + 0.35) {
-      const levelGroup = this.towerGroup.children[this.currentLevelIndex + 1] as THREE.Group; // +1 because of pole
+      const levelGroup = this.towerGroup.children[this.currentLevelIndex + 1] as THREE.Group;
       let hitSomething = false;
 
       if (levelGroup && levelGroup.children) {
@@ -226,8 +215,6 @@ export class GameManager {
               const start = params.thetaStart;
               const length = params.thetaLength;
               const end = start + length;
-
-              // Angle wrap check (the segment might cross the 0/2PI line)
               const isInRange = checkAngle >= start && checkAngle <= end;
 
               if (isInRange) {
@@ -236,6 +223,7 @@ export class GameManager {
                   } else {
                       this.ballVelocityY = this.bounceStrength;
                       this.ball.position.y = currentLevelY + 0.36;
+                      this.audio.playBounce();
                       hitSomething = true;
                   }
                   break;
@@ -244,11 +232,11 @@ export class GameManager {
       }
 
       if (!hitSomething) {
-          // It's a gap! Check if we passed a level
           if (this.ball.position.y < currentLevelY - 0.5) {
               this.currentLevelIndex++;
               this.score += this.difficulty === 'HARD' ? 20 : 10;
               this.options.onScoreUpdate(this.score);
+              this.audio.playSmash();
 
               if (this.currentLevelIndex >= this.numLevels) {
                 this.gameWon();
@@ -257,7 +245,6 @@ export class GameManager {
       }
     }
     
-    // Safety net
     if (this.ball.position.y < -(this.numLevels + 2) * this.platformGap) {
         this.gameOver();
     }
@@ -266,21 +253,20 @@ export class GameManager {
   private gameOver() {
     this.gameState = 'GAMEOVER';
     this.options.onGameStateChange(this.gameState);
+    this.audio.playGameOver();
+    this.audio.stopMusic();
   }
 
   private gameWon() {
     this.gameState = 'WON';
     this.options.onGameStateChange(this.gameState);
-  }
-
-  private onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.audio.playWin();
+    this.audio.stopMusic();
   }
 
   public dispose() {
     this.renderer.dispose();
+    this.audio.stopMusic();
     window.removeEventListener('resize', this.onWindowResize.bind(this));
   }
 }
