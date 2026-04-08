@@ -32,13 +32,14 @@ export default function HelixGame() {
     };
   }, []);
 
-  // Handle Input
+  // Handle Input (Mouse, Touch, Keyboard)
   useEffect(() => {
     const manager = managerRef.current;
     if (!manager) return;
 
     let isDragging = false;
     let lastX = 0;
+    const keysPressed = new Set<string>();
 
     const onStart = (x: number) => {
         isDragging = true;
@@ -58,6 +59,30 @@ export default function HelixGame() {
         isDragging = false;
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keysPressed.add(e.key);
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      keysPressed.delete(e.key);
+    };
+
+    // Continuous rotation loop for keyboard
+    let rafId: number;
+    const updateKeyboard = () => {
+      if (gameState === 'PLAYING') {
+        const rotationSpeed = 15; // Speed for keyboard rotation
+        if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
+          manager.rotateTower(rotationSpeed);
+        }
+        if (keysPressed.has('ArrowRight') || keysPressed.has('d') || keysPressed.has('D')) {
+          manager.rotateTower(-rotationSpeed);
+        }
+      }
+      rafId = requestAnimationFrame(updateKeyboard);
+    };
+    rafId = requestAnimationFrame(updateKeyboard);
+
     const mouseDown = (e: MouseEvent) => onStart(e.clientX);
     const mouseMove = (e: MouseEvent) => onMove(e.clientX, e);
     const mouseUp = () => onEnd();
@@ -70,8 +95,10 @@ export default function HelixGame() {
     window.addEventListener('mousemove', mouseMove, { passive: false });
     window.addEventListener('mouseup', mouseUp);
     window.addEventListener('touchstart', touchStart, { passive: false });
-    window.addEventListener('touchmove', touchMove, { passive: false });
+    window.addEventListener('touchMove', touchMove, { passive: false });
     window.addEventListener('touchend', touchEnd);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
       window.removeEventListener('mousedown', mouseDown);
@@ -80,8 +107,11 @@ export default function HelixGame() {
       window.removeEventListener('touchstart', touchStart);
       window.removeEventListener('touchmove', touchMove);
       window.removeEventListener('touchend', touchEnd);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [gameState]);
 
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
@@ -188,7 +218,7 @@ export default function HelixGame() {
         )}
 
         <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4">
-            Drag to Rotate Tower
+            Drag or use Arrows to Rotate
         </div>
       </div>
     </div>
