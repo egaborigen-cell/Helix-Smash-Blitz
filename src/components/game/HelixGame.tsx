@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -8,6 +7,14 @@ import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languag
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 
+declare global {
+  interface Window {
+    YaGames?: {
+      init: () => Promise<any>;
+    };
+  }
+}
+
 export default function HelixGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const managerRef = useRef<GameManager | null>(null);
@@ -16,8 +23,29 @@ export default function HelixGame() {
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
   const [isMuted, setIsMuted] = useState(false);
   const [lang, setLang] = useState<Language>('en');
+  const [ysdk, setYsdk] = useState<any>(null);
 
   const t = translations[lang];
+
+  // Yandex SDK Initialization
+  useEffect(() => {
+    const initYandex = async () => {
+      if (typeof window !== 'undefined' && window.YaGames) {
+        try {
+          const sdk = await window.YaGames.init();
+          setYsdk(sdk);
+          // Signal that the game is ready
+          if (sdk.features && sdk.features.LoadingAPI) {
+            sdk.features.LoadingAPI.ready();
+          }
+          console.log('Yandex SDK initialized');
+        } catch (e) {
+          console.error('Yandex SDK failed to initialize', e);
+        }
+      }
+    };
+    initYandex();
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || managerRef.current) return;
