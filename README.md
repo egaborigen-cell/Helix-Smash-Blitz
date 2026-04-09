@@ -8,6 +8,7 @@ HelixSmash is a hyper-casual 3D game built with Next.js and Three.js. Guide a bo
 - **Difficulty Modes**:
   - **Easy**: Shorter towers (15 levels) with more gaps and fewer danger zones.
   - **Hard**: Tall towers (30 levels) with fewer gaps, more danger zones, and higher score multipliers.
+  - **Insane**: Extreme towers (50 levels) with only a single gap per platform and high danger zone density.
 - **Responsive 3D Graphics**: Powered by Three.js with smooth animations and dynamic lighting.
 - **Mobile Optimized**: Smooth touch controls for rotating the tower on any device.
 - **Score System**: Track your progress as you smash through levels.
@@ -29,7 +30,7 @@ HelixSmash is a hyper-casual 3D game built with Next.js and Three.js. Guide a bo
     ```
 2.  **Open the game**: Navigate to `http://localhost:9002` in your browser.
 3.  **How to Play**:
-    - **Desktop**: Click and drag your mouse horizontally to rotate the tower.
+    - **Desktop**: Click and drag your mouse horizontally or use **Arrow Keys / A-D keys** to rotate the tower.
     - **Mobile**: Swipe left or right to rotate the tower.
     - Avoid the red segments and reach the green finish platform at the bottom!
 

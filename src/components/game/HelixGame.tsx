@@ -1,10 +1,9 @@
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function HelixGame() {
@@ -168,6 +167,22 @@ export default function HelixGame() {
                         <div className="text-left">
                             <div className="font-bold">HARD</div>
                             <div className="text-xs opacity-70">Tall tower, high danger</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button 
+                    onClick={() => setDifficulty('INSANE')}
+                    className={cn(
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        difficulty === 'INSANE' ? "bg-red-500/20 border-red-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <Skull className="w-6 h-6 text-red-500" />
+                        <div className="text-left">
+                            <div className="font-bold">INSANE</div>
+                            <div className="text-xs opacity-70">50 levels, 1 gap, extreme risk</div>
                         </div>
                     </div>
                 </button>

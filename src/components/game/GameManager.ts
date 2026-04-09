@@ -1,9 +1,8 @@
-
 import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
 
 export type GameState = 'START' | 'PLAYING' | 'GAMEOVER' | 'WON';
-export type Difficulty = 'EASY' | 'HARD';
+export type Difficulty = 'EASY' | 'HARD' | 'INSANE';
 
 interface GameOptions {
   onScoreUpdate: (score: number) => void;
@@ -112,9 +111,13 @@ export class GameManager {
       if (this.difficulty === 'EASY') {
           numGaps = i === 0 ? 2 : Math.floor(Math.random() * 2) + 2;
           dangerZonesPerLevel = i > 5 ? 1 : 0;
-      } else {
+      } else if (this.difficulty === 'HARD') {
           numGaps = i === 0 ? 1 : Math.floor(Math.random() * 2) + 1;
           dangerZonesPerLevel = i > 2 ? Math.floor(Math.random() * 2) + 1 : 0;
+      } else {
+          // INSANE
+          numGaps = 1;
+          dangerZonesPerLevel = i > 0 ? Math.floor(Math.random() * 3) + 2 : 0;
       }
 
       while (gapIndices.size < numGaps) {
@@ -161,7 +164,10 @@ export class GameManager {
 
   public startGame(difficulty: Difficulty = 'EASY') {
     this.difficulty = difficulty;
-    this.numLevels = difficulty === 'EASY' ? 15 : 30;
+    if (difficulty === 'EASY') this.numLevels = 15;
+    else if (difficulty === 'HARD') this.numLevels = 30;
+    else this.numLevels = 50; // INSANE
+
     this.gameState = 'PLAYING';
     this.options.onGameStateChange(this.gameState);
     this.score = 0;
@@ -240,7 +246,11 @@ export class GameManager {
       if (!hitSomething) {
           if (this.ball.position.y < currentLevelY - 0.5) {
               this.currentLevelIndex++;
-              this.score += this.difficulty === 'HARD' ? 20 : 10;
+              let points = 10;
+              if (this.difficulty === 'HARD') points = 20;
+              if (this.difficulty === 'INSANE') points = 50;
+              
+              this.score += points;
               this.options.onScoreUpdate(this.score);
               this.audio.playSmash();
 
