@@ -2,7 +2,7 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
-## [1.2.0] - 2024-05-20
+## [1.2.0] - 2026-04-09
 ### Added
 - **Insane Difficulty**: A new extreme mode with 50 levels, single-gap platforms, and high danger density.
 - **Localization**: Full support for English and Russian languages with a UI toggle.
