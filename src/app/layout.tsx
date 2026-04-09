@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import Script from 'next/script';
@@ -7,6 +8,7 @@ const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '600', '800'],
   variable: '--font-poppins',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
