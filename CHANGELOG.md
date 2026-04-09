@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.3.2] - 2026-04-15
+### Fixed
+- **Next/Font Compatibility**: Removed relative `assetPrefix` to resolve the "assetPrefix must start with a leading slash" error triggered by the Google Fonts loader.
+
 ## [1.3.1] - 2026-04-14
 ### Fixed
 - **Turbopack Compatibility**: Removed `--turbopack` from the `dev` script to resolve "turbo.createProject is not supported by the wasm bindings" error in certain environments.
