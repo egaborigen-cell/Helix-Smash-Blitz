@@ -12,6 +12,8 @@ HelixSmash is a hyper-casual 3D game built with Next.js and Three.js. Guide a bo
 - **Responsive 3D Graphics**: Powered by Three.js with smooth animations and dynamic lighting.
 - **Mobile Optimized**: Smooth touch controls for rotating the tower on any device.
 - **Score System**: Track your progress as you smash through levels.
+- **Localization**: Supports English and Russian.
+- **Yandex Games Integrated**: Fully compatible with the Yandex Games SDK.
 
 ## Tech Stack
 
@@ -34,6 +36,28 @@ HelixSmash is a hyper-casual 3D game built with Next.js and Three.js. Guide a bo
     - **Mobile**: Swipe left or right to rotate the tower.
     - Avoid the red segments and reach the green finish platform at the bottom!
 
+## Pushing Updates to GitHub
+
+To push your local changes to your GitHub repository:
+
+1. **Stage all changes**:
+   ```bash
+   git add .
+   ```
+2. **Commit your work**:
+   ```bash
+   git commit -m "Add new features and fixes"
+   ```
+3. **Push to the main branch**:
+   ```bash
+   git push origin main
+   ```
+
 ## Deployment
 
-This project is configured for [Firebase App Hosting](https://firebase.google.com/docs/app-hosting). Use the `apphosting.yaml` for configuration.
+This project is configured for [Firebase App Hosting](https://firebase.google.com/docs/app-hosting). Use the `apphosting.yaml` for configuration. For static export (like for Yandex Games), run:
+
+```bash
+npm run build
+```
+The output will be in the `out` directory.
