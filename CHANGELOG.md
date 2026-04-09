@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.3.1] - 2026-04-14
+### Fixed
+- **Turbopack Compatibility**: Removed `--turbopack` from the `dev` script to resolve "turbo.createProject is not supported by the wasm bindings" error in certain environments.
+
 ## [1.3.0] - 2026-04-13
 ### Added
 - **Yandex Leaderboards**: Integrated leaderboard score submission. Final scores are now sent to the "TopScores" leaderboard automatically.
