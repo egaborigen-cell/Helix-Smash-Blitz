@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.3.3] - 2026-04-16
+### Fixed
+- **SWC Binary Loading**: Added documentation regarding "next/swc" loading errors. These are typically caused by non-standard characters in the project path (e.g., "ƒ"). Moving the project to a standard alphanumeric path resolves this.
+
 ## [1.3.2] - 2026-04-15
 ### Fixed
 - **Next/Font Compatibility**: Removed relative `assetPrefix` to resolve the "assetPrefix must start with a leading slash" error triggered by the Google Fonts loader.
@@ -23,11 +27,11 @@ All notable changes to the HelixSmash project will be documented in this file.
 ### Fixed
 - **Compatibility**: Forced `glob` v10 and `rimraf` v5 via `package.json` overrides to resolve "Glob versions prior to v9 are no longer supported" errors in modern Node.js environments.
 
-## [1.2.1] - 2026-04-10
+## [1.2.1] - 2024-04-10
 ### Fixed
 - **Compatibility**: Removed `patch-package` to resolve "inflight module is not supported" error in modern Node.js environments.
 
-## [1.2.0] - 2026-04-09
+## [1.2.0] - 2024-04-09
 ### Added
 - **Insane Difficulty**: A new extreme mode with 50 levels, single-gap platforms, and high danger density.
 - **Localization**: Full support for English and Russian languages with a UI toggle.
