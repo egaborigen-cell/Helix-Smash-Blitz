@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.2.2] - 2026-04-11
+### Fixed
+- **Compatibility**: Forced `glob` v10 and `rimraf` v5 via `package.json` overrides to resolve "Glob versions prior to v9 are no longer supported" errors in modern Node.js environments.
+
 ## [1.2.1] - 2026-04-10
 ### Fixed
 - **Compatibility**: Removed `patch-package` to resolve "inflight module is not supported" error in modern Node.js environments.
