@@ -1,10 +1,12 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { translations, Language } from '@/app/lib/translations';
 
 export default function HelixGame() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,6 +15,9 @@ export default function HelixGame() {
   const [gameState, setGameState] = useState<GameState>('START');
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
   const [isMuted, setIsMuted] = useState(false);
+  const [lang, setLang] = useState<Language>('en');
+
+  const t = translations[lang];
 
   useEffect(() => {
     if (!containerRef.current || managerRef.current) return;
@@ -114,6 +119,10 @@ export default function HelixGame() {
     }
   };
 
+  const toggleLang = () => {
+    setLang(prev => prev === 'en' ? 'ru' : 'en');
+  };
+
   return (
     <div className="game-container touch-none select-none">
       <div ref={containerRef} className="w-full h-full" />
@@ -124,19 +133,24 @@ export default function HelixGame() {
         {/* HUD */}
         <div className="w-full flex justify-between items-start pointer-events-auto">
             <div className="flex flex-col items-start gap-1">
-                <div className="text-xs font-semibold text-muted-foreground tracking-widest uppercase">Score</div>
+                <div className="text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.score}</div>
                 <div className="text-4xl font-extrabold text-accent drop-shadow-lg">{score}</div>
             </div>
             
-            <Button variant="outline" size="icon" onClick={toggleMute} className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40">
-                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-            </Button>
+            <div className="flex gap-2">
+                <Button variant="outline" size="icon" onClick={toggleLang} className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40">
+                    <Languages className="w-5 h-5" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={toggleMute} className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40">
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </Button>
+            </div>
         </div>
 
         {/* Start Screen */}
         {gameState === 'START' && (
           <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full">
-            <h1 className="text-4xl font-extrabold text-primary tracking-tighter text-center">HELIX SMASH</h1>
+            <h1 className="text-4xl font-extrabold text-primary tracking-tighter text-center">{t.title}</h1>
             
             <div className="flex flex-col gap-3 w-full">
                 <button 
@@ -149,8 +163,8 @@ export default function HelixGame() {
                     <div className="flex items-center gap-3">
                         <Shield className="w-6 h-6 text-primary" />
                         <div className="text-left">
-                            <div className="font-bold">EASY</div>
-                            <div className="text-xs opacity-70">Shorter tower, more gaps</div>
+                            <div className="font-bold">{t.difficulty.EASY.name}</div>
+                            <div className="text-xs opacity-70">{t.difficulty.EASY.desc}</div>
                         </div>
                     </div>
                 </button>
@@ -165,8 +179,8 @@ export default function HelixGame() {
                     <div className="flex items-center gap-3">
                         <Zap className="w-6 h-6 text-orange-500" />
                         <div className="text-left">
-                            <div className="font-bold">HARD</div>
-                            <div className="text-xs opacity-70">Tall tower, high danger</div>
+                            <div className="font-bold">{t.difficulty.HARD.name}</div>
+                            <div className="text-xs opacity-70">{t.difficulty.HARD.desc}</div>
                         </div>
                     </div>
                 </button>
@@ -181,15 +195,15 @@ export default function HelixGame() {
                     <div className="flex items-center gap-3">
                         <Skull className="w-6 h-6 text-red-500" />
                         <div className="text-left">
-                            <div className="font-bold">INSANE</div>
-                            <div className="text-xs opacity-70">50 levels, 1 gap, extreme risk</div>
+                            <div className="font-bold">{t.difficulty.INSANE.name}</div>
+                            <div className="text-xs opacity-70">{t.difficulty.INSANE.desc}</div>
                         </div>
                     </div>
                 </button>
             </div>
 
             <Button size="lg" onClick={() => handleStart()} className="w-full h-16 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground group shadow-xl hover:scale-105 transition-all">
-                <Play className="mr-2 fill-current" /> PLAY
+                <Play className="mr-2 fill-current" /> {t.play}
             </Button>
           </div>
         )}
@@ -200,16 +214,16 @@ export default function HelixGame() {
             <div className="bg-destructive/10 p-4 rounded-full">
                 <RefreshCcw className="w-12 h-12 text-destructive" />
             </div>
-            <h2 className="text-4xl font-extrabold text-foreground">GAME OVER</h2>
+            <h2 className="text-4xl font-extrabold text-foreground">{t.gameOver}</h2>
             <div className="text-center">
-                <p className="text-muted-foreground">Final Score</p>
+                <p className="text-muted-foreground">{t.finalScore}</p>
                 <p className="text-5xl font-black text-accent">{score}</p>
             </div>
             <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
-                TRY AGAIN
+                {t.tryAgain}
             </Button>
             <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground">
-                BACK TO MENU
+                {t.backToMenu}
             </Button>
           </div>
         )}
@@ -220,23 +234,23 @@ export default function HelixGame() {
             <div className="bg-primary/20 p-4 rounded-full">
                 <Trophy className="w-12 h-12 text-primary" />
             </div>
-            <h2 className="text-4xl font-extrabold text-foreground">YOU SMASHED IT!</h2>
-            <p className="text-muted-foreground">Level completed on {difficulty} mode!</p>
+            <h2 className="text-4xl font-extrabold text-foreground">{t.winTitle}</h2>
+            <p className="text-muted-foreground">{t.winSub.replace('{diff}', t.difficulty[difficulty].name)}</p>
             <div className="text-center">
-                <p className="text-muted-foreground">Final Score</p>
+                <p className="text-muted-foreground">{t.finalScore}</p>
                 <p className="text-5xl font-black text-accent">{score}</p>
             </div>
             <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
-                PLAY AGAIN
+                {t.play} {t.tryAgain}
             </Button>
             <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground">
-                BACK TO MENU
+                {t.backToMenu}
             </Button>
           </div>
         )}
 
         <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4">
-            Drag or use Arrows to Rotate
+            {t.instructions}
         </div>
       </div>
     </div>
