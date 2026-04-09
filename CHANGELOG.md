@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.3.0] - 2026-04-13
+### Added
+- **Yandex Leaderboards**: Integrated leaderboard score submission. Final scores are now sent to the "TopScores" leaderboard automatically.
+
 ## [1.2.3] - 2026-04-12
 ### Fixed
 - **Installation**: Added `esbuild` override to resolve command failures in paths with special characters (e.g., non-ASCII characters in folder names).

@@ -47,6 +47,21 @@ export default function HelixGame() {
     initYandex();
   }, []);
 
+  // Leaderboard Integration
+  useEffect(() => {
+    if (ysdk && (gameState === 'GAMEOVER' || gameState === 'WON') && score > 0) {
+      ysdk.getLeaderboards()
+        .then((lb: any) => {
+          // 'TopScores' is the technical name of the leaderboard in Yandex Console
+          lb.setLeaderboardScore('TopScores', score);
+          console.log('Score submitted to leaderboard:', score);
+        })
+        .catch((err: any) => {
+          console.error('Leaderboard submission failed:', err);
+        });
+    }
+  }, [gameState, score, ysdk]);
+
   useEffect(() => {
     if (!containerRef.current || managerRef.current) return;
 
