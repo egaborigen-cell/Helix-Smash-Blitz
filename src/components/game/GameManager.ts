@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
+import { ParticleSystem } from './ParticleSystem';
 
 export type GameState = 'START' | 'PLAYING' | 'GAMEOVER' | 'WON';
 export type Difficulty = 'EASY' | 'HARD' | 'INSANE';
@@ -18,6 +19,7 @@ export class GameManager {
   private ball: THREE.Mesh;
   private clock: THREE.Clock;
   private audio: AudioManager;
+  private particles: ParticleSystem;
 
   private score: number = 0;
   private gameState: GameState = 'START';
@@ -43,6 +45,7 @@ export class GameManager {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xdbe0d1);
     this.audio = new AudioManager();
+    this.particles = new ParticleSystem(this.scene);
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.set(0, 5, 10);
@@ -175,6 +178,7 @@ export class GameManager {
     
     this.createTower();
     this.resetBall();
+    this.particles.clear();
     
     this.towerGroup.rotation.y = 0;
     this.targetTowerRotation = 0;
@@ -197,10 +201,15 @@ export class GameManager {
   }
 
   private animate = () => {
+    const delta = this.clock.getDelta();
     requestAnimationFrame(this.animate);
+    
     if (this.gameState === 'PLAYING') {
       this.updatePhysics();
     }
+    
+    this.particles.update(delta);
+    
     this.towerGroup.rotation.y += (this.targetTowerRotation - this.towerGroup.rotation.y) * 0.1;
     const targetCamY = this.ball.position.y + 3;
     this.camera.position.y += (targetCamY - this.camera.position.y) * 0.05;
@@ -231,11 +240,13 @@ export class GameManager {
 
               if (isInRange) {
                   if (mesh.userData.isDanger) {
+                      this.particles.emit(this.ball.position, 0xff4444, 20, 0.2);
                       this.gameOver();
                   } else {
                       this.ballVelocityY = this.bounceStrength;
                       this.ball.position.y = currentLevelY + 0.36;
                       this.audio.playBounce();
+                      this.particles.emit(this.ball.position, 0xf2cc0d, 8, 0.1);
                       hitSomething = true;
                   }
                   break;
@@ -253,6 +264,9 @@ export class GameManager {
               this.score += points;
               this.options.onScoreUpdate(this.score);
               this.audio.playSmash();
+              
+              // Level pass effect
+              this.particles.emit(this.ball.position, 0xb8f53d, 15, 0.15);
 
               if (this.currentLevelIndex >= this.numLevels) {
                 this.gameWon();
@@ -278,6 +292,7 @@ export class GameManager {
     this.options.onGameStateChange(this.gameState);
     this.audio.playWin();
     this.audio.stopMusic();
+    this.particles.emit(this.ball.position, 0xb8f53d, 50, 0.3);
   }
 
   public dispose() {
