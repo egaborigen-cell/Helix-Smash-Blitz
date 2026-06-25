@@ -3,6 +3,17 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.4.0] - 2024-05-20
+### Added
+- **Skin Selection**: Players can now choose between Toxic, Neon, and Aqua skins in the start menu.
+- **Particle System**: High-performance 3D particle effects for bounces, smashed platforms, and level completions.
+- **New Difficulty Modes**: Added 'PRACTICE' (no danger) and 'BEGINNER' (low risk) modes to improve accessibility for new players.
+- **GitHub Workflow**: Added comprehensive instructions to README for staging, committing, and pushing code.
+
+### Improved
+- **Yandex SDK Robustness**: Implemented a retry mechanism for SDK initialization and added player authorization support.
+- **Visual Feedback**: Platform colors and particle effects now sync with the selected ball skin.
+
 ## [1.3.4] - 2026-04-17
 ### Fixed
 - **Yandex 404 Resolution**: Updated `README.md` with critical instructions for correct ZIP archiving (zipping contents vs zipping the folder).
