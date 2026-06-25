@@ -13,7 +13,7 @@ HelixSmash is a hyper-casual 3D game built with Next.js and Three.js. Guide a bo
 - **Mobile Optimized**: Smooth touch controls for rotating the tower on any device.
 - **Score System**: Track your progress as you smash through levels.
 - **Localization**: Supports English and Russian.
-- **Yandex Games Integrated**: Fully compatible with the Yandex Games SDK and Leaderboards.
+- **Yandex Games Integrated**: Fully compatible with the Yandex Games SDK, Fullscreen Ads, and Leaderboards.
 
 ## Tech Stack
 
@@ -55,7 +55,7 @@ To push your local changes to your GitHub repository:
 
 ## Deployment to Yandex Games
 
-To resolve 404 errors on Yandex Games, follow these steps exactly:
+To resolve 404 errors and ensure correct SDK integration on Yandex Games:
 
 1. **Build the project**:
    ```bash
@@ -67,10 +67,13 @@ To resolve 404 errors on Yandex Games, follow these steps exactly:
    - Select **all files and folders inside** (including `index.html`, `_next/`, etc.).
    - Create a ZIP archive from these selected items.
    - **DO NOT** zip the `out/` folder itself. The `index.html` must be at the top level of the ZIP.
-4. **Upload**: Upload this ZIP to the Yandex Games Console.
+4. **Leaderboard Setup**:
+   - In the Yandex Games Console, go to the **Leaderboards** section.
+   - Create a new leaderboard with the **Technical Name**: `TopScores`.
+   - Ensure the name matches exactly, as the code uses this identifier to submit scores.
 
 ## Troubleshooting
 
 - **404 Errors**: Ensure you zipped the *contents* of the `out` folder, not the folder itself.
-- **Font Errors**: If fonts fail to load, ensure `trailingSlash: true` is set in `next.config.ts`.
+- **Leaderboard Not Working**: Double-check the technical name in the Yandex Console matches `TopScores`.
 - **SWC Errors**: If the build fails locally, ensure your project path contains only standard alphanumeric characters (no special symbols like `ƒ`).

@@ -24,23 +24,41 @@ export default function HelixGame() {
   const [isMuted, setIsMuted] = useState(false);
   const [lang, setLang] = useState<Language>('en');
   const [ysdk, setYsdk] = useState<any>(null);
+  const [player, setPlayer] = useState<any>(null);
 
   const t = translations[lang];
 
-  // Yandex SDK Initialization
+  // Robust Yandex SDK Initialization
   useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 10;
+
     const initYandex = async () => {
-      if (typeof window !== 'undefined' && window.YaGames) {
-        try {
-          const sdk = await window.YaGames.init();
-          setYsdk(sdk);
-          // Signal that the game is ready
-          if (sdk.features && sdk.features.LoadingAPI) {
-            sdk.features.LoadingAPI.ready();
+      if (typeof window !== 'undefined') {
+        if (window.YaGames) {
+          try {
+            const sdk = await window.YaGames.init();
+            setYsdk(sdk);
+            
+            // Initialize Player for better leaderboard tracking
+            try {
+                const p = await sdk.getPlayer({ scopes: false });
+                setPlayer(p);
+            } catch (playerError) {
+                console.warn('Player initialization failed or declined:', playerError);
+            }
+
+            // Signal that the game is ready
+            if (sdk.features && sdk.features.LoadingAPI) {
+              sdk.features.LoadingAPI.ready();
+            }
+            console.log('Yandex SDK initialized successfully');
+          } catch (e) {
+            console.error('Yandex SDK failed to initialize', e);
           }
-          console.log('Yandex SDK initialized');
-        } catch (e) {
-          console.error('Yandex SDK failed to initialize', e);
+        } else if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(initYandex, 500); // Retry after 500ms
         }
       }
     };
@@ -53,6 +71,7 @@ export default function HelixGame() {
       ysdk.getLeaderboards()
         .then((lb: any) => {
           // 'TopScores' is the technical name of the leaderboard in Yandex Console
+          // Ensure this name matches exactly what you created in the Yandex Games Console
           lb.setLeaderboardScore('TopScores', score);
           console.log('Score submitted to leaderboard:', score);
         })
@@ -152,6 +171,16 @@ export default function HelixGame() {
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
         managerRef.current.startGame(diff);
+        
+        // Show interstitial ad on game start (if available)
+        if (ysdk && ysdk.adv) {
+            ysdk.adv.showFullscreenAdv({
+                callbacks: {
+                    onOpen: () => managerRef.current?.toggleMute(), // Mute during ad
+                    onClose: () => managerRef.current?.toggleMute() // Unmute after ad
+                }
+            });
+        }
     }
   };
 
