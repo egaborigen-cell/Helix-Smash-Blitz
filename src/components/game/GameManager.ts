@@ -4,7 +4,7 @@ import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
 
 export type GameState = 'START' | 'PLAYING' | 'GAMEOVER' | 'WON';
-export type Difficulty = 'EASY' | 'HARD' | 'INSANE';
+export type Difficulty = 'PRACTICE' | 'BEGINNER' | 'EASY' | 'HARD' | 'INSANE';
 
 interface GameOptions {
   onScoreUpdate: (score: number) => void;
@@ -113,7 +113,13 @@ export class GameManager {
       let numGaps = 2;
       let dangerZonesPerLevel = 1;
 
-      if (this.difficulty === 'EASY') {
+      if (this.difficulty === 'PRACTICE') {
+          numGaps = 4;
+          dangerZonesPerLevel = 0;
+      } else if (this.difficulty === 'BEGINNER') {
+          numGaps = 3;
+          dangerZonesPerLevel = i > 7 ? 1 : 0;
+      } else if (this.difficulty === 'EASY') {
           numGaps = i === 0 ? 2 : Math.floor(Math.random() * 2) + 2;
           dangerZonesPerLevel = i > 5 ? 1 : 0;
       } else if (this.difficulty === 'HARD') {
@@ -174,7 +180,9 @@ export class GameManager {
       (this.ball.material as THREE.MeshStandardMaterial).color.setHex(ballColor);
     }
 
-    if (difficulty === 'EASY') this.numLevels = 15;
+    if (difficulty === 'PRACTICE') this.numLevels = 5;
+    else if (difficulty === 'BEGINNER') this.numLevels = 10;
+    else if (difficulty === 'EASY') this.numLevels = 15;
     else if (difficulty === 'HARD') this.numLevels = 30;
     else this.numLevels = 50; // INSANE
 
@@ -265,6 +273,8 @@ export class GameManager {
           if (this.ball.position.y < currentLevelY - 0.5) {
               this.currentLevelIndex++;
               let points = 10;
+              if (this.difficulty === 'PRACTICE') points = 5;
+              if (this.difficulty === 'BEGINNER') points = 8;
               if (this.difficulty === 'HARD') points = 20;
               if (this.difficulty === 'INSANE') points = 50;
               

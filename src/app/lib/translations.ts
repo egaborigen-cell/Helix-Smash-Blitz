@@ -20,6 +20,14 @@ export const translations = {
       aqua: "Aqua"
     },
     difficulty: {
+      PRACTICE: {
+        name: "PRACTICE",
+        desc: "5 levels, no danger"
+      },
+      BEGINNER: {
+        name: "BEGINNER",
+        desc: "10 levels, minimal risk"
+      },
       EASY: {
         name: "EASY",
         desc: "Shorter tower, more gaps"
@@ -52,6 +60,14 @@ export const translations = {
       aqua: "Аква"
     },
     difficulty: {
+      PRACTICE: {
+        name: "ПРАКТИКА",
+        desc: "5 уровней, без риска"
+      },
+      BEGINNER: {
+        name: "НОВИЧОК",
+        desc: "10 уровней, минимум риска"
+      },
       EASY: {
         name: "ЛЕГКО",
         desc: "Короткая башня, много просветов"

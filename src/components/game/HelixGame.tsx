@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 
@@ -120,8 +120,13 @@ export default function HelixGame() {
     };
 
     const onEnd = () => { isDragging = false; };
-    const handleKeyDown = (e: KeyboardEvent) => keysPressed.add(e.key);
-    const handleKeyUp = (e: KeyboardEvent) => keysPressed.delete(e.key);
+    const handleKeyDown = (e: KeyboardEvent) => handleKey(e.key, true);
+    const handleKeyUp = (e: KeyboardEvent) => handleKey(e.key, false);
+
+    const handleKey = (key: string, isDown: boolean) => {
+      if (isDown) keysPressed.add(key);
+      else keysPressed.delete(key);
+    };
 
     let rafId: number;
     const updateKeyboard = () => {
@@ -252,6 +257,38 @@ export default function HelixGame() {
 
             {/* Difficulty Selection */}
             <div className="flex flex-col gap-3 w-full">
+                <button 
+                    onClick={() => setDifficulty('PRACTICE')}
+                    className={cn(
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        difficulty === 'PRACTICE' ? "bg-green-500/20 border-green-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <Baby className="w-6 h-6 text-green-500" />
+                        <div className="text-left">
+                            <div className="font-bold">{t.difficulty.PRACTICE.name}</div>
+                            <div className="text-xs opacity-70">{t.difficulty.PRACTICE.desc}</div>
+                        </div>
+                    </div>
+                </button>
+
+                <button 
+                    onClick={() => setDifficulty('BEGINNER')}
+                    className={cn(
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        difficulty === 'BEGINNER' ? "bg-cyan-500/20 border-cyan-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
+                    )}
+                >
+                    <div className="flex items-center gap-3">
+                        <Smile className="w-6 h-6 text-cyan-500" />
+                        <div className="text-left">
+                            <div className="font-bold">{t.difficulty.BEGINNER.name}</div>
+                            <div className="text-xs opacity-70">{t.difficulty.BEGINNER.desc}</div>
+                        </div>
+                    </div>
+                </button>
+
                 <button 
                     onClick={() => setDifficulty('EASY')}
                     className={cn(
