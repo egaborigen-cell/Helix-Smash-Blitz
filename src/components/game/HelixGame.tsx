@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 
@@ -15,12 +16,19 @@ declare global {
   }
 }
 
+const SKINS = [
+    { id: 'toxic', color: 0xb8f53d, hex: '#b8f53d' },
+    { id: 'neon', color: 0xff00ff, hex: '#ff00ff' },
+    { id: 'aqua', color: 0x00ffff, hex: '#00ffff' }
+];
+
 export default function HelixGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const managerRef = useRef<GameManager | null>(null);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>('START');
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
+  const [selectedSkin, setSelectedSkin] = useState(SKINS[0]);
   const [isMuted, setIsMuted] = useState(false);
   const [lang, setLang] = useState<Language>('en');
   const [ysdk, setYsdk] = useState<any>(null);
@@ -28,7 +36,6 @@ export default function HelixGame() {
 
   const t = translations[lang];
 
-  // Robust Yandex SDK Initialization
   useEffect(() => {
     let retryCount = 0;
     const maxRetries = 10;
@@ -40,7 +47,6 @@ export default function HelixGame() {
             const sdk = await window.YaGames.init();
             setYsdk(sdk);
             
-            // Initialize Player for better leaderboard tracking
             try {
                 const p = await sdk.getPlayer({ scopes: false });
                 setPlayer(p);
@@ -48,32 +54,26 @@ export default function HelixGame() {
                 console.warn('Player initialization failed or declined:', playerError);
             }
 
-            // Signal that the game is ready
             if (sdk.features && sdk.features.LoadingAPI) {
               sdk.features.LoadingAPI.ready();
             }
-            console.log('Yandex SDK initialized successfully');
           } catch (e) {
             console.error('Yandex SDK failed to initialize', e);
           }
         } else if (retryCount < maxRetries) {
           retryCount++;
-          setTimeout(initYandex, 500); // Retry after 500ms
+          setTimeout(initYandex, 500);
         }
       }
     };
     initYandex();
   }, []);
 
-  // Leaderboard Integration
   useEffect(() => {
     if (ysdk && (gameState === 'GAMEOVER' || gameState === 'WON') && score > 0) {
       ysdk.getLeaderboards()
         .then((lb: any) => {
-          // 'TopScores' is the technical name of the leaderboard in Yandex Console
-          // Ensure this name matches exactly what you created in the Yandex Games Console
           lb.setLeaderboardScore('TopScores', score);
-          console.log('Score submitted to leaderboard:', score);
         })
         .catch((err: any) => {
           console.error('Leaderboard submission failed:', err);
@@ -170,14 +170,13 @@ export default function HelixGame() {
 
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
-        managerRef.current.startGame(diff);
+        managerRef.current.startGame(diff, selectedSkin.color);
         
-        // Show interstitial ad on game start (if available)
         if (ysdk && ysdk.adv) {
             ysdk.adv.showFullscreenAdv({
                 callbacks: {
-                    onOpen: () => managerRef.current?.toggleMute(), // Mute during ad
-                    onClose: () => managerRef.current?.toggleMute() // Unmute after ad
+                    onOpen: () => managerRef.current?.toggleMute(),
+                    onClose: () => managerRef.current?.toggleMute()
                 }
             });
         }
@@ -221,9 +220,37 @@ export default function HelixGame() {
 
         {/* Start Screen */}
         {gameState === 'START' && (
-          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full">
+          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full overflow-y-auto max-h-[85vh]">
             <h1 className="text-4xl font-extrabold text-primary tracking-tighter text-center">{t.title}</h1>
             
+            {/* Skin Selection */}
+            <div className="w-full flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground tracking-widest uppercase mb-1">
+                    <Palette className="w-4 h-4" /> {t.selectSkin}
+                </div>
+                <div className="flex justify-between gap-3">
+                    {SKINS.map((skin) => (
+                        <button
+                            key={skin.id}
+                            onClick={() => setSelectedSkin(skin)}
+                            className={cn(
+                                "flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all",
+                                selectedSkin.id === skin.id ? "bg-white/20 border-white" : "bg-white/5 border-transparent opacity-60"
+                            )}
+                        >
+                            <div 
+                                className="w-8 h-8 rounded-full shadow-lg border border-white/20" 
+                                style={{ backgroundColor: skin.hex }}
+                            />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                                {t.skins[skin.id as keyof typeof t.skins]}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Difficulty Selection */}
             <div className="flex flex-col gap-3 w-full">
                 <button 
                     onClick={() => setDifficulty('EASY')}

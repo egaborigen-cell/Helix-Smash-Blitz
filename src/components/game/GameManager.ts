@@ -1,3 +1,4 @@
+
 import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
@@ -25,6 +26,7 @@ export class GameManager {
   private gameState: GameState = 'START';
   private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
+  private ballColor: number = 0xb8f53d;
 
   // Ball physics
   private ballVelocityY: number = 0;
@@ -70,7 +72,7 @@ export class GameManager {
     this.scene.add(directionalLight);
 
     const ballGeo = new THREE.SphereGeometry(0.3, 32, 32);
-    const ballMat = new THREE.MeshStandardMaterial({ color: 0xb8f53d, roughness: 0.3 });
+    const ballMat = new THREE.MeshStandardMaterial({ color: this.ballColor, roughness: 0.3 });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
     this.ball.castShadow = true;
     this.ball.position.set(0, 2, 2);
@@ -159,14 +161,19 @@ export class GameManager {
     }
 
     const finishGeo = new THREE.CylinderGeometry(this.platformRadius + 1, this.platformRadius + 1, 0.5, 32);
-    const finishMat = new THREE.MeshStandardMaterial({ color: 0xb8f53d });
+    const finishMat = new THREE.MeshStandardMaterial({ color: this.ballColor });
     const finish = new THREE.Mesh(finishGeo, finishMat);
     finish.position.y = -this.numLevels * this.platformGap;
     this.towerGroup.add(finish);
   }
 
-  public startGame(difficulty: Difficulty = 'EASY') {
+  public startGame(difficulty: Difficulty = 'EASY', ballColor?: number) {
     this.difficulty = difficulty;
+    if (ballColor !== undefined) {
+      this.ballColor = ballColor;
+      (this.ball.material as THREE.MeshStandardMaterial).color.setHex(ballColor);
+    }
+
     if (difficulty === 'EASY') this.numLevels = 15;
     else if (difficulty === 'HARD') this.numLevels = 30;
     else this.numLevels = 50; // INSANE
@@ -266,7 +273,7 @@ export class GameManager {
               this.audio.playSmash();
               
               // Level pass effect
-              this.particles.emit(this.ball.position, 0xb8f53d, 15, 0.15);
+              this.particles.emit(this.ball.position, this.ballColor, 15, 0.15);
 
               if (this.currentLevelIndex >= this.numLevels) {
                 this.gameWon();
@@ -292,7 +299,7 @@ export class GameManager {
     this.options.onGameStateChange(this.gameState);
     this.audio.playWin();
     this.audio.stopMusic();
-    this.particles.emit(this.ball.position, 0xb8f53d, 50, 0.3);
+    this.particles.emit(this.ball.position, this.ballColor, 50, 0.3);
   }
 
   public dispose() {

@@ -13,6 +13,12 @@ export const translations = {
     winSub: "Level completed on {diff} mode!",
     finalScore: "Final Score",
     instructions: "Drag or use Arrows to Rotate",
+    selectSkin: "SELECT SKIN",
+    skins: {
+      toxic: "Toxic",
+      neon: "Neon",
+      aqua: "Aqua"
+    },
     difficulty: {
       EASY: {
         name: "EASY",
@@ -39,6 +45,12 @@ export const translations = {
     winSub: "Пройдено на сложности: {diff}",
     finalScore: "Итоговый счёт",
     instructions: "Тяни или жми стрелки",
+    selectSkin: "ВЫБЕРИ СКИН",
+    skins: {
+      toxic: "Токсик",
+      neon: "Неон",
+      aqua: "Аква"
+    },
     difficulty: {
       EASY: {
         name: "ЛЕГКО",
