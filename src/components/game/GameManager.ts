@@ -307,14 +307,15 @@ export class GameManager {
   }
 
   private gameWon() {
-    this.gameState = 'WON';
-    this.options.onGameStateChange(this.gameState);
+    if (this.gameState !== 'PLAYING') return;
+
+    this.gameState = 'WON'; // Internally stop physics
     this.audio.playWin();
     this.audio.stopMusic();
     
     // Victory Fountain: Multiple bursts for high impact
     const victoryPos = this.ball.position.clone();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
         setTimeout(() => {
             if (this.gameState === 'WON') {
                 this.particles.emit(victoryPos, 0x22c55e, 40, 0.5);
@@ -322,6 +323,13 @@ export class GameManager {
             }
         }, i * 250);
     }
+
+    // Delay the external game state change to allow animations to play
+    setTimeout(() => {
+        if (this.gameState === 'WON') {
+            this.options.onGameStateChange('WON');
+        }
+    }, 2500);
   }
 
   public dispose() {
