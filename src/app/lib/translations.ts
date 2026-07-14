@@ -14,6 +14,11 @@ export const translations = {
     finalScore: "Final Score",
     instructions: "Drag or use Arrows to Rotate",
     selectSkin: "SELECT SKIN",
+    leaderboard: "Leaderboard",
+    loading: "Loading...",
+    noData: "No scores yet",
+    rank: "Rank",
+    player: "Player",
     skins: {
       toxic: "Toxic",
       neon: "Neon",
@@ -54,6 +59,11 @@ export const translations = {
     finalScore: "Итоговый счёт",
     instructions: "Тяни или жми стрелки",
     selectSkin: "ВЫБЕРИ СКИН",
+    leaderboard: "Таблица лидеров",
+    loading: "Загрузка...",
+    noData: "Пока нет результатов",
+    rank: "Место",
+    player: "Игрок",
     skins: {
       toxic: "Токсик",
       neon: "Неон",
