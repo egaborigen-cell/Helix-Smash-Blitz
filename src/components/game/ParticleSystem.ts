@@ -15,27 +15,34 @@ export class ParticleSystem {
   constructor(scene: THREE.Scene) {
     this.group = new THREE.Group();
     scene.add(this.group);
-    this.geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    this.geometry = new THREE.BoxGeometry(0.15, 0.15, 0.15);
   }
 
-  public emit(position: THREE.Vector3, color: number, count: number = 10, speed: number = 0.1) {
+  public emit(position: THREE.Vector3, color: number, count: number = 15, speed: number = 0.2) {
     for (let i = 0; i < count; i++) {
       const material = new THREE.MeshStandardMaterial({
         color: color,
         transparent: true,
         opacity: 1,
+        emissive: color,
+        emissiveIntensity: 0.5,
       });
       const mesh = new THREE.Mesh(this.geometry, material);
       
       mesh.position.copy(position);
       
+      // Randomize velocity for a more natural explosion
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = Math.random() * speed;
+
       const velocity = new THREE.Vector3(
-        (Math.random() - 0.5) * speed,
-        (Math.random() - 0.5) * speed + 0.05,
-        (Math.random() - 0.5) * speed
+        r * Math.sin(phi) * Math.cos(theta),
+        r * Math.abs(Math.sin(phi) * Math.sin(theta)) + speed * 0.5, // Bias upwards
+        r * Math.cos(phi)
       );
 
-      const life = 0.5 + Math.random() * 0.5;
+      const life = 0.6 + Math.random() * 0.6;
       
       this.particles.push({
         mesh,
@@ -61,13 +68,14 @@ export class ParticleSystem {
       }
 
       p.mesh.position.add(p.velocity);
-      p.velocity.y -= 0.005; // Gravity on particles
+      p.velocity.y -= 0.01; // Gravity on particles
+      p.velocity.multiplyScalar(0.98); // Air resistance
       
       const opacity = p.life / p.maxLife;
       (p.mesh.material as THREE.MeshStandardMaterial).opacity = opacity;
       p.mesh.scale.setScalar(opacity);
-      p.mesh.rotation.x += 0.1;
-      p.mesh.rotation.y += 0.1;
+      p.mesh.rotation.x += 0.2;
+      p.mesh.rotation.y += 0.2;
     }
   }
 

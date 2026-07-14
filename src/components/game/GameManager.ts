@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
@@ -168,7 +167,7 @@ export class GameManager {
     }
 
     const finishGeo = new THREE.CylinderGeometry(this.platformRadius + 1, this.platformRadius + 1, 0.5, 32);
-    const finishMat = new THREE.MeshStandardMaterial({ color: this.ballColor });
+    const finishMat = new THREE.MeshStandardMaterial({ color: 0x22c55e }); // Bright green finish
     const finish = new THREE.Mesh(finishGeo, finishMat);
     finish.position.y = -this.numLevels * this.platformGap;
     this.towerGroup.add(finish);
@@ -248,6 +247,8 @@ export class GameManager {
       if (levelGroup && levelGroup.children) {
           for (const segment of levelGroup.children) {
               const mesh = segment as THREE.Mesh;
+              if (mesh.geometry.type !== 'CylinderGeometry' || mesh.userData.level === undefined) continue;
+
               const params = (mesh.geometry as any).parameters;
               const start = params.thetaStart;
               const length = params.thetaLength;
@@ -256,13 +257,13 @@ export class GameManager {
 
               if (isInRange) {
                   if (mesh.userData.isDanger) {
-                      this.particles.emit(this.ball.position, 0xff4444, 20, 0.2);
+                      this.particles.emit(this.ball.position, 0xff4444, 30, 0.4);
                       this.gameOver();
                   } else {
                       this.ballVelocityY = this.bounceStrength;
                       this.ball.position.y = currentLevelY + 0.36;
                       this.audio.playBounce();
-                      this.particles.emit(this.ball.position, 0xf2cc0d, 8, 0.1);
+                      this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
                       hitSomething = true;
                   }
                   break;
@@ -283,8 +284,8 @@ export class GameManager {
               this.options.onScoreUpdate(this.score);
               this.audio.playSmash();
               
-              // Level pass effect
-              this.particles.emit(this.ball.position, this.ballColor, 15, 0.15);
+              // Enhanced Level pass effect
+              this.particles.emit(this.ball.position, this.ballColor, 25, 0.3);
 
               if (this.currentLevelIndex >= this.numLevels) {
                 this.gameWon();
@@ -310,7 +311,17 @@ export class GameManager {
     this.options.onGameStateChange(this.gameState);
     this.audio.playWin();
     this.audio.stopMusic();
-    this.particles.emit(this.ball.position, this.ballColor, 50, 0.3);
+    
+    // Victory Fountain: Multiple bursts for high impact
+    const victoryPos = this.ball.position.clone();
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            if (this.gameState === 'WON') {
+                this.particles.emit(victoryPos, 0x22c55e, 40, 0.5);
+                this.particles.emit(victoryPos, this.ballColor, 20, 0.4);
+            }
+        }, i * 250);
+    }
   }
 
   public dispose() {
