@@ -45,7 +45,8 @@ export class GameManager {
   constructor(options: GameOptions) {
     this.options = options;
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xdbe0d1);
+    // Set background to null to allow DOM background to show through
+    this.scene.background = null;
     this.audio = new AudioManager();
     this.particles = new ParticleSystem(this.scene);
     
@@ -57,6 +58,8 @@ export class GameManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
+    // Ensure clear alpha is 0
+    this.renderer.setClearColor(0x000000, 0);
     options.container.appendChild(this.renderer.domElement);
 
     this.clock = new THREE.Clock();
