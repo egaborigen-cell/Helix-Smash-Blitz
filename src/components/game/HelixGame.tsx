@@ -2,13 +2,11 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { GameManager, GameState, Difficulty } from './GameManager';
 import { Button } from '@/components/ui/button';
 import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
-import placeholderData from '@/app/lib/placeholder-images.json';
 
 declare global {
   interface Window {
@@ -37,7 +35,6 @@ export default function HelixGame() {
   const [player, setPlayer] = useState<any>(null);
 
   const t = translations[lang];
-  const bgImage = placeholderData.placeholderImages.find(img => img.id === 'game-background');
 
   useEffect(() => {
     let retryCount = 0;
@@ -204,20 +201,6 @@ export default function HelixGame() {
 
   return (
     <div className="game-container touch-none select-none relative overflow-hidden bg-background">
-      {/* Background Image Layer */}
-      {bgImage && (
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <Image
-            src={bgImage.imageUrl}
-            alt="Background"
-            fill
-            className="object-cover"
-            data-ai-hint={bgImage.imageHint}
-            priority
-          />
-        </div>
-      )}
-
       {/* 3D Game Layer */}
       <div ref={containerRef} className="w-full h-full relative z-10" />
       

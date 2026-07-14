@@ -1,11 +1,4 @@
 
 {
-  "placeholderImages": [
-    {
-      "id": "game-background",
-      "description": "Subtle textured abstract background for the game scene",
-      "imageUrl": "https://picsum.photos/seed/helix-bg/1920/1080",
-      "imageHint": "abstract gradient"
-    }
-  ]
+  "placeholderImages": []
 }
