@@ -44,6 +44,7 @@
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(180deg, #bae6fd 0%, #1e3a8a 100%);
 }
 
 .ui-overlay {
