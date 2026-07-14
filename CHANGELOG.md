@@ -3,6 +3,11 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.5.0] - 2024-05-21
+### Improved
+- **User Experience**: The game now starts immediately upon selecting a difficulty mode, removing a redundant step from the start screen.
+- **UI Feedback**: Added visual play indicators to difficulty buttons to signal they are interactive start triggers.
+
 ## [1.4.0] - 2024-05-20
 ### Added
 - **Skin Selection**: Players can now choose between Toxic, Neon, and Aqua skins in the start menu.

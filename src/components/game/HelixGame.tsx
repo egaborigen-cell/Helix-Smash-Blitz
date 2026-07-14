@@ -255,12 +255,15 @@ export default function HelixGame() {
                 </div>
             </div>
 
-            {/* Difficulty Selection */}
+            {/* Difficulty Selection - Now starts the game immediately */}
             <div className="flex flex-col gap-3 w-full">
                 <button 
-                    onClick={() => setDifficulty('PRACTICE')}
+                    onClick={() => {
+                        setDifficulty('PRACTICE');
+                        handleStart('PRACTICE');
+                    }}
                     className={cn(
-                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group",
                         difficulty === 'PRACTICE' ? "bg-green-500/20 border-green-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
                     )}
                 >
@@ -271,12 +274,16 @@ export default function HelixGame() {
                             <div className="text-xs opacity-70">{t.difficulty.PRACTICE.desc}</div>
                         </div>
                     </div>
+                    <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-green-500" />
                 </button>
 
                 <button 
-                    onClick={() => setDifficulty('BEGINNER')}
+                    onClick={() => {
+                        setDifficulty('BEGINNER');
+                        handleStart('BEGINNER');
+                    }}
                     className={cn(
-                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group",
                         difficulty === 'BEGINNER' ? "bg-cyan-500/20 border-cyan-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
                     )}
                 >
@@ -287,12 +294,16 @@ export default function HelixGame() {
                             <div className="text-xs opacity-70">{t.difficulty.BEGINNER.desc}</div>
                         </div>
                     </div>
+                    <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-cyan-500" />
                 </button>
 
                 <button 
-                    onClick={() => setDifficulty('EASY')}
+                    onClick={() => {
+                        setDifficulty('EASY');
+                        handleStart('EASY');
+                    }}
                     className={cn(
-                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group",
                         difficulty === 'EASY' ? "bg-primary/20 border-primary shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
                     )}
                 >
@@ -303,12 +314,16 @@ export default function HelixGame() {
                             <div className="text-xs opacity-70">{t.difficulty.EASY.desc}</div>
                         </div>
                     </div>
+                    <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
                 </button>
 
                 <button 
-                    onClick={() => setDifficulty('HARD')}
+                    onClick={() => {
+                        setDifficulty('HARD');
+                        handleStart('HARD');
+                    }}
                     className={cn(
-                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group",
                         difficulty === 'HARD' ? "bg-orange-500/20 border-orange-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
                     )}
                 >
@@ -319,12 +334,16 @@ export default function HelixGame() {
                             <div className="text-xs opacity-70">{t.difficulty.HARD.desc}</div>
                         </div>
                     </div>
+                    <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-orange-500" />
                 </button>
 
                 <button 
-                    onClick={() => setDifficulty('INSANE')}
+                    onClick={() => {
+                        setDifficulty('INSANE');
+                        handleStart('INSANE');
+                    }}
                     className={cn(
-                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                        "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group",
                         difficulty === 'INSANE' ? "bg-red-500/20 border-red-500 shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100"
                     )}
                 >
@@ -335,12 +354,9 @@ export default function HelixGame() {
                             <div className="text-xs opacity-70">{t.difficulty.INSANE.desc}</div>
                         </div>
                     </div>
+                    <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-red-500" />
                 </button>
             </div>
-
-            <Button size="lg" onClick={() => handleStart()} className="w-full h-16 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground group shadow-xl hover:scale-105 transition-all">
-                <Play className="mr-2 fill-current" /> {t.play}
-            </Button>
           </div>
         )}
 
@@ -385,7 +401,7 @@ export default function HelixGame() {
           </div>
         )}
 
-        <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4">
+        <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4 text-center">
             {t.instructions}
         </div>
       </div>
