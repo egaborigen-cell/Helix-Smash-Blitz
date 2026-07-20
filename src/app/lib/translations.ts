@@ -22,7 +22,12 @@ export const translations = {
     skins: {
       toxic: "Toxic",
       neon: "Neon",
-      aqua: "Aqua"
+      aqua: "Aqua",
+      traits: {
+        toxic: "Balanced",
+        neon: "Bouncy & Light",
+        aqua: "Fast & Heavy"
+      }
     },
     difficulty: {
       PRACTICE: {
@@ -67,7 +72,12 @@ export const translations = {
     skins: {
       toxic: "Токсик",
       neon: "Неон",
-      aqua: "Аква"
+      aqua: "Аква",
+      traits: {
+        toxic: "Баланс",
+        neon: "Прыгучий",
+        aqua: "Тяжелый"
+      }
     },
     difficulty: {
       PRACTICE: {

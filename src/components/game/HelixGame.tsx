@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { GameManager, GameState, Difficulty } from './GameManager';
+import { GameManager, GameState, Difficulty, SkinConfig } from './GameManager';
 import { Button } from '@/components/ui/button';
 import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,10 +23,10 @@ declare global {
   }
 }
 
-const SKINS = [
-    { id: 'toxic', color: 0xb8f53d, hex: '#b8f53d' },
-    { id: 'neon', color: 0xff00ff, hex: '#ff00ff' },
-    { id: 'aqua', color: 0x00ffff, hex: '#00ffff' }
+const SKINS: SkinConfig[] = [
+    { id: 'toxic', color: 0xb8f53d, hex: '#b8f53d', gravity: -0.015, bounceStrength: 0.3, scale: 1.0 },
+    { id: 'neon', color: 0xff00ff, hex: '#ff00ff', gravity: -0.012, bounceStrength: 0.35, scale: 0.8 },
+    { id: 'aqua', color: 0x00ffff, hex: '#00ffff', gravity: -0.018, bounceStrength: 0.28, scale: 1.2 }
 ];
 
 interface LeaderboardEntry {
@@ -222,7 +222,7 @@ export default function HelixGame() {
 
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
-        managerRef.current.startGame(diff, selectedSkin.color);
+        managerRef.current.startGame(diff, selectedSkin);
         
         if (ysdk && ysdk.adv) {
             ysdk.adv.showFullscreenAdv({
@@ -329,13 +329,13 @@ export default function HelixGame() {
                 <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground tracking-widest uppercase mb-1">
                     <Palette className="w-4 h-4" /> {t.selectSkin}
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="grid grid-cols-3 gap-3">
                     {SKINS.map((skin) => (
                         <button
                             key={skin.id}
                             onClick={() => setSelectedSkin(skin)}
                             className={cn(
-                                "flex-1 flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all",
+                                "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all",
                                 selectedSkin.id === skin.id ? "bg-white/20 border-white" : "bg-white/5 border-transparent opacity-60"
                             )}
                         >
@@ -343,9 +343,14 @@ export default function HelixGame() {
                                 className="w-8 h-8 rounded-full shadow-lg border border-white/20" 
                                 style={{ backgroundColor: skin.hex }}
                             />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">
-                                {t.skins[skin.id as keyof typeof t.skins]}
-                            </span>
+                            <div className="flex flex-col items-center">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-center">
+                                    {t.skins[skin.id as keyof typeof t.skins]}
+                                </span>
+                                <span className="text-[8px] opacity-70 font-medium text-center leading-tight">
+                                    {t.skins.traits[skin.id as keyof typeof t.skins.traits]}
+                                </span>
+                            </div>
                         </button>
                     ))}
                 </div>

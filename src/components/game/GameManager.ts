@@ -1,9 +1,18 @@
+
 import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
 
 export type GameState = 'START' | 'PLAYING' | 'GAMEOVER' | 'WON';
 export type Difficulty = 'PRACTICE' | 'BEGINNER' | 'EASY' | 'HARD' | 'INSANE';
+
+export interface SkinConfig {
+  id: string;
+  color: number;
+  gravity: number;
+  bounceStrength: number;
+  scale: number;
+}
 
 interface GameOptions {
   onScoreUpdate: (score: number) => void;
@@ -25,12 +34,15 @@ export class GameManager {
   private gameState: GameState = 'START';
   private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
+  
+  // Current Skin Settings
   private ballColor: number = 0xb8f53d;
-
-  // Ball physics
-  private ballVelocityY: number = 0;
   private gravity: number = -0.015;
   private bounceStrength: number = 0.3;
+  private ballScale: number = 1.0;
+
+  // Ball physics state
+  private ballVelocityY: number = 0;
   private currentLevelIndex: number = 0;
   private towerRotation: number = 0;
   private targetTowerRotation: number = 0;
@@ -173,12 +185,17 @@ export class GameManager {
     this.towerGroup.add(finish);
   }
 
-  public startGame(difficulty: Difficulty = 'EASY', ballColor?: number) {
+  public startGame(difficulty: Difficulty = 'EASY', skin: SkinConfig) {
     this.difficulty = difficulty;
-    if (ballColor !== undefined) {
-      this.ballColor = ballColor;
-      (this.ball.material as THREE.MeshStandardMaterial).color.setHex(ballColor);
-    }
+    
+    // Apply Skin Physics
+    this.ballColor = skin.color;
+    this.gravity = skin.gravity;
+    this.bounceStrength = skin.bounceStrength;
+    this.ballScale = skin.scale;
+    
+    (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
+    this.ball.scale.setScalar(this.ballScale);
 
     if (difficulty === 'PRACTICE') this.numLevels = 5;
     else if (difficulty === 'BEGINNER') this.numLevels = 10;
