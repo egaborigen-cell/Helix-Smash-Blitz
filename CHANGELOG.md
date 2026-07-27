@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.7.0] - 2024-05-23
+### Added
+- **Git Documentation**: Added clear instructions to `README.md` for changing the project's Git remote repository URL.
+
 ## [1.6.0] - 2024-05-22
 ### Improved
 - **Obstacle Balancing**: Refined spike spawning to start with a single spike per platform at the beginning of the run, gradually increasing density as distance increases to provide a smoother difficulty curve.

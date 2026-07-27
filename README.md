@@ -35,6 +35,30 @@ If you are ready to publish on Yandex Games, check out [src/app/yandex-promo.md]
 2. **Commit your work**: `git commit -m "Update features"`
 3. **Push to the main branch**: `git push origin main`
 
+## Changing the Git Repository
+
+If you need to point this project to a different GitHub repository:
+
+1. **Check the current remote**:
+   ```bash
+   git remote -v
+   ```
+
+2. **Update the remote URL**:
+   ```bash
+   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_NEW_REPO_NAME.git
+   ```
+
+3. **Verify the change**:
+   ```bash
+   git remote -v
+   ```
+
+4. **Push your code to the new repo**:
+   ```bash
+   git push -u origin main
+   ```
+
 ## Deployment to Yandex Games
 
 1. **Build**: `npm run build`
