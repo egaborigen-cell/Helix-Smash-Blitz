@@ -117,7 +117,8 @@ export class GameManager {
     step.receiveShadow = true;
     
     if (isDanger) {
-      const spikeGeo = new THREE.ConeGeometry(0.2, 0.6, 6);
+      // Larger spikes
+      const spikeGeo = new THREE.ConeGeometry(0.35, 1.0, 8);
       const spikeMat = new THREE.MeshStandardMaterial({ 
         color: 0xff4444, 
         roughness: 0.3,
@@ -125,10 +126,11 @@ export class GameManager {
         emissiveIntensity: 0.2
       });
 
-      const baseGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.1, 6);
+      const baseGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.15, 8);
       const baseMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
 
-      const ringGeo = new THREE.RingGeometry(0.4, 0.5, 32);
+      // Larger hazard rings
+      const ringGeo = new THREE.RingGeometry(0.6, 0.8, 32);
       const ringMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
       
       let numSpikes = 1;
@@ -141,7 +143,7 @@ export class GameManager {
         
         const spike = new THREE.Mesh(spikeGeo, spikeMat);
         spike.castShadow = true;
-        spike.position.y = 0.3;
+        spike.position.y = 0.5;
         
         const base = new THREE.Mesh(baseGeo, baseMat);
         base.receiveShadow = true;
@@ -155,8 +157,8 @@ export class GameManager {
         spikeGroup.add(base);
         spikeGroup.add(hazardRing);
 
-        const randomX = (Math.random() - 0.5) * (width - 0.8);
-        const randomZ = (Math.random() - 0.5) * 1.4;
+        const randomX = (Math.random() - 0.5) * (width - 1.2);
+        const randomZ = (Math.random() - 0.5) * 1.0;
         spikeGroup.position.set(randomX, 0.15, randomZ);
         spikeGroup.rotation.y = Math.random() * Math.PI;
         step.add(spikeGroup);
@@ -283,8 +285,8 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            // Collision detection window (increased height for spike detection)
-            if (dz < 1.4 && dx < width / 2 + 0.5 && dy > -0.5 && dy < 1.5) {
+            // Collision detection window
+            if (dz < 1.6 && dx < width / 2 + 0.6 && dy > -0.5 && dy < 1.8) {
                 
                 // Hazard Check (Prioritize spikes over platform surface)
                 if (step.userData.isDanger) {
@@ -296,10 +298,9 @@ export class GameManager {
                       const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                     Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                       
-                      // Match visual hazard ring radius (approx 0.6 units)
-                      //dy range is generous to catch the ball as it falls onto the spike
-                      if (distSq < 0.45 && dy < 1.2 && dy > -0.2) { 
-                        this.particles.emit(this.ball.position, 0xff4444, 40, 0.4);
+                      // Match larger hazard ring radius (approx 0.8 units)
+                      if (distSq < 0.7 && dy < 1.5 && dy > -0.2) { 
+                        this.particles.emit(this.ball.position, 0xff4444, 50, 0.5);
                         this.gameOver();
                         return; // Stop processing immediately
                       }
