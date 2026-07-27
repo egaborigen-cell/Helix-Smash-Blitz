@@ -3,16 +3,16 @@ export type Language = 'en' | 'ru';
 
 export const translations = {
   en: {
-    score: "Score",
-    title: "HELIX SMASH",
-    play: "PLAY",
+    score: "Distance",
+    title: "STEP SMASH",
+    play: "START RUN",
     tryAgain: "TRY AGAIN",
     backToMenu: "BACK TO MENU",
-    gameOver: "GAME OVER",
-    winTitle: "YOU SMASHED IT!",
-    winSub: "Level completed on {diff} mode!",
-    finalScore: "Final Score",
-    instructions: "Drag or use Arrows to Rotate",
+    gameOver: "OUT OF STEPS",
+    winTitle: "UNBELIEVABLE!",
+    winSub: "You reached {diff} level distance!",
+    finalScore: "Total Distance",
+    instructions: "Drag or use Arrows to move the Ball",
     selectSkin: "SELECT SKIN",
     leaderboard: "Leaderboard",
     loading: "Loading...",
@@ -32,37 +32,37 @@ export const translations = {
     difficulty: {
       PRACTICE: {
         name: "PRACTICE",
-        desc: "5 levels, no danger"
+        desc: "Slow speed, wide steps"
       },
       BEGINNER: {
         name: "BEGINNER",
-        desc: "10 levels, minimal risk"
+        desc: "Relaxed pace"
       },
       EASY: {
         name: "EASY",
-        desc: "Shorter tower, more gaps"
+        desc: "Standard runner"
       },
       HARD: {
         name: "HARD",
-        desc: "Tall tower, high danger"
+        desc: "Fast & Narrow"
       },
       INSANE: {
         name: "INSANE",
-        desc: "50 levels, 1 gap, extreme risk"
+        desc: "Extreme speed, tiny steps"
       }
     }
   },
   ru: {
-    score: "Счёт",
-    title: "HELIX SMASH",
-    play: "ИГРАТЬ",
+    score: "Дистанция",
+    title: "STEP SMASH",
+    play: "НАЧАТЬ ЗАБЕГ",
     tryAgain: "ЕЩЁ РАЗ",
     backToMenu: "В МЕНЮ",
-    gameOver: "ИГРА ОКОНЧЕНА",
-    winTitle: "ПОБЕДА!",
-    winSub: "Пройдено на сложности: {diff}",
-    finalScore: "Итоговый счёт",
-    instructions: "Тяни или жми стрелки",
+    gameOver: "ШАГИ ЗАКОНЧИЛИСЬ",
+    winTitle: "НЕВЕРОЯТНО!",
+    winSub: "Дистанция на сложности: {diff}",
+    finalScore: "Итоговая дистанция",
+    instructions: "Тяни или жми стрелки для движения",
     selectSkin: "ВЫБЕРИ СКИН",
     leaderboard: "Таблица лидеров",
     loading: "Загрузка...",
@@ -82,23 +82,23 @@ export const translations = {
     difficulty: {
       PRACTICE: {
         name: "ПРАКТИКА",
-        desc: "5 уровней, без риска"
+        desc: "Медленно, широкие шаги"
       },
       BEGINNER: {
         name: "НОВИЧОК",
-        desc: "10 уровней, минимум риска"
+        desc: "Спокойный темп"
       },
       EASY: {
         name: "ЛЕГКО",
-        desc: "Короткая башня, много просветов"
+        desc: "Обычный забег"
       },
       HARD: {
         name: "СЛОЖНО",
-        desc: "Высокая башня, больше опасностей"
+        desc: "Быстро и узко"
       },
       INSANE: {
         name: "БЕЗУМИЕ",
-        desc: "50 уровней, 1 просвет, макс. риск"
+        desc: "Макс. скорость, крошечные шаги"
       }
     }
   }

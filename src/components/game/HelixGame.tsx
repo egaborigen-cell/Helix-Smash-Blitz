@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty, SkinConfig } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered, MoveHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 import {
@@ -98,7 +98,7 @@ export default function HelixGame() {
   };
 
   useEffect(() => {
-    if (gameState === 'GAMEOVER' || gameState === 'WON') {
+    if (gameState === 'GAMEOVER') {
       submitScore(score);
     }
   }, [gameState]);
@@ -162,7 +162,7 @@ export default function HelixGame() {
         if (!isDragging) return;
         if (e.cancelable) e.preventDefault();
         const delta = x - lastX;
-        manager.rotateTower(delta * 2.5); 
+        manager.moveBall(delta * 0.5); 
         lastX = x;
     };
 
@@ -178,12 +178,12 @@ export default function HelixGame() {
     let rafId: number;
     const updateKeyboard = () => {
       if (gameState === 'PLAYING') {
-        const rotationSpeed = 15;
+        const moveSpeed = 0.8;
         if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
-          manager.rotateTower(rotationSpeed);
+          manager.moveBall(-moveSpeed);
         }
         if (keysPressed.has('ArrowRight') || keysPressed.has('d') || keysPressed.has('D')) {
-          manager.rotateTower(-rotationSpeed);
+          manager.moveBall(moveSpeed);
         }
       }
       rafId = requestAnimationFrame(updateKeyboard);
@@ -258,7 +258,7 @@ export default function HelixGame() {
         <div className="w-full flex justify-between items-start pointer-events-auto">
             <div className="flex flex-col items-start gap-1">
                 <div className="text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.score}</div>
-                <div className="text-4xl font-extrabold text-accent drop-shadow-lg">{score}</div>
+                <div className="text-4xl font-extrabold text-accent drop-shadow-lg">{score}m</div>
             </div>
             
             <div className="flex gap-2">
@@ -470,7 +470,7 @@ export default function HelixGame() {
             <h2 className="text-4xl font-extrabold text-foreground">{t.gameOver}</h2>
             <div className="text-center">
                 <p className="text-muted-foreground">{t.finalScore}</p>
-                <p className="text-5xl font-black text-accent">{score}</p>
+                <p className="text-5xl font-black text-accent">{score}m</p>
             </div>
             <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
                 {t.tryAgain}
@@ -481,29 +481,8 @@ export default function HelixGame() {
           </div>
         )}
 
-        {/* Win Screen */}
-        {gameState === 'WON' && (
-          <div className="flex flex-col items-center gap-6 bg-white/80 backdrop-blur-xl p-10 rounded-3xl border border-primary/20 shadow-2xl animate-in fade-in zoom-in-95 pointer-events-auto">
-            <div className="bg-primary/20 p-4 rounded-full">
-                <Trophy className="w-12 h-12 text-primary" />
-            </div>
-            <h2 className="text-4xl font-extrabold text-foreground">{t.winTitle}</h2>
-            <p className="text-muted-foreground">{t.winSub.replace('{diff}', t.difficulty[difficulty].name)}</p>
-            <div className="text-center">
-                <p className="text-muted-foreground">{t.finalScore}</p>
-                <p className="text-5xl font-black text-accent">{score}</p>
-            </div>
-            <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">
-                {t.play} {t.tryAgain}
-            </Button>
-            <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground">
-                {t.backToMenu}
-            </Button>
-          </div>
-        )}
-
-        <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4 text-center">
-            {t.instructions}
+        <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4 text-center flex items-center gap-2">
+            <MoveHorizontal className="w-4 h-4" /> {t.instructions}
         </div>
       </div>
     </div>

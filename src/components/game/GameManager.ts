@@ -24,7 +24,7 @@ export class GameManager {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
-  private towerGroup: THREE.Group;
+  private stepsGroup: THREE.Group;
   private ball: THREE.Mesh;
   private clock: THREE.Clock;
   private audio: AudioManager;
@@ -41,17 +41,17 @@ export class GameManager {
   private bounceStrength: number = 0.3;
   private ballScale: number = 1.0;
 
-  // Ball physics state
+  // Physics state
   private ballVelocityY: number = 0;
-  private currentLevelIndex: number = 0;
-  private towerRotation: number = 0;
-  private targetTowerRotation: number = 0;
+  private ballVelocityX: number = 0;
+  private forwardSpeed: number = 0.15;
+  private lateralSensitivity: number = 0.05;
 
-  // Configuration
-  private platformGap: number = 4;
-  private platformRadius: number = 2.5;
-  private platformThickness: number = 0.3;
-  private numLevels: number = 20;
+  // Platform Generation
+  private steps: THREE.Mesh[] = [];
+  private stepSpacing: number = 4;
+  private nextStepZ: number = 0;
+  private laneWidth: number = 8;
 
   constructor(options: GameOptions) {
     this.options = options;
@@ -61,7 +61,7 @@ export class GameManager {
     this.particles = new ParticleSystem(this.scene);
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set(0, 5, 10);
+    this.camera.position.set(0, 5, 8);
     this.camera.lookAt(0, 0, 0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -72,8 +72,8 @@ export class GameManager {
     options.container.appendChild(this.renderer.domElement);
 
     this.clock = new THREE.Clock();
-    this.towerGroup = new THREE.Group();
-    this.scene.add(this.towerGroup);
+    this.stepsGroup = new THREE.Group();
+    this.scene.add(this.stepsGroup);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambientLight);
@@ -87,7 +87,7 @@ export class GameManager {
     const ballMat = new THREE.MeshStandardMaterial({ color: this.ballColor, roughness: 0.3 });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
     this.ball.castShadow = true;
-    this.ball.position.set(0, 2, 2);
+    this.ball.position.set(0, 2, 0);
     this.scene.add(this.ball);
 
     this.animate();
@@ -100,120 +100,64 @@ export class GameManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
-  private createTower() {
-    while(this.towerGroup.children.length > 0) { 
-        this.towerGroup.remove(this.towerGroup.children[0]); 
-    }
-
-    const poleHeight = this.numLevels * this.platformGap + 10;
-    const poleGeo = new THREE.CylinderGeometry(0.8, 0.8, poleHeight, 32);
-    const poleMat = new THREE.MeshStandardMaterial({ color: 0x999999 });
-    const pole = new THREE.Mesh(poleGeo, poleMat);
-    pole.receiveShadow = true;
-    pole.position.y = -(poleHeight / 2) + 5;
-    this.towerGroup.add(pole);
-
-    for (let i = 0; i < this.numLevels; i++) {
-      const levelGroup = new THREE.Group();
-      levelGroup.position.y = -i * this.platformGap;
-      this.towerGroup.add(levelGroup);
-
-      const numSegments = 12;
-      const segmentAngle = (Math.PI * 2) / numSegments;
-      
-      const gapIndices = new Set<number>();
-      let numGaps = 2;
-      let dangerZonesPerLevel = 1;
-
-      if (this.difficulty === 'PRACTICE') {
-          numGaps = 4;
-          dangerZonesPerLevel = 0;
-      } else if (this.difficulty === 'BEGINNER') {
-          numGaps = 3;
-          dangerZonesPerLevel = i > 7 ? 1 : 0;
-      } else if (this.difficulty === 'EASY') {
-          numGaps = i === 0 ? 2 : Math.floor(Math.random() * 2) + 2;
-          dangerZonesPerLevel = i > 5 ? 1 : 0;
-      } else if (this.difficulty === 'HARD') {
-          numGaps = i === 0 ? 1 : Math.floor(Math.random() * 2) + 1;
-          dangerZonesPerLevel = i > 2 ? Math.floor(Math.random() * 2) + 1 : 0;
-      } else {
-          // INSANE
-          numGaps = 1;
-          dangerZonesPerLevel = i > 0 ? Math.floor(Math.random() * 3) + 2 : 0;
-      }
-
-      while (gapIndices.size < numGaps) {
-        gapIndices.add(Math.floor(Math.random() * numSegments));
-      }
-
-      const dangerIndices = new Set<number>();
-      while (dangerIndices.size < dangerZonesPerLevel) {
-          const idx = Math.floor(Math.random() * numSegments);
-          if (!gapIndices.has(idx)) {
-              dangerIndices.add(idx);
-          }
-      }
-
-      for (let j = 0; j < numSegments; j++) {
-        if (gapIndices.has(j)) continue;
-
-        const isDanger = dangerIndices.has(j);
-        const geo = new THREE.CylinderGeometry(
-          this.platformRadius, 
-          this.platformRadius, 
-          this.platformThickness, 
-          32, 1, false, 
-          j * segmentAngle, 
-          segmentAngle
-        );
-        const mat = new THREE.MeshStandardMaterial({ 
-          color: isDanger ? 0xff4444 : 0xf2cc0d,
-          roughness: 0.5 
-        });
-        const segment = new THREE.Mesh(geo, mat);
-        segment.receiveShadow = true;
-        segment.userData = { isDanger, level: i };
-        levelGroup.add(segment);
-      }
-    }
-
-    const finishGeo = new THREE.CylinderGeometry(this.platformRadius + 1, this.platformRadius + 1, 0.5, 32);
-    const finishMat = new THREE.MeshStandardMaterial({ color: 0x22c55e }); // Bright green finish
-    const finish = new THREE.Mesh(finishGeo, finishMat);
-    finish.position.y = -this.numLevels * this.platformGap;
-    this.towerGroup.add(finish);
+  private createStep(z: number) {
+    const isDanger = Math.random() > 0.8 && z > 20;
+    const width = this.difficulty === 'INSANE' ? 1.5 : this.difficulty === 'HARD' ? 2.5 : 4;
+    const geo = new THREE.BoxGeometry(width, 0.3, 2);
+    const mat = new THREE.MeshStandardMaterial({ 
+      color: isDanger ? 0xff4444 : 0xf2cc0d,
+      roughness: 0.5 
+    });
+    
+    const step = new THREE.Mesh(geo, mat);
+    step.receiveShadow = true;
+    
+    // Procedural lateral placement
+    const range = this.laneWidth - width;
+    step.position.set((Math.random() - 0.5) * range, 0, -z);
+    step.userData = { isDanger, z };
+    
+    this.stepsGroup.add(step);
+    this.steps.push(step);
   }
 
   public startGame(difficulty: Difficulty = 'EASY', skin: SkinConfig) {
     this.difficulty = difficulty;
-    
-    // Apply Skin Physics
     this.ballColor = skin.color;
     this.gravity = skin.gravity;
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
+
+    // Adjust speed based on difficulty
+    const speeds = { PRACTICE: 0.1, BEGINNER: 0.12, EASY: 0.15, HARD: 0.22, INSANE: 0.3 };
+    this.forwardSpeed = speeds[difficulty];
     
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
-
-    if (difficulty === 'PRACTICE') this.numLevels = 5;
-    else if (difficulty === 'BEGINNER') this.numLevels = 10;
-    else if (difficulty === 'EASY') this.numLevels = 15;
-    else if (difficulty === 'HARD') this.numLevels = 30;
-    else this.numLevels = 50; // INSANE
 
     this.gameState = 'PLAYING';
     this.options.onGameStateChange(this.gameState);
     this.score = 0;
     this.options.onScoreUpdate(this.score);
     
-    this.createTower();
-    this.resetBall();
-    this.particles.clear();
+    // Clear old steps
+    while(this.stepsGroup.children.length > 0) { 
+        this.stepsGroup.remove(this.stepsGroup.children[0]); 
+    }
+    this.steps = [];
+    this.nextStepZ = 0;
     
-    this.towerGroup.rotation.y = 0;
-    this.targetTowerRotation = 0;
+    // Initial batch
+    for (let i = 0; i < 15; i++) {
+        this.createStep(this.nextStepZ);
+        this.nextStepZ += this.stepSpacing;
+    }
+
+    this.ball.position.set(this.steps[0].position.x, 2, 0);
+    this.ballVelocityY = 0;
+    this.ballVelocityX = 0;
+    
+    this.particles.clear();
     this.audio.startMusic();
   }
 
@@ -221,15 +165,9 @@ export class GameManager {
     return this.audio.toggleMute();
   }
 
-  private resetBall() {
-    this.ball.position.set(0, 2, 2);
-    this.ballVelocityY = 0;
-    this.currentLevelIndex = 0;
-  }
-
-  public rotateTower(delta: number) {
+  public moveBall(delta: number) {
     if (this.gameState !== 'PLAYING') return;
-    this.targetTowerRotation += delta * 0.01;
+    this.ballVelocityX += delta * this.lateralSensitivity;
   }
 
   private animate = () => {
@@ -238,115 +176,101 @@ export class GameManager {
     
     if (this.gameState === 'PLAYING') {
       this.updatePhysics();
+      this.spawnSteps();
     }
     
     this.particles.update(delta);
     
-    this.towerGroup.rotation.y += (this.targetTowerRotation - this.towerGroup.rotation.y) * 0.1;
-    const targetCamY = this.ball.position.y + 3;
+    // Camera follow
+    const targetCamX = this.ball.position.x * 0.5;
+    const targetCamY = this.ball.position.y + 4;
+    const targetCamZ = this.ball.position.z + 8;
+    
+    this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
     this.camera.position.y += (targetCamY - this.camera.position.y) * 0.05;
-    this.camera.lookAt(0, this.ball.position.y - 1, 0);
+    this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.1;
+    this.camera.lookAt(this.ball.position.x, this.ball.position.y, this.ball.position.z - 5);
+    
     this.renderer.render(this.scene, this.camera);
   };
 
+  private spawnSteps() {
+    // Keep steps ahead of ball
+    if (Math.abs(this.ball.position.z) + 40 > this.nextStepZ) {
+        this.createStep(this.nextStepZ);
+        this.nextStepZ += this.stepSpacing;
+    }
+
+    // Cleanup steps behind
+    if (this.steps.length > 20) {
+        const first = this.steps[0];
+        if (first.position.z > this.ball.position.z + 10) {
+            this.stepsGroup.remove(first);
+            this.steps.shift();
+        }
+    }
+  }
+
   private updatePhysics() {
+    // Forward Movement
+    this.ball.position.z -= this.forwardSpeed;
+    
+    // Lateral Movement
+    this.ball.position.x += this.ballVelocityX;
+    this.ballVelocityX *= 0.9; // Friction
+    
+    // Clamp to lanes
+    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1) {
+        this.gameOver();
+    }
+
+    // Vertical Movement
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
-    const currentLevelY = -this.currentLevelIndex * this.platformGap;
-    let checkAngle = (-this.towerGroup.rotation.y) % (Math.PI * 2);
-    if (checkAngle < 0) checkAngle += Math.PI * 2;
+    // Collision Detection
+    if (this.ballVelocityY < 0) {
+        for (const step of this.steps) {
+            const dx = Math.abs(this.ball.position.x - step.position.x);
+            const dz = Math.abs(this.ball.position.z - step.position.z);
+            const dy = this.ball.position.y - step.position.y;
 
-    if (this.ballVelocityY < 0 && this.ball.position.y <= currentLevelY + 0.35) {
-      const levelGroup = this.towerGroup.children[this.currentLevelIndex + 1] as THREE.Group;
-      let hitSomething = false;
+            const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-      if (levelGroup && levelGroup.children) {
-          for (const segment of levelGroup.children) {
-              const mesh = segment as THREE.Mesh;
-              if (mesh.geometry.type !== 'CylinderGeometry' || mesh.userData.level === undefined) continue;
-
-              const params = (mesh.geometry as any).parameters;
-              const start = params.thetaStart;
-              const length = params.thetaLength;
-              const end = start + length;
-              const isInRange = checkAngle >= start && checkAngle <= end;
-
-              if (isInRange) {
-                  if (mesh.userData.isDanger) {
-                      this.particles.emit(this.ball.position, 0xff4444, 30, 0.4);
-                      this.gameOver();
-                  } else {
-                      this.ballVelocityY = this.bounceStrength;
-                      this.ball.position.y = currentLevelY + 0.36;
-                      this.audio.playBounce();
-                      this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
-                      hitSomething = true;
-                  }
-                  break;
-              }
-          }
-      }
-
-      if (!hitSomething) {
-          if (this.ball.position.y < currentLevelY - 0.5) {
-              this.currentLevelIndex++;
-              let points = 10;
-              if (this.difficulty === 'PRACTICE') points = 5;
-              if (this.difficulty === 'BEGINNER') points = 8;
-              if (this.difficulty === 'HARD') points = 20;
-              if (this.difficulty === 'INSANE') points = 50;
-              
-              this.score += points;
-              this.options.onScoreUpdate(this.score);
-              this.audio.playSmash();
-              
-              // Enhanced Level pass effect
-              this.particles.emit(this.ball.position, this.ballColor, 25, 0.3);
-
-              if (this.currentLevelIndex >= this.numLevels) {
-                this.gameWon();
-              }
-          }
-      }
+            if (dz < 1.2 && dx < width / 2 + 0.2 && dy > -0.2 && dy < 0.5) {
+                if (step.userData.isDanger) {
+                    this.particles.emit(this.ball.position, 0xff4444, 30, 0.4);
+                    this.gameOver();
+                } else {
+                    this.ballVelocityY = this.bounceStrength;
+                    this.ball.position.y = step.position.y + 0.4;
+                    this.audio.playBounce();
+                    this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
+                    
+                    // Score based on distance
+                    const newScore = Math.floor(Math.abs(this.ball.position.z));
+                    if (newScore > this.score) {
+                        this.score = newScore;
+                        this.options.onScoreUpdate(this.score);
+                    }
+                }
+                break;
+            }
+        }
     }
-    
-    if (this.ball.position.y < -(this.numLevels + 2) * this.platformGap) {
+
+    // Fall detection
+    if (this.ball.position.y < -10) {
         this.gameOver();
     }
   }
 
   private gameOver() {
+    if (this.gameState !== 'PLAYING') return;
     this.gameState = 'GAMEOVER';
     this.options.onGameStateChange(this.gameState);
     this.audio.playGameOver();
     this.audio.stopMusic();
-  }
-
-  private gameWon() {
-    if (this.gameState !== 'PLAYING') return;
-
-    this.gameState = 'WON'; // Internally stop physics
-    this.audio.playWin();
-    this.audio.stopMusic();
-    
-    // Victory Fountain: Multiple bursts for high impact
-    const victoryPos = this.ball.position.clone();
-    for (let i = 0; i < 8; i++) {
-        setTimeout(() => {
-            if (this.gameState === 'WON') {
-                this.particles.emit(victoryPos, 0x22c55e, 40, 0.5);
-                this.particles.emit(victoryPos, this.ballColor, 20, 0.4);
-            }
-        }, i * 250);
-    }
-
-    // Delay the external game state change to allow animations to play
-    setTimeout(() => {
-        if (this.gameState === 'WON') {
-            this.options.onGameStateChange('WON');
-        }
-    }, 2500);
   }
 
   public dispose() {
