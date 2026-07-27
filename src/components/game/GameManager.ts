@@ -171,8 +171,9 @@ export class GameManager {
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    this.ball.position.set(this.steps[0].position.x, 0.6, 0);
-    this.ballVelocityY = 0;
+    // Set start position on the first step with an initial upward bounce
+    this.ball.position.set(this.steps[0].position.x, 0.4, 0);
+    this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     
     this.particles.clear();
@@ -212,7 +213,6 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    // Constant spacing logic
     if (Math.abs(this.ball.position.z) + 50 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
@@ -248,6 +248,7 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
+            // Improved vertical collision window for stability at high speeds
             if (dz < 1.2 && dx < width / 2 + 0.3 && dy > -0.5 && dy < 0.6) {
                 if (step.userData.isDanger) {
                   let hitSpike = false;
