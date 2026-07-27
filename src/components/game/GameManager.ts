@@ -105,12 +105,32 @@ export class GameManager {
     const width = this.difficulty === 'INSANE' ? 2.2 : this.difficulty === 'HARD' ? 3.8 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
     const mat = new THREE.MeshStandardMaterial({ 
-      color: isDanger ? 0xff4444 : 0xf2cc0d,
+      color: 0xf2cc0d,
       roughness: 0.5 
     });
     
     const step = new THREE.Mesh(geo, mat);
     step.receiveShadow = true;
+    
+    if (isDanger) {
+      // Add red spikes to the step
+      const spikeGeo = new THREE.ConeGeometry(0.2, 0.6, 4);
+      const spikeMat = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.3 });
+      
+      const numSpikes = 3 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < numSpikes; i++) {
+        const spike = new THREE.Mesh(spikeGeo, spikeMat);
+        spike.castShadow = true;
+        
+        // Random position on the top surface of the step
+        const randomX = (Math.random() - 0.5) * (width - 0.6);
+        const randomZ = (Math.random() - 0.5) * 1.4;
+        spike.position.set(randomX, 0.45, randomZ);
+        
+        spike.rotation.y = Math.random() * Math.PI;
+        step.add(spike);
+      }
+    }
     
     const range = this.laneWidth - width;
     step.position.set((Math.random() - 0.5) * range, 0, -z);

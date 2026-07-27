@@ -1,3 +1,4 @@
+
 # Yandex Games Promo Materials - Helix Smash
 
 This document contains the localized text and graphic requirements for publishing **Helix Smash** on the Yandex Games console.
@@ -7,65 +8,65 @@ This document contains the localized text and graphic requirements for publishin
 ## 📝 English Promo Text
 
 ### Game Title
-**Helix Smash: 3D Adventure**
+**Step Smash: 3D Endless Runner**
 
 ### Short Description (Max 50 chars)
-Smash through platforms! How deep can you go?
+Smash through steps! Avoid the spikes!
 
 ### Full Description
-Dive into the ultimate 3D helix adventure! Guide your bouncing ball down a massive procedural tower, smashing through vibrant platforms while avoiding deadly red zones. With 5 unique difficulty modes, there's a challenge for everyone from beginners to insane pros!
+Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball across floating platforms in a procedural endless world. Smash through vibrant platforms, but be careful — avoid the deadly red spikes! With 5 unique difficulty modes, there's a challenge for everyone from beginners to insane pros!
 
 **Features:**
-- 🌀 **Procedural Levels:** No two towers are the same!
-- 🎨 **Skin System:** Choose between Toxic, Neon, and Aqua styles.
+- 🌀 **Procedural Levels:** No two runs are the same!
+- 🎨 **Skin System:** Choose between Toxic, Neon, and Aqua styles with unique physics.
 - 🔥 **5 Difficulty Modes:** Practice, Beginner, Easy, Hard, and Insane.
 - ✨ **Dynamic Particles:** Satisfying smash and bounce effects.
 - 🏆 **Global Leaderboards:** Compete for the top score on Yandex Games.
 
 ### Instructions / Controls
-- **Desktop:** Click and drag horizontally OR use **Arrow Keys / A-D** to rotate the tower.
-- **Mobile:** Swipe left or right to rotate.
-- **Goal:** Smash through the yellow platforms and reach the green base! Avoid the red segments.
+- **Desktop:** Click and drag horizontally OR use **Arrow Keys / A-D** to move the ball.
+- **Mobile:** Swipe left or right to move.
+- **Goal:** Land on the yellow platforms to keep moving forward. Avoid the sharp red spikes!
 
 ---
 
 ## 📝 Russian Promo Text (Локализация)
 
 ### Название игры
-**Helix Smash: 3D Приключение**
+**Step Smash: 3D Забег**
 
 ### Короткое описание (До 50 симв.)
-Разбивай платформы! Как далеко ты пройдешь?
+Разбивай шаги! Избегай шипов!
 
 ### Полное описание
-Погрузитесь в захватывающее 3D-приключение! Управляйте прыгающим шаром, спускаясь по огромной процедурно-генерируемой башне. Разбивайте яркие платформы, но будьте осторожны — избегайте смертельных красных зон! С 5 режимами сложности игра подойдет как новичкам, так и настоящим мастерам.
+Погрузитесь в захватывающее 3D-приключение! Управляйте прыгающим шаром, спускаясь по бесконечным парящим платформам. Разбивайте яркие ступени, но будьте осторожны — избегайте смертельных красных шипов! С 5 режимами сложности игра подойдет как новичкам, так и настоящим мастерам.
 
 **Особенности игры:**
-- 🌀 **Процедурные уровни:** Каждая башня уникальна!
-- 🎨 **Система скинов:** Выбирайте стили Toxic, Neon или Aqua.
+- 🌀 **Процедурные уровни:** Каждая трасса уникальна!
+- 🎨 **Система скинов:** Выбирайте стили Toxic, Neon или Aqua с разной физикой.
 - 🔥 **5 уровней сложности:** Практика, Новичок, Легко, Сложно и Безумие.
 - ✨ **Динамические эффекты:** Сочные частицы при каждом ударе.
 - 🏆 **Таблицы лидеров:** Станьте лучшим игроком в Yandex Games.
 
 ### Как играть
-- **ПК:** Зажмите левую кнопку мыши и тяните ИЛИ используйте **стрелки / A-D** для вращения башни.
+- **ПК:** Зажмите левую кнопку мыши и тяните ИЛИ используйте **стрелки / A-D** для движения шара.
 - **Мобильный:** Проведите пальцем влево или вправо.
-- **Цель:** Пробивайте желтые платформы и доберитесь до финиша! Избегайте красных участков.
+- **Цель:** Приземляйтесь на желтые платформы, чтобы двигаться вперед. Избегайте красных шипов!
 
 ---
 
 ## 🎨 Graphics Suggestions
 
 ### Icon (512x512)
-*Focus on a high-contrast shot of the ball smashing a platform.*
-**AI Prompt:** `High-quality 3D render of a neon green glowing ball smashing through a yellow glass platform, helix tower background, vibrant lighting, mobile game icon style, clean background --v 6.0`
+*Focus on a high-contrast shot of the ball bouncing near sharp spikes.*
+**AI Prompt:** `High-quality 3D render of a neon green glowing ball about to land on a yellow platform with sharp red spikes, vibrant lighting, mobile game icon style, clean background --v 6.0`
 
 ### Cover / Banner (1920x1080)
-*Action-oriented shot showing the scale of the tower.*
-**AI Prompt:** `Cinematic 3D view of a tall rotating helix tower with a bouncing ball, motion blur, colorful platforms, floating particles, hyper-realistic, 8k resolution, stylized arcade aesthetic --ar 16:9`
+*Action-oriented shot showing the endless path of steps.*
+**AI Prompt:** `Cinematic 3D view of an endless path of floating yellow steps in a blue sky, bouncing ball, red spikes, motion blur, colorful platforms, floating particles, hyper-realistic, 8k resolution, stylized arcade aesthetic --ar 16:9`
 
 ### Screenshots
 1. **Start Screen:** Show off the difficulty selection menu and skins.
-2. **Gameplay (Action):** Capture a moment where the ball is passing through multiple levels with smash particles.
-3. **Danger Zone:** Show a "Hard" or "Insane" level with high density of red platforms.
-4. **Victory:** Show the ball reaching the bottom green platform with the confetti/fountain particles.
+2. **Gameplay (Action):** Capture a moment where the ball is bouncing on a safe step next to a spike-filled one.
+3. **Danger Zone:** Show an "Insane" level with high density of spikes.
+4. **Game Over:** Show the ball bursting into red particles after hitting a spike.
