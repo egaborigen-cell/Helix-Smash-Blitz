@@ -102,7 +102,7 @@ export class GameManager {
 
   private createStep(z: number) {
     const isDanger = Math.random() > 0.8 && z > 20;
-    const width = this.difficulty === 'INSANE' ? 1.5 : this.difficulty === 'HARD' ? 2.5 : 4;
+    const width = this.difficulty === 'INSANE' ? 2.2 : this.difficulty === 'HARD' ? 3.8 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
     const mat = new THREE.MeshStandardMaterial({ 
       color: isDanger ? 0xff4444 : 0xf2cc0d,
@@ -112,7 +112,6 @@ export class GameManager {
     const step = new THREE.Mesh(geo, mat);
     step.receiveShadow = true;
     
-    // Procedural lateral placement
     const range = this.laneWidth - width;
     step.position.set((Math.random() - 0.5) * range, 0, -z);
     step.userData = { isDanger, z };
@@ -128,7 +127,6 @@ export class GameManager {
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
 
-    // Adjust speed based on difficulty
     const speeds = { PRACTICE: 0.1, BEGINNER: 0.12, EASY: 0.15, HARD: 0.22, INSANE: 0.3 };
     this.forwardSpeed = speeds[difficulty];
     
@@ -140,20 +138,17 @@ export class GameManager {
     this.score = 0;
     this.options.onScoreUpdate(this.score);
     
-    // Clear old steps
     while(this.stepsGroup.children.length > 0) { 
         this.stepsGroup.remove(this.stepsGroup.children[0]); 
     }
     this.steps = [];
     this.nextStepZ = 0;
     
-    // Initial batch
     for (let i = 0; i < 15; i++) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.stepSpacing;
     }
 
-    // Fix: Start the ball at y=0.5 (just above the platform) to ensure it hits the first step immediately
     this.ball.position.set(this.steps[0].position.x, 0.5, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
@@ -182,7 +177,6 @@ export class GameManager {
     
     this.particles.update(delta);
     
-    // Camera follow
     const targetCamX = this.ball.position.x * 0.5;
     const targetCamY = this.ball.position.y + 4;
     const targetCamZ = this.ball.position.z + 8;
@@ -196,13 +190,11 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    // Keep steps ahead of ball
     if (Math.abs(this.ball.position.z) + 40 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.stepSpacing;
     }
 
-    // Cleanup steps behind
     if (this.steps.length > 20) {
         const first = this.steps[0];
         if (first.position.z > this.ball.position.z + 10) {
@@ -213,23 +205,18 @@ export class GameManager {
   }
 
   private updatePhysics() {
-    // Forward Movement
     this.ball.position.z -= this.forwardSpeed;
     
-    // Lateral Movement
     this.ball.position.x += this.ballVelocityX;
-    this.ballVelocityX *= 0.9; // Friction
+    this.ballVelocityX *= 0.9;
     
-    // Clamp to lanes
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1) {
         this.gameOver();
     }
 
-    // Vertical Movement
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
-    // Collision Detection
     if (this.ballVelocityY < 0) {
         for (const step of this.steps) {
             const dx = Math.abs(this.ball.position.x - step.position.x);
@@ -248,7 +235,6 @@ export class GameManager {
                     this.audio.playBounce();
                     this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
                     
-                    // Score based on distance
                     const newScore = Math.floor(Math.abs(this.ball.position.z));
                     if (newScore > this.score) {
                         this.score = newScore;
@@ -260,7 +246,6 @@ export class GameManager {
         }
     }
 
-    // Fall detection
     if (this.ball.position.y < -10) {
         this.gameOver();
     }
