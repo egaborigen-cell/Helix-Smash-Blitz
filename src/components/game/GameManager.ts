@@ -45,7 +45,7 @@ export class GameManager {
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
   private forwardSpeed: number = 0.15;
-  private lateralSensitivity: number = 0.12; // Increased for better responsiveness
+  private lateralSensitivity: number = 0.04;
 
   // Platform Generation
   private steps: THREE.Mesh[] = [];
@@ -125,6 +125,9 @@ export class GameManager {
 
       const baseGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.1, 6);
       const baseMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+
+      const ringGeo = new THREE.RingGeometry(0.4, 0.5, 32);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
       
       let numSpikes = 1;
       if (z > 100) numSpikes = 1 + Math.floor(Math.random() * 2);
@@ -143,8 +146,13 @@ export class GameManager {
         base.receiveShadow = true;
         base.position.y = 0;
 
+        const hazardRing = new THREE.Mesh(ringGeo, ringMat);
+        hazardRing.rotation.x = -Math.PI / 2;
+        hazardRing.position.y = 0.16; // Slightly above platform surface
+
         spikeGroup.add(spike);
         spikeGroup.add(base);
+        spikeGroup.add(hazardRing);
 
         const randomX = (Math.random() - 0.5) * (width - 0.8);
         const randomZ = (Math.random() - 0.5) * 1.4;
@@ -253,7 +261,7 @@ export class GameManager {
   private updatePhysics() {
     this.ball.position.z -= this.forwardSpeed;
     this.ball.position.x += this.ballVelocityX;
-    this.ballVelocityX *= 0.85; // Slightly faster decay for tighter control
+    this.ballVelocityX *= 0.85;
     
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.2) {
         this.gameOver();
@@ -281,7 +289,8 @@ export class GameManager {
                       const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                     Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                       
-                      if (distSq < 0.2 && dy < 1.0 && dy > 0) { 
+                      // Danger zone threshold (0.5 radius squared = 0.25)
+                      if (distSq < 0.25 && dy < 1.0 && dy > 0) { 
                         hitSpike = true;
                         break;
                       }
