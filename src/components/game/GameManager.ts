@@ -153,7 +153,8 @@ export class GameManager {
         this.nextStepZ += this.stepSpacing;
     }
 
-    this.ball.position.set(this.steps[0].position.x, 2, 0);
+    // Fix: Start the ball at y=0.5 (just above the platform) to ensure it hits the first step immediately
+    this.ball.position.set(this.steps[0].position.x, 0.5, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
     
