@@ -38,7 +38,7 @@ export class GameManager {
   // Current Skin Settings
   private ballColor: number = 0xb8f53d;
   private gravity: number = -0.015;
-  private bounceStrength: number = 0.32; // Slightly buffed from 0.3
+  private bounceStrength: number = 0.32; 
   private ballScale: number = 1.0;
 
   // Physics state
@@ -101,7 +101,6 @@ export class GameManager {
   };
 
   private createStep(z: number) {
-    // Difficulty increases with score: more spikes and more variation
     const progressFactor = Math.min(this.score / 500, 1);
     const isDanger = Math.random() > (0.9 - progressFactor * 0.2) && z > 20;
     
@@ -166,14 +165,12 @@ export class GameManager {
     this.steps = [];
     this.nextStepZ = 0;
     
-    // Initial batch of steps
-    for (let i = 0; i < 20; i++) { // Increased initial batch
+    // Initial batch of steps with constant spacing
+    for (let i = 0; i < 20; i++) {
         this.createStep(this.nextStepZ);
-        const spacingVariation = (Math.random() - 0.5) * 0.4;
-        this.nextStepZ += this.baseStepSpacing + spacingVariation;
+        this.nextStepZ += this.baseStepSpacing;
     }
 
-    // Set starting position lower to ensure immediate first bounce
     this.ball.position.set(this.steps[0].position.x, 0.6, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
@@ -215,17 +212,10 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    // Increased look-ahead distance to 50 for more reliable generation
+    // Constant spacing logic
     if (Math.abs(this.ball.position.z) + 50 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
-        
-        // Calculate new spacing with progress factor
-        const progressFactor = Math.min(this.score / 1500, 1);
-        const spacingVariation = (Math.random() - 0.5) * (1.0 + progressFactor * 1.5);
-        const dynamicSpacing = this.baseStepSpacing + (progressFactor * 1.2) + spacingVariation;
-        
-        // Clamped more tightly to ensure playability (max gap 7.0 instead of 8.0)
-        this.nextStepZ += Math.max(3.2, Math.min(7.0, dynamicSpacing));
+        this.nextStepZ += this.baseStepSpacing;
     }
 
     if (this.steps.length > 25) {
@@ -258,8 +248,7 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            // Detection window: widened dy range from -0.2/0.5 to -0.4/0.6 to catch high-speed impacts
-            if (dz < 1.2 && dx < width / 2 + 0.3 && dy > -0.4 && dy < 0.6) {
+            if (dz < 1.2 && dx < width / 2 + 0.3 && dy > -0.5 && dy < 0.6) {
                 if (step.userData.isDanger) {
                   let hitSpike = false;
                   for (const child of step.children) {
@@ -291,7 +280,7 @@ export class GameManager {
         }
     }
 
-    if (this.ball.position.y < -12) { // Slightly deeper fall grace
+    if (this.ball.position.y < -12) {
         this.gameOver();
     }
   }
