@@ -38,7 +38,7 @@ export class GameManager {
   // Current Skin Settings
   private ballColor: number = 0xb8f53d;
   private gravity: number = -0.015;
-  private bounceStrength: number = 0.3;
+  private bounceStrength: number = 0.32; // Slightly buffed from 0.3
   private ballScale: number = 1.0;
 
   // Physics state
@@ -105,7 +105,7 @@ export class GameManager {
     const progressFactor = Math.min(this.score / 500, 1);
     const isDanger = Math.random() > (0.9 - progressFactor * 0.2) && z > 20;
     
-    const width = this.difficulty === 'INSANE' ? 2.2 : this.difficulty === 'HARD' ? 3.8 : 5.5;
+    const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
     const mat = new THREE.MeshStandardMaterial({ 
       color: 0xf2cc0d,
@@ -167,10 +167,9 @@ export class GameManager {
     this.nextStepZ = 0;
     
     // Initial batch of steps
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) { // Increased initial batch
         this.createStep(this.nextStepZ);
-        // Gradually vary spacing even at the start
-        const spacingVariation = (Math.random() - 0.5) * 0.5;
+        const spacingVariation = (Math.random() - 0.5) * 0.4;
         this.nextStepZ += this.baseStepSpacing + spacingVariation;
     }
 
@@ -216,22 +215,22 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    if (Math.abs(this.ball.position.z) + 40 > this.nextStepZ) {
+    // Increased look-ahead distance to 50 for more reliable generation
+    if (Math.abs(this.ball.position.z) + 50 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         
         // Calculate new spacing with progress factor
-        // The further you go, the more the rhythm shifts
-        const progressFactor = Math.min(this.score / 1000, 1);
-        const spacingVariation = (Math.random() - 0.5) * (1.5 + progressFactor * 2.0);
-        const dynamicSpacing = this.baseStepSpacing + (progressFactor * 1.5) + spacingVariation;
+        const progressFactor = Math.min(this.score / 1500, 1);
+        const spacingVariation = (Math.random() - 0.5) * (1.0 + progressFactor * 1.5);
+        const dynamicSpacing = this.baseStepSpacing + (progressFactor * 1.2) + spacingVariation;
         
-        // Clamp spacing to ensure it's playable (not too close, not impossibly far)
-        this.nextStepZ += Math.max(3.0, Math.min(8.0, dynamicSpacing));
+        // Clamped more tightly to ensure playability (max gap 7.0 instead of 8.0)
+        this.nextStepZ += Math.max(3.2, Math.min(7.0, dynamicSpacing));
     }
 
-    if (this.steps.length > 20) {
+    if (this.steps.length > 25) {
         const first = this.steps[0];
-        if (first.position.z > this.ball.position.z + 10) {
+        if (first.position.z > this.ball.position.z + 15) {
             this.stepsGroup.remove(first);
             this.steps.shift();
         }
@@ -259,8 +258,8 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            // Detection window: 1.2 units depth and 0.2 units grace on width
-            if (dz < 1.2 && dx < width / 2 + 0.2 && dy > -0.2 && dy < 0.5) {
+            // Detection window: widened dy range from -0.2/0.5 to -0.4/0.6 to catch high-speed impacts
+            if (dz < 1.2 && dx < width / 2 + 0.3 && dy > -0.4 && dy < 0.6) {
                 if (step.userData.isDanger) {
                   let hitSpike = false;
                   for (const child of step.children) {
@@ -292,7 +291,7 @@ export class GameManager {
         }
     }
 
-    if (this.ball.position.y < -10) {
+    if (this.ball.position.y < -12) { // Slightly deeper fall grace
         this.gameOver();
     }
   }
