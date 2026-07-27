@@ -1,3 +1,4 @@
+
 # Step Smash: 3D Endless Runner
 
 Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, Three.js, and React. Navigate a bouncing ball across procedurally generated floating platforms, dodging deadly spikes and competing for the global high score.
@@ -38,10 +39,18 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
 ## 📡 Deployment & Publishing
 
 ### Yandex Games Console
-1. **Build the project**: `npm run build`
-2. **Package for upload**: Open the `out/` directory. Select all files/folders *inside* `out/` and create a ZIP archive. 
-   - *Note: Do not zip the 'out' folder itself, only its contents.*
-3. **Leaderboards**: Ensure you create a leaderboard in the Yandex Console with the Technical Name: `TopScores`.
+To prepare your game for upload to the Yandex Games console:
+
+1. **Run the export script**:
+   ```bash
+   npm run export-zip
+   ```
+2. **Result**: This will create a `game.zip` file in your root directory.
+3. **Upload**: Upload this `game.zip` directly to the Yandex Games Developer Console. 
+   - *Note: This script automatically handles the requirement of zipping the contents of the 'out' folder, not the folder itself.*
+
+### Leaderboards
+Ensure you create a leaderboard in the Yandex Console with the Technical Name: `TopScores`.
 
 ### Git Workflow
 If you need to push updates to your repository:
@@ -62,7 +71,7 @@ git push -u origin main
 ```
 
 ### 404 Errors on Yandex Games
-Usually caused by incorrect zipping. Ensure the `index.html` file is at the root level of your ZIP archive, not inside a subfolder named `out`.
+Usually caused by incorrect zipping. Use the `npm run export-zip` command to ensure the `index.html` file is at the root level of your ZIP archive.
 
 ## 🛠 Maintenance & Known Warnings
 

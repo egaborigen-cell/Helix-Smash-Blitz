@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.9.0] - 2025-05-26
+### Added
+- **Export Script**: Added `export-zip` script to `package.json` to automate building and zipping the web export for Yandex Games.
+
 ## [1.8.0] - 2024-05-25
 ### Added
 - **Maintenance Docs**: Added an explanation for the `@opentelemetry/exporter-jaeger` deprecation warning in `README.md` to clarify it is harmless.
