@@ -102,7 +102,9 @@ export class GameManager {
 
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    const isDanger = z < 10 ? false : (Math.random() > (0.85 - progressFactor * 0.2) && z > 15);
+    
+    // No spikes in Practice mode
+    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 10 ? false : (Math.random() > (0.85 - progressFactor * 0.2) && z > 15));
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
@@ -281,12 +283,11 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            // Collision window
-            if (dz < 1.4 && dx < width / 2 + 0.4 && dy > -0.5 && dy < 0.8) {
+            // Collision detection window (increased height for spike detection)
+            if (dz < 1.4 && dx < width / 2 + 0.5 && dy > -0.5 && dy < 1.5) {
                 
-                // Hazard Check
+                // Hazard Check (Prioritize spikes over platform surface)
                 if (step.userData.isDanger) {
-                  let hitSpike = false;
                   for (const child of step.children) {
                     if (child.name === 'spike') {
                       const spikeGlobalX = step.position.x + child.position.x;
@@ -295,23 +296,22 @@ export class GameManager {
                       const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                     Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                       
-                      // Match visual hazard ring radius (approx 0.5-0.6 units)
-                      if (distSq < 0.36 && dy < 1.0 && dy > -0.2) { 
-                        hitSpike = true;
-                        break;
+                      // Match visual hazard ring radius (approx 0.6 units)
+                      //dy range is generous to catch the ball as it falls onto the spike
+                      if (distSq < 0.45 && dy < 1.2 && dy > -0.2) { 
+                        this.particles.emit(this.ball.position, 0xff4444, 40, 0.4);
+                        this.gameOver();
+                        return; // Stop processing immediately
                       }
                     }
                   }
-
-                  if (hitSpike) {
-                    this.particles.emit(this.ball.position, 0xff4444, 30, 0.4);
-                    this.gameOver();
-                    return; // Stop processing immediately to prevent bounce
-                  }
                 }
 
-                this.performBounce(step);
-                return; // Stop checking other steps once one is hit
+                // Standard platform surface check
+                if (dy < 0.8) {
+                    this.performBounce(step);
+                    return; // Stop checking other steps
+                }
             }
         }
     }
