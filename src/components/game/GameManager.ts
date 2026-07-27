@@ -113,28 +113,19 @@ export class GameManager {
     step.receiveShadow = true;
     
     if (isDanger) {
-      // Add red spikes to the step
       const spikeGeo = new THREE.ConeGeometry(0.2, 0.6, 4);
       const spikeMat = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.3 });
       
-      // Refined spike spawning: start with 1, increase with distance
       let numSpikes = 1;
-      if (z > 100) {
-        numSpikes = 1 + Math.floor(Math.random() * 2); // 1-2 spikes
-      }
-      if (z > 250) {
-        numSpikes = 2 + Math.floor(Math.random() * 3); // 2-4 spikes
-      }
+      if (z > 100) numSpikes = 1 + Math.floor(Math.random() * 2);
+      if (z > 250) numSpikes = 2 + Math.floor(Math.random() * 3);
       
       for (let i = 0; i < numSpikes; i++) {
         const spike = new THREE.Mesh(spikeGeo, spikeMat);
         spike.castShadow = true;
-        
-        // Random position on the top surface of the step
         const randomX = (Math.random() - 0.5) * (width - 0.6);
         const randomZ = (Math.random() - 0.5) * 1.4;
         spike.position.set(randomX, 0.45, randomZ);
-        
         spike.rotation.y = Math.random() * Math.PI;
         step.add(spike);
       }
@@ -177,8 +168,8 @@ export class GameManager {
         this.nextStepZ += this.stepSpacing;
     }
 
-    // Start safely on the first step
-    this.ball.position.set(this.steps[0].position.x, 0.5, 0);
+    // Set starting position higher to ensure collision on fast levels
+    this.ball.position.set(this.steps[0].position.x, 1.5, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
     
@@ -237,7 +228,7 @@ export class GameManager {
     this.ball.position.z -= this.forwardSpeed;
     
     this.ball.position.x += this.ballVelocityX;
-    this.ballVelocityX *= 0.9;
+    this.ballVelocityX *= 0.85; // Slightly increased damping for better control
     
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1) {
         this.gameOver();
@@ -255,21 +246,34 @@ export class GameManager {
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
             if (dz < 1.2 && dx < width / 2 + 0.2 && dy > -0.2 && dy < 0.5) {
+                // If the step has spikes, check for specific proximity to spikes
                 if (step.userData.isDanger) {
+                  let hitSpike = false;
+                  for (const child of step.children) {
+                    if (child instanceof THREE.Mesh) {
+                      const spikeGlobalX = step.position.x + child.position.x;
+                      const spikeGlobalZ = step.position.z + child.position.z;
+                      const distToSpike = Math.sqrt(
+                        Math.pow(this.ball.position.x - spikeGlobalX, 2) +
+                        Math.pow(this.ball.position.z - spikeGlobalZ, 2)
+                      );
+                      
+                      if (distToSpike < 0.45) { // Collision radius for spikes
+                        hitSpike = true;
+                        break;
+                      }
+                    }
+                  }
+
+                  if (hitSpike) {
                     this.particles.emit(this.ball.position, 0xff4444, 30, 0.4);
                     this.gameOver();
-                } else {
-                    this.ballVelocityY = this.bounceStrength;
-                    this.ball.position.y = step.position.y + 0.4;
-                    this.audio.playBounce();
-                    this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
-                    
-                    const newScore = Math.floor(Math.abs(this.ball.position.z));
-                    if (newScore > this.score) {
-                        this.score = newScore;
-                        this.options.onScoreUpdate(this.score);
-                    }
+                    break;
+                  }
                 }
+
+                // If not hit or not a spike step, perform standard bounce
+                this.performBounce(step);
                 break;
             }
         }
@@ -277,6 +281,19 @@ export class GameManager {
 
     if (this.ball.position.y < -10) {
         this.gameOver();
+    }
+  }
+
+  private performBounce(step: THREE.Mesh) {
+    this.ballVelocityY = this.bounceStrength;
+    this.ball.position.y = step.position.y + 0.4;
+    this.audio.playBounce();
+    this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
+    
+    const newScore = Math.floor(Math.abs(this.ball.position.z));
+    if (newScore > this.score) {
+        this.score = newScore;
+        this.options.onScoreUpdate(this.score);
     }
   }
 
