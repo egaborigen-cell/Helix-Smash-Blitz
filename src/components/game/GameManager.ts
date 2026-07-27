@@ -168,8 +168,9 @@ export class GameManager {
         this.nextStepZ += this.stepSpacing;
     }
 
-    // Set starting position higher to ensure collision on fast levels
-    this.ball.position.set(this.steps[0].position.x, 1.5, 0);
+    // Set starting position lower to ensure collision even on fast levels
+    // The ball is positioned exactly over the first step at z=0
+    this.ball.position.set(this.steps[0].position.x, 0.6, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
     
