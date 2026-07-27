@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.6.0] - 2024-05-22
+### Improved
+- **Obstacle Balancing**: Refined spike spawning to start with a single spike per platform at the beginning of the run, gradually increasing density as distance increases to provide a smoother difficulty curve.
+
 ## [1.5.0] - 2024-05-21
 ### Improved
 - **User Experience**: The game now starts immediately upon selecting a difficulty mode, removing a redundant step from the start screen.

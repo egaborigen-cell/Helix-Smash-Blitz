@@ -117,7 +117,15 @@ export class GameManager {
       const spikeGeo = new THREE.ConeGeometry(0.2, 0.6, 4);
       const spikeMat = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.3 });
       
-      const numSpikes = 3 + Math.floor(Math.random() * 3);
+      // Refined spike spawning: start with 1, increase with distance
+      let numSpikes = 1;
+      if (z > 100) {
+        numSpikes = 1 + Math.floor(Math.random() * 2); // 1-2 spikes
+      }
+      if (z > 250) {
+        numSpikes = 2 + Math.floor(Math.random() * 3); // 2-4 spikes
+      }
+      
       for (let i = 0; i < numSpikes; i++) {
         const spike = new THREE.Mesh(spikeGeo, spikeMat);
         spike.castShadow = true;
@@ -169,6 +177,7 @@ export class GameManager {
         this.nextStepZ += this.stepSpacing;
     }
 
+    // Start safely on the first step
     this.ball.position.set(this.steps[0].position.x, 0.5, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
