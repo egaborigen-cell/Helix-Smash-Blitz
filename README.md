@@ -1,85 +1,68 @@
-# HelixSmash - 3D Bouncing Adventure
+# Step Smash: 3D Endless Runner
 
-HelixSmash is a hyper-casual 3D game built with Next.js and Three.js. Guide a bouncing ball down a rotating procedural tower, smashing through colored platforms while avoiding dangerous obstacles.
+Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, Three.js, and React. Navigate a bouncing ball across procedurally generated floating platforms, dodging deadly spikes and competing for the global high score.
 
-## Features
+## 🎮 Key Features
 
-- **Procedural Tower Generation**: Every game session features a unique tower layout.
-- **Difficulty Modes**:
-  - **Practice**: 5 levels, no danger zones.
-  - **Beginner**: 10 levels, minimal risk.
-  - **Easy**: 15 levels, standard gameplay.
-  - **Hard**: 30 levels, high danger density.
-  - **Insane**: 50 levels, extreme risk (single gap).
-- **Skin Selection**: Choose between Toxic, Neon, and Aqua styles.
-- **Particle System**: High-performance 3D particle effects for bounces and smashes.
-- **Mobile Optimized**: Smooth touch and keyboard controls.
-- **Localization**: Full English and Russian support.
-- **Yandex Games Integrated**: Leaderboards, Fullscreen Ads, and SDK initialization ready.
+- **Procedural Step Generation**: An infinite path that becomes more challenging as you progress.
+- **Dynamic Hazard System**: Strategically placed 3D spikes that test your reflexes.
+- **Advanced Physics & Rhythm**: Synchronized bounce mechanics that reward consistent timing.
+- **Diverse Difficulty Modes**:
+  - **Practice**: Slow speed, wide steps, no spikes.
+  - **Beginner**: Relaxed pace for casual play.
+  - **Easy**: The standard runner experience.
+  - **Hard**: Fast speed and narrow platforms.
+  - **Insane**: Extreme speed with tiny steps for the pros.
+- **Skin Customization**: 
+  - **Toxic**: Balanced physics (Green).
+  - **Neon**: Light and high-bouncing (Pink).
+  - **Aqua**: Fast and heavy (Cyan).
+- **Yandex Games Integrated**: Global leaderboards and ads ready for publishing.
+- **Cross-Platform**: Optimized for both high-end desktop browsers and mobile touch devices.
 
-## Marketing & Publishing
-
-If you are ready to publish on Yandex Games, check out [src/app/yandex-promo.md](./src/app/yandex-promo.md) for localized descriptions and AI graphic prompts.
-
-## Getting Started
+## 🚀 Getting Started
 
 1.  **Start the development server**:
     ```bash
     npm run dev
     ```
-2.  **Open the game**: Navigate to `http://localhost:9002` in your browser.
+2.  **Open the game**: Navigate to `http://localhost:9002`.
 
-## Pushing Updates to GitHub
+## 🛠 Tech Stack
 
-1. **Stage all changes**: `git add .`
-2. **Commit your work**: `git commit -m "Update features"`
-3. **Push to the main branch**: `git push origin main`
+- **Framework**: Next.js 15 (App Router)
+- **3D Engine**: Three.js
+- **Styling**: Tailwind CSS & ShadCN UI
+- **AI Integration**: Genkit (Configured for future expansion)
 
-## Changing the Git Repository
+## 📡 Deployment & Publishing
 
-If you need to point this project to a different GitHub repository:
+### Yandex Games Console
+1. **Build the project**: `npm run build`
+2. **Package for upload**: Open the `out/` directory. Select all files/folders *inside* `out/` and create a ZIP archive. 
+   - *Note: Do not zip the 'out' folder itself, only its contents.*
+3. **Leaderboards**: Ensure you create a leaderboard in the Yandex Console with the Technical Name: `TopScores`.
 
-1. **Check the current remote**:
-   ```bash
-   git remote -v
-   ```
+### Git Workflow
+If you need to push updates to your repository:
+1. `git add .`
+2. `git commit -m "Your description of changes"`
+3. `git push origin main`
 
-2. **Update the remote URL**:
-   ```bash
-   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_NEW_REPO_NAME.git
-   ```
+## ❓ Troubleshooting
 
-3. **Verify the change**:
-   ```bash
-   git remote -v
-   ```
+### "Permission Denied" on Git Push
+If you see `remote: Permission to ... denied to ...`, it usually means your local Git is authenticated as a user who doesn't have write access to that specific repository.
 
-4. **Push your code to the new repo**:
-   ```bash
-   git push -u origin main
-   ```
-
-## Troubleshooting Git Errors
-
-### "Permission Denied" Error
-If you see `remote: Permission to ... denied to ...`, it means you are authenticated as a user who doesn't have access to the target repository.
-
-**Solution 1: Use your own repository**
-Ensure you are pushing to a repository under your own GitHub account. Create a new repository on GitHub and run:
+**Solution:**
+Create your own repository on GitHub and point the project to it:
 ```bash
 git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git push -u origin main
 ```
 
-**Solution 2: Check SSH/HTTPS Credentials**
-If you are using HTTPS, your browser or credential manager might be storing the wrong account. Try logging out or using a Personal Access Token.
+### 404 Errors on Yandex Games
+Usually caused by incorrect zipping. Ensure the `index.html` file is at the root level of your ZIP archive, not inside a subfolder named `out`.
 
-## Deployment to Yandex Games
-
-1. **Build**: `npm run build`
-2. **Zip**: Open the `out/` folder, select all contents, and create a ZIP. **Do not zip the 'out' folder itself.**
-3. **Leaderboard**: Create a leaderboard with the Technical Name: `TopScores` in the Yandex Console.
-
-## Troubleshooting Game Errors
-
-- **404 Errors**: Ensure you zipped the *contents* of the `out` folder.
-- **SWC Errors**: Ensure your project path contains only standard alphanumeric characters.
+---
+*For marketing copy and AI graphic prompts, see [src/app/yandex-promo.md](./src/app/yandex-promo.md).*
