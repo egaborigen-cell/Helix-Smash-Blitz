@@ -41,6 +41,7 @@ export default function HelixGame() {
   const managerRef = useRef<GameManager | null>(null);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>('START');
+  const [showGameOverUI, setShowGameOverUI] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
   const [selectedSkin, setSelectedSkin] = useState(SKINS[0]);
   const [isMuted, setIsMuted] = useState(false);
@@ -100,8 +101,14 @@ export default function HelixGame() {
   useEffect(() => {
     if (gameState === 'GAMEOVER') {
       submitScore(score);
+      const timer = setTimeout(() => {
+        setShowGameOverUI(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowGameOverUI(false);
     }
-  }, [gameState]);
+  }, [gameState, score]);
 
   const fetchLeaderboard = async () => {
     if (!ysdk) return;
@@ -173,20 +180,24 @@ export default function HelixGame() {
       
       // Shortcuts for Start / Restart
       if (e.key === 'Enter' || e.key === ' ') {
-        if (gameState === 'START' || gameState === 'GAMEOVER') {
+        if (gameState === 'START' || (gameState === 'GAMEOVER' && showGameOverUI)) {
           handleStart();
         }
       }
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {
+      handleKeyUpInEffect(e);
+    };
+
+    const handleKeyUpInEffect = (e: KeyboardEvent) => {
       keysPressed.delete(e.key);
     };
 
     let rafId: number;
     const updateKeyboard = () => {
       if (gameState === 'PLAYING') {
-        const moveMultiplier = 1.0; // Higher polling speed for keyboard
+        const moveMultiplier = 1.0;
         if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
           manager.moveBall(-moveMultiplier);
         }
@@ -226,7 +237,7 @@ export default function HelixGame() {
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(rafId);
     };
-  }, [gameState, difficulty, selectedSkin]);
+  }, [gameState, difficulty, selectedSkin, showGameOverUI]);
 
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
@@ -470,7 +481,7 @@ export default function HelixGame() {
         )}
 
         {/* Game Over Screen */}
-        {gameState === 'GAMEOVER' && (
+        {showGameOverUI && (
           <div className="flex flex-col items-center gap-6 bg-white/80 backdrop-blur-xl p-10 rounded-3xl border border-destructive/20 shadow-2xl animate-in fade-in zoom-in-95 pointer-events-auto">
             <div className="bg-destructive/10 p-4 rounded-full">
                 <RefreshCcw className="w-12 h-12 text-destructive" />
