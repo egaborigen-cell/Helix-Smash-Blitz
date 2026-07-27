@@ -23,7 +23,6 @@ declare global {
   }
 }
 
-// Slightly buffed bounce values to match GameManager improvements
 const SKINS: SkinConfig[] = [
     { id: 'toxic', color: 0xb8f53d, hex: '#b8f53d', gravity: -0.015, bounceStrength: 0.32, scale: 1.0 },
     { id: 'neon', color: 0xff00ff, hex: '#ff00ff', gravity: -0.012, bounceStrength: 0.37, scale: 0.8 },
@@ -168,23 +167,31 @@ export default function HelixGame() {
     };
 
     const onEnd = () => { isDragging = false; };
-    const handleKeyDown = (e: KeyboardEvent) => handleKey(e.key, true);
-    const handleKeyUp = (e: KeyboardEvent) => handleKey(e.key, false);
-
-    const handleKey = (key: string, isDown: boolean) => {
-      if (isDown) keysPressed.add(key);
-      else keysPressed.delete(key);
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keysPressed.add(e.key);
+      
+      // Shortcuts for Start / Restart
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (gameState === 'START' || gameState === 'GAMEOVER') {
+          handleStart();
+        }
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      keysPressed.delete(e.key);
     };
 
     let rafId: number;
     const updateKeyboard = () => {
       if (gameState === 'PLAYING') {
-        const moveSpeed = 0.8;
+        const moveMultiplier = 1.0; // Higher polling speed for keyboard
         if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
-          manager.moveBall(-moveSpeed);
+          manager.moveBall(-moveMultiplier);
         }
         if (keysPressed.has('ArrowRight') || keysPressed.has('d') || keysPressed.has('D')) {
-          manager.moveBall(moveSpeed);
+          manager.moveBall(moveMultiplier);
         }
       }
       rafId = requestAnimationFrame(updateKeyboard);
@@ -219,7 +226,7 @@ export default function HelixGame() {
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(rafId);
     };
-  }, [gameState]);
+  }, [gameState, difficulty, selectedSkin]);
 
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {

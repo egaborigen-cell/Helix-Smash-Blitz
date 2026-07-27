@@ -45,7 +45,7 @@ export class GameManager {
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
   private forwardSpeed: number = 0.15;
-  private lateralSensitivity: number = 0.08;
+  private lateralSensitivity: number = 0.12; // Increased for better responsiveness
 
   // Platform Generation
   private steps: THREE.Mesh[] = [];
@@ -102,7 +102,6 @@ export class GameManager {
 
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    // Spikes only appear after a safe initial zone
     const isDanger = z < 15 ? false : (Math.random() > (0.9 - progressFactor * 0.3) && z > 20);
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
@@ -138,7 +137,7 @@ export class GameManager {
         
         const spike = new THREE.Mesh(spikeGeo, spikeMat);
         spike.castShadow = true;
-        spike.position.y = 0.3; // Half height of cone
+        spike.position.y = 0.3;
         
         const base = new THREE.Mesh(baseGeo, baseMat);
         base.receiveShadow = true;
@@ -254,7 +253,7 @@ export class GameManager {
   private updatePhysics() {
     this.ball.position.z -= this.forwardSpeed;
     this.ball.position.x += this.ballVelocityX;
-    this.ballVelocityX *= 0.9;
+    this.ballVelocityX *= 0.85; // Slightly faster decay for tighter control
     
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.2) {
         this.gameOver();
@@ -282,7 +281,6 @@ export class GameManager {
                       const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                     Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                       
-                      // Precise spike collision including Y height
                       if (distSq < 0.2 && dy < 1.0 && dy > 0) { 
                         hitSpike = true;
                         break;
