@@ -24,7 +24,7 @@ export const translations = {
       neon: "Neon",
       aqua: "Aqua",
       traits: {
-        toxic: "Balanced",
+        toxic: "Big & Balanced",
         neon: "Bouncy & Light",
         aqua: "Fast & Heavy"
       }
@@ -74,7 +74,7 @@ export const translations = {
       neon: "Неон",
       aqua: "Аква",
       traits: {
-        toxic: "Баланс",
+        toxic: "Большой и Баланс",
         neon: "Прыгучий",
         aqua: "Тяжелый"
       }
