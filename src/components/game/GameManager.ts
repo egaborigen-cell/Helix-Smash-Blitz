@@ -49,7 +49,7 @@ export class GameManager {
 
   // Platform Generation
   private steps: THREE.Mesh[] = [];
-  private stepSpacing: number = 4;
+  private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
   private laneWidth: number = 8;
 
@@ -101,7 +101,10 @@ export class GameManager {
   };
 
   private createStep(z: number) {
-    const isDanger = Math.random() > 0.8 && z > 20;
+    // Difficulty increases with score: more spikes and more variation
+    const progressFactor = Math.min(this.score / 500, 1);
+    const isDanger = Math.random() > (0.9 - progressFactor * 0.2) && z > 20;
+    
     const width = this.difficulty === 'INSANE' ? 2.2 : this.difficulty === 'HARD' ? 3.8 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
     const mat = new THREE.MeshStandardMaterial({ 
@@ -163,13 +166,15 @@ export class GameManager {
     this.steps = [];
     this.nextStepZ = 0;
     
+    // Initial batch of steps
     for (let i = 0; i < 15; i++) {
         this.createStep(this.nextStepZ);
-        this.nextStepZ += this.stepSpacing;
+        // Gradually vary spacing even at the start
+        const spacingVariation = (Math.random() - 0.5) * 0.5;
+        this.nextStepZ += this.baseStepSpacing + spacingVariation;
     }
 
-    // Set starting position lower to ensure collision even on fast levels
-    // The ball is positioned exactly over the first step at z=0
+    // Set starting position lower to ensure immediate first bounce
     this.ball.position.set(this.steps[0].position.x, 0.6, 0);
     this.ballVelocityY = 0;
     this.ballVelocityX = 0;
@@ -213,7 +218,15 @@ export class GameManager {
   private spawnSteps() {
     if (Math.abs(this.ball.position.z) + 40 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
-        this.nextStepZ += this.stepSpacing;
+        
+        // Calculate new spacing with progress factor
+        // The further you go, the more the rhythm shifts
+        const progressFactor = Math.min(this.score / 1000, 1);
+        const spacingVariation = (Math.random() - 0.5) * (1.5 + progressFactor * 2.0);
+        const dynamicSpacing = this.baseStepSpacing + (progressFactor * 1.5) + spacingVariation;
+        
+        // Clamp spacing to ensure it's playable (not too close, not impossibly far)
+        this.nextStepZ += Math.max(3.0, Math.min(8.0, dynamicSpacing));
     }
 
     if (this.steps.length > 20) {
@@ -229,7 +242,7 @@ export class GameManager {
     this.ball.position.z -= this.forwardSpeed;
     
     this.ball.position.x += this.ballVelocityX;
-    this.ballVelocityX *= 0.85; // Slightly increased damping for better control
+    this.ballVelocityX *= 0.85; 
     
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1) {
         this.gameOver();
@@ -246,8 +259,8 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
+            // Detection window: 1.2 units depth and 0.2 units grace on width
             if (dz < 1.2 && dx < width / 2 + 0.2 && dy > -0.2 && dy < 0.5) {
-                // If the step has spikes, check for specific proximity to spikes
                 if (step.userData.isDanger) {
                   let hitSpike = false;
                   for (const child of step.children) {
@@ -259,7 +272,7 @@ export class GameManager {
                         Math.pow(this.ball.position.z - spikeGlobalZ, 2)
                       );
                       
-                      if (distToSpike < 0.45) { // Collision radius for spikes
+                      if (distToSpike < 0.45) { 
                         hitSpike = true;
                         break;
                       }
@@ -273,7 +286,6 @@ export class GameManager {
                   }
                 }
 
-                // If not hit or not a spike step, perform standard bounce
                 this.performBounce(step);
                 break;
             }
