@@ -45,7 +45,7 @@ export class GameManager {
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
   private forwardSpeed: number = 0.15;
-  private lateralSensitivity: number = 0.05;
+  private lateralSensitivity: number = 0.08; // Increased sensitivity
 
   // Platform Generation
   private steps: THREE.Mesh[] = [];
@@ -102,7 +102,8 @@ export class GameManager {
 
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    const isDanger = Math.random() > (0.9 - progressFactor * 0.2) && z > 20;
+    // Ensure the first few steps are always safe
+    const isDanger = z < 15 ? false : (Math.random() > (0.9 - progressFactor * 0.2) && z > 20);
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
@@ -134,7 +135,9 @@ export class GameManager {
     }
     
     const range = this.laneWidth - width;
-    step.position.set((Math.random() - 0.5) * range, 0, -z);
+    // For the very first step, keep it centered for a clean start
+    const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
+    step.position.set(xPos, 0, -z);
     step.userData = { isDanger, z };
     
     this.stepsGroup.add(step);
@@ -151,6 +154,10 @@ export class GameManager {
     const speeds = { PRACTICE: 0.1, BEGINNER: 0.12, EASY: 0.15, HARD: 0.22, INSANE: 0.3 };
     this.forwardSpeed = speeds[difficulty];
     
+    // Rhythm Synchronization: Calculate spacing so the ball lands exactly on a step each bounce
+    const bounceTime = 2 * this.bounceStrength / -this.gravity;
+    this.baseStepSpacing = this.forwardSpeed * bounceTime;
+    
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
 
@@ -165,14 +172,14 @@ export class GameManager {
     this.steps = [];
     this.nextStepZ = 0;
     
-    // Initial batch of steps with constant spacing
+    // Initial batch of steps with synchronized spacing
     for (let i = 0; i < 20; i++) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    // Set start position on the first step with an initial upward bounce
-    this.ball.position.set(this.steps[0].position.x, 0.4, 0);
+    // Set start position EXACTLY on the first step
+    this.ball.position.set(0, 0.4, 0);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     
@@ -213,14 +220,14 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    if (Math.abs(this.ball.position.z) + 50 > this.nextStepZ) {
+    if (Math.abs(this.ball.position.z) + 60 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    if (this.steps.length > 25) {
+    if (this.steps.length > 30) {
         const first = this.steps[0];
-        if (first.position.z > this.ball.position.z + 15) {
+        if (first.position.z > this.ball.position.z + 20) {
             this.stepsGroup.remove(first);
             this.steps.shift();
         }
@@ -231,9 +238,9 @@ export class GameManager {
     this.ball.position.z -= this.forwardSpeed;
     
     this.ball.position.x += this.ballVelocityX;
-    this.ballVelocityX *= 0.85; 
+    this.ballVelocityX *= 0.9; // Slightly reduced damping for snappier movement
     
-    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1) {
+    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.2) {
         this.gameOver();
     }
 
@@ -248,8 +255,8 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            // Improved vertical collision window for stability at high speeds
-            if (dz < 1.2 && dx < width / 2 + 0.3 && dy > -0.5 && dy < 0.6) {
+            // Robust collision volume for high-speed reliability
+            if (dz < 1.4 && dx < width / 2 + 0.4 && dy > -0.6 && dy < 0.8) {
                 if (step.userData.isDanger) {
                   let hitSpike = false;
                   for (const child of step.children) {
