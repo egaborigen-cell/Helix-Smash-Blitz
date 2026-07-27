@@ -102,7 +102,7 @@ export class GameManager {
 
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    const isDanger = z < 15 ? false : (Math.random() > (0.9 - progressFactor * 0.3) && z > 20);
+    const isDanger = z < 10 ? false : (Math.random() > (0.85 - progressFactor * 0.2) && z > 15);
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
@@ -132,7 +132,6 @@ export class GameManager {
       let numSpikes = 1;
       if (z > 100) numSpikes = 1 + Math.floor(Math.random() * 2);
       if (z > 300) numSpikes = 2 + Math.floor(Math.random() * 2);
-      if (z > 600) numSpikes = 3 + Math.floor(Math.random() * 2);
       
       for (let i = 0; i < numSpikes; i++) {
         const spikeGroup = new THREE.Group();
@@ -148,7 +147,7 @@ export class GameManager {
 
         const hazardRing = new THREE.Mesh(ringGeo, ringMat);
         hazardRing.rotation.x = -Math.PI / 2;
-        hazardRing.position.y = 0.16; // Slightly above platform surface
+        hazardRing.position.y = 0.16;
 
         spikeGroup.add(spike);
         spikeGroup.add(base);
@@ -181,6 +180,7 @@ export class GameManager {
     const speeds = { PRACTICE: 0.1, BEGINNER: 0.12, EASY: 0.15, HARD: 0.22, INSANE: 0.3 };
     this.forwardSpeed = speeds[difficulty];
     
+    // Rhythm Sync: Calculate spacing so the ball lands consistently
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
     this.baseStepSpacing = this.forwardSpeed * bounceTime;
     
@@ -203,6 +203,7 @@ export class GameManager {
         this.nextStepZ += this.baseStepSpacing;
     }
 
+    // Start precisely on first step
     this.ball.position.set(0, 0.4, 0);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
@@ -244,7 +245,7 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    if (Math.abs(this.ball.position.z) + 60 > this.nextStepZ) {
+    if (Math.abs(this.ball.position.z) + 50 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
     }
@@ -265,11 +266,13 @@ export class GameManager {
     
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.2) {
         this.gameOver();
+        return;
     }
 
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
+    // Check collisions when falling
     if (this.ballVelocityY < 0) {
         for (const step of this.steps) {
             const dx = Math.abs(this.ball.position.x - step.position.x);
@@ -278,7 +281,10 @@ export class GameManager {
 
             const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            if (dz < 1.4 && dx < width / 2 + 0.4 && dy > -0.6 && dy < 0.8) {
+            // Collision window
+            if (dz < 1.4 && dx < width / 2 + 0.4 && dy > -0.5 && dy < 0.8) {
+                
+                // Hazard Check
                 if (step.userData.isDanger) {
                   let hitSpike = false;
                   for (const child of step.children) {
@@ -289,8 +295,8 @@ export class GameManager {
                       const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                     Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                       
-                      // Danger zone threshold (0.5 radius squared = 0.25)
-                      if (distSq < 0.25 && dy < 1.0 && dy > 0) { 
+                      // Match visual hazard ring radius (approx 0.5-0.6 units)
+                      if (distSq < 0.36 && dy < 1.0 && dy > -0.2) { 
                         hitSpike = true;
                         break;
                       }
@@ -300,12 +306,12 @@ export class GameManager {
                   if (hitSpike) {
                     this.particles.emit(this.ball.position, 0xff4444, 30, 0.4);
                     this.gameOver();
-                    break;
+                    return; // Stop processing immediately to prevent bounce
                   }
                 }
 
                 this.performBounce(step);
-                break;
+                return; // Stop checking other steps once one is hit
             }
         }
     }
