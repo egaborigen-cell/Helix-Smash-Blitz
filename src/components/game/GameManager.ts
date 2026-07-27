@@ -117,21 +117,27 @@ export class GameManager {
     step.receiveShadow = true;
     
     if (isDanger) {
-      // Larger spikes
-      const spikeGeo = new THREE.ConeGeometry(0.35, 1.0, 8);
+      // Significantly larger spikes
+      const spikeGeo = new THREE.ConeGeometry(0.45, 1.2, 8);
       const spikeMat = new THREE.MeshStandardMaterial({ 
-        color: 0xff4444, 
-        roughness: 0.3,
-        emissive: 0xaa0000,
-        emissiveIntensity: 0.2
+        color: 0xff0000, 
+        roughness: 0.1,
+        metalness: 0.8,
+        emissive: 0x660000,
+        emissiveIntensity: 0.5
       });
 
-      const baseGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.15, 8);
-      const baseMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+      const baseGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 8);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 });
 
-      // Larger hazard rings
-      const ringGeo = new THREE.RingGeometry(0.6, 0.8, 32);
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+      // Broader hazard rings
+      const ringGeo = new THREE.RingGeometry(0.8, 1.0, 32);
+      const ringMat = new THREE.MeshBasicMaterial({ 
+        color: 0xff0000, 
+        transparent: true, 
+        opacity: 0.6, 
+        side: THREE.DoubleSide 
+      });
       
       let numSpikes = 1;
       if (z > 100) numSpikes = 1 + Math.floor(Math.random() * 2);
@@ -143,11 +149,11 @@ export class GameManager {
         
         const spike = new THREE.Mesh(spikeGeo, spikeMat);
         spike.castShadow = true;
-        spike.position.y = 0.5;
+        spike.position.y = 0.6;
         
         const base = new THREE.Mesh(baseGeo, baseMat);
         base.receiveShadow = true;
-        base.position.y = 0;
+        base.position.y = 0.1;
 
         const hazardRing = new THREE.Mesh(ringGeo, ringMat);
         hazardRing.rotation.x = -Math.PI / 2;
@@ -157,9 +163,9 @@ export class GameManager {
         spikeGroup.add(base);
         spikeGroup.add(hazardRing);
 
-        const randomX = (Math.random() - 0.5) * (width - 1.2);
+        const randomX = (Math.random() - 0.5) * (width - 1.5);
         const randomZ = (Math.random() - 0.5) * 1.0;
-        spikeGroup.position.set(randomX, 0.15, randomZ);
+        spikeGroup.position.set(randomX, 0, randomZ);
         spikeGroup.rotation.y = Math.random() * Math.PI;
         step.add(spikeGroup);
       }
@@ -276,43 +282,42 @@ export class GameManager {
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
-    // Check collisions when falling
-    if (this.ballVelocityY < 0) {
-        for (const step of this.steps) {
-            const dx = Math.abs(this.ball.position.x - step.position.x);
-            const dz = Math.abs(this.ball.position.z - step.position.z);
-            const dy = this.ball.position.y - step.position.y;
+    // Check collisions
+    for (const step of this.steps) {
+        const dx = Math.abs(this.ball.position.x - step.position.x);
+        const dz = Math.abs(this.ball.position.z - step.position.z);
+        const dy = this.ball.position.y - step.position.y;
 
-            const width = (step.geometry as THREE.BoxGeometry).parameters.width;
+        const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-            // Collision detection window
-            if (dz < 1.6 && dx < width / 2 + 0.6 && dy > -0.5 && dy < 1.8) {
-                
-                // Hazard Check (Prioritize spikes over platform surface)
-                if (step.userData.isDanger) {
-                  for (const child of step.children) {
-                    if (child.name === 'spike') {
-                      const spikeGlobalX = step.position.x + child.position.x;
-                      const spikeGlobalZ = step.position.z + child.position.z;
-                      
-                      const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
-                                    Math.pow(this.ball.position.z - spikeGlobalZ, 2);
-                      
-                      // Match larger hazard ring radius (approx 0.8 units)
-                      if (distSq < 0.7 && dy < 1.5 && dy > -0.2) { 
-                        this.particles.emit(this.ball.position, 0xff4444, 50, 0.5);
-                        this.gameOver();
-                        return; // Stop processing immediately
-                      }
-                    }
+        // Broad detection window for step interaction
+        if (dz < 1.8 && dx < width / 2 + 0.8 && dy > -0.5 && dy < 2.0) {
+            
+            // PRIORITY: Hazard Check
+            if (step.userData.isDanger) {
+              for (const child of step.children) {
+                if (child.name === 'spike') {
+                  const spikeGlobalX = step.position.x + child.position.x;
+                  const spikeGlobalZ = step.position.z + child.position.z;
+                  
+                  const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
+                                Math.pow(this.ball.position.z - spikeGlobalZ, 2);
+                  
+                  // Deadlier collision radius matching the new larger hazard rings (approx 1.0 units)
+                  // Use a slightly larger radius to ensure fairness
+                  if (distSq < 1.0 && dy < 1.6 && dy > -0.2) { 
+                    this.particles.emit(this.ball.position, 0xff0000, 60, 0.6);
+                    this.gameOver();
+                    return; 
                   }
                 }
+              }
+            }
 
-                // Standard platform surface check
-                if (dy < 0.8) {
-                    this.performBounce(step);
-                    return; // Stop checking other steps
-                }
+            // Standard platform surface check (only if falling and not dead)
+            if (this.ballVelocityY < 0 && dy < 0.8 && dy > -0.1) {
+                this.performBounce(step);
+                return; 
             }
         }
     }
