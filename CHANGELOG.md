@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.7.1] - 2024-05-24
+### Added
+- **Git Troubleshooting**: Added documentation for resolving "Permission Denied" errors when pushing to remote repositories in `README.md`.
+
 ## [1.7.0] - 2024-05-23
 ### Added
 - **Git Documentation**: Added clear instructions to `README.md` for changing the project's Git remote repository URL.

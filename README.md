@@ -59,13 +59,27 @@ If you need to point this project to a different GitHub repository:
    git push -u origin main
    ```
 
+## Troubleshooting Git Errors
+
+### "Permission Denied" Error
+If you see `remote: Permission to ... denied to ...`, it means you are authenticated as a user who doesn't have access to the target repository.
+
+**Solution 1: Use your own repository**
+Ensure you are pushing to a repository under your own GitHub account. Create a new repository on GitHub and run:
+```bash
+git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+```
+
+**Solution 2: Check SSH/HTTPS Credentials**
+If you are using HTTPS, your browser or credential manager might be storing the wrong account. Try logging out or using a Personal Access Token.
+
 ## Deployment to Yandex Games
 
 1. **Build**: `npm run build`
 2. **Zip**: Open the `out/` folder, select all contents, and create a ZIP. **Do not zip the 'out' folder itself.**
 3. **Leaderboard**: Create a leaderboard with the Technical Name: `TopScores` in the Yandex Console.
 
-## Troubleshooting
+## Troubleshooting Game Errors
 
 - **404 Errors**: Ensure you zipped the *contents* of the `out` folder.
 - **SWC Errors**: Ensure your project path contains only standard alphanumeric characters.
