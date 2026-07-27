@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.8.0] - 2024-05-25
+### Added
+- **Maintenance Docs**: Added an explanation for the `@opentelemetry/exporter-jaeger` deprecation warning in `README.md` to clarify it is harmless.
+
 ## [1.7.1] - 2024-05-24
 ### Added
 - **Git Troubleshooting**: Added documentation for resolving "Permission Denied" errors when pushing to remote repositories in `README.md`.

@@ -64,5 +64,12 @@ git push -u origin main
 ### 404 Errors on Yandex Games
 Usually caused by incorrect zipping. Ensure the `index.html` file is at the root level of your ZIP archive, not inside a subfolder named `out`.
 
+## 🛠 Maintenance & Known Warnings
+
+### NPM Deprecation Warnings
+You may see a warning like: `npm warn deprecated @opentelemetry/exporter-jaeger@1.30.1: Package no longer supported`.
+- **Reason**: This is a transitive dependency used by the Genkit telemetry system. The industry is moving from Jaeger-specific exporters to the universal OTLP protocol.
+- **Impact**: **None.** This warning is informational and does not affect the game's build, performance, or functionality. You can safely ignore it.
+
 ---
 *For marketing copy and AI graphic prompts, see [src/app/yandex-promo.md](./src/app/yandex-promo.md).*
