@@ -1,0 +1,20 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1920" height="1080" fill="url(#paint0_linear)"/>
+  <g opacity="0.4">
+    <path d="M400 800L600 700H1320L1520 800H400Z" fill="#F2CC0D"/>
+    <path d="M600 600L750 520H1170L1320 600H600Z" fill="#F2CC0D"/>
+  </g>
+  <circle cx="960" cy="450" r="120" fill="#B8F53D" filter="url(#glow)"/>
+  <path d="M880 700L960 550L1040 700H880Z" fill="#FF0000"/>
+  <text x="960" y="250" text-anchor="middle" font-family="Arial" font-weight="900" font-size="180" fill="white" style="letter-spacing: -5px;">STEP SMASH</text>
+  <defs>
+    <linearGradient id="paint0_linear" x1="960" y1="0" x2="960" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset="1" stop-color="#1E40AF"/>
+    </linearGradient>
+    <filter id="glow" x="780" y="280" width="360" height="360" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+</svg>
