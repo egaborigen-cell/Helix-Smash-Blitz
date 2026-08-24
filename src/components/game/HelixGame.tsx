@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty, SkinConfig } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered, MoveHorizontal, Smartphone } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered, MoveHorizontal, Smartphone, Info, CircleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 import {
@@ -50,10 +50,17 @@ export default function HelixGame() {
   const [player, setPlayer] = useState<any>(null);
   const [lbEntries, setLbEntries] = useState<LeaderboardEntry[]>([]);
   const [lbLoading, setLbLoading] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const t = translations[lang];
 
   useEffect(() => {
+    // Check for first-time player
+    const hasPlayed = localStorage.getItem('stepSmash_hasPlayed');
+    if (!hasPlayed) {
+      setShowOnboarding(true);
+    }
+
     let retryCount = 0;
     const maxRetries = 10;
 
@@ -85,6 +92,11 @@ export default function HelixGame() {
     };
     initYandex();
   }, []);
+
+  const closeOnboarding = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('stepSmash_hasPlayed', 'true');
+  };
 
   const submitScore = (finalScore: number) => {
     if (ysdk && finalScore > 0) {
@@ -169,9 +181,8 @@ export default function HelixGame() {
         if (!isDragging) return;
         if (e.cancelable) e.preventDefault();
         
-        // Normalize delta based on screen width for consistent feel across devices
         const deltaPixels = x - lastX;
-        const normalizedDelta = (deltaPixels / window.innerWidth) * 80; // Scale to a reasonable movement value
+        const normalizedDelta = (deltaPixels / window.innerWidth) * 80;
         
         manager.moveBall(normalizedDelta); 
         lastX = x;
@@ -183,7 +194,9 @@ export default function HelixGame() {
       keysPressed.add(e.key);
       
       if (e.key === 'Enter' || e.key === ' ') {
-        if (gameState === 'START' || (gameState === 'GAMEOVER' && showGameOverUI)) {
+        if (gameState === 'START' && !showOnboarding) {
+          handleStart();
+        } else if (gameState === 'GAMEOVER' && showGameOverUI) {
           handleStart();
         }
       }
@@ -240,7 +253,7 @@ export default function HelixGame() {
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(rafId);
     };
-  }, [gameState, difficulty, selectedSkin, showGameOverUI]);
+  }, [gameState, difficulty, selectedSkin, showGameOverUI, showOnboarding]);
 
   const handleStart = (diff: Difficulty = difficulty) => {
     if (managerRef.current) {
@@ -340,6 +353,49 @@ export default function HelixGame() {
                 </Button>
             </div>
         </div>
+
+        {/* Onboarding Dialog */}
+        <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+          <DialogContent className="max-w-md bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl rounded-3xl p-8 pointer-events-auto">
+            <DialogHeader className="flex flex-col items-center gap-2">
+              <div className="bg-primary/20 p-4 rounded-full">
+                <Info className="w-12 h-12 text-primary" />
+              </div>
+              <DialogTitle className="text-3xl font-black text-primary uppercase tracking-tighter text-center">
+                {t.onboarding.title}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-6 mt-4">
+              <div className="flex items-start gap-4 p-4 bg-black/5 rounded-2xl border border-black/5">
+                <Play className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-bold text-lg leading-tight mb-1">{t.onboarding.welcome}</h4>
+                  <p className="text-sm text-muted-foreground">{t.onboarding.goal}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-destructive/5 rounded-2xl border border-destructive/10">
+                <CircleAlert className="w-6 h-6 text-destructive flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-bold text-lg leading-tight mb-1 text-destructive">{t.onboarding.hazard}</h4>
+                  <p className="text-sm text-muted-foreground">{t.onboarding.hazard}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-accent/5 rounded-2xl border border-accent/10">
+                <MoveHorizontal className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-bold text-lg leading-tight mb-1">{t.instructions}</h4>
+                  <p className="text-sm text-muted-foreground">{t.onboarding.controls}</p>
+                </div>
+              </div>
+
+              <Button onClick={closeOnboarding} className="h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-xl shadow-lg hover:bg-primary/90 transition-all">
+                {t.onboarding.gotIt}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Start Screen */}
         {gameState === 'START' && (

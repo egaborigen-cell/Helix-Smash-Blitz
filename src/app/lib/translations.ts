@@ -20,6 +20,14 @@ export const translations = {
     noData: "No scores yet",
     rank: "Rank",
     player: "Player",
+    onboarding: {
+      title: "HOW TO PLAY",
+      welcome: "Welcome to Step Smash!",
+      goal: "Navigate the bouncing ball across floating platforms. Land on yellow steps to keep moving forward.",
+      hazard: "DANGER: Avoid the red spikes and hazard zones! One touch and the run ends.",
+      controls: "Use Arrows, A/D, or Swipe to move laterally.",
+      gotIt: "GOT IT!"
+    },
     skins: {
       toxic: "Toxic",
       neon: "Neon",
@@ -71,6 +79,14 @@ export const translations = {
     noData: "Пока нет результатов",
     rank: "Место",
     player: "Игрок",
+    onboarding: {
+      title: "КАК ИГРАТЬ",
+      welcome: "Добро пожаловать в Step Smash!",
+      goal: "Управляйте прыгающим шаром. Приземляйтесь на желтые платформы, чтобы двигаться вперед.",
+      hazard: "ОПАСНОСТЬ: Избегайте красных шипов! Одно касание — и игра окончена.",
+      controls: "Используйте стрелки, A/D или свайпы для движения в стороны.",
+      gotIt: "ПОНЯТНО!"
+    },
     skins: {
       toxic: "Токсик",
       neon: "Неон",
