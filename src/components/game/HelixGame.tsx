@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 
 declare global {
-  interface window {
+  interface Window {
     YaGames?: {
       init: () => Promise<any>;
     };
@@ -70,7 +70,6 @@ export default function HelixGame() {
           const sdk = await window.YaGames.init();
           setYsdk(sdk);
 
-          // Detect Language from Yandex Environment
           if (sdk.environment && sdk.environment.i18n && sdk.environment.i18n.lang) {
             const detectedLang = sdk.environment.i18n.lang;
             if (detectedLang === 'ru' || detectedLang === 'en') {
@@ -83,9 +82,10 @@ export default function HelixGame() {
             setPlayer(p);
           } catch (playerError) {
             console.warn('Player initialization failed:', playerError);
-          }
-          if (sdk.features && sdk.features.LoadingAPI) {
-            sdk.features.LoadingAPI.ready();
+          } finally {
+            if (sdk.features && sdk.features.LoadingAPI) {
+              sdk.features.LoadingAPI.ready();
+            }
           }
         } catch (e) {
           console.error('Yandex SDK failed to initialize', e);

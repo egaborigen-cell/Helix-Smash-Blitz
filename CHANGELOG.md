@@ -3,6 +3,11 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.9.1] - 2025-05-27
+### Fixed
+- **Yandex Games SDK**: Refined `LoadingAPI.ready()` signaling to ensure it is always called regardless of player authorization status.
+- **TypeScript**: Fixed global `Window` interface declaration in `HelixGame.tsx`.
+
 ## [1.9.0] - 2025-05-26
 ### Added
 - **Export Script**: Added `export-zip` script to `package.json` to automate building and zipping the web export for Yandex Games.

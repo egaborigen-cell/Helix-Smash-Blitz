@@ -5,6 +5,10 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 🚀 Key Improvements & Features
 
+### 📡 Platform Integration Refinement
+- **GameReady Signal**: Verified and refined the `LoadingAPI.ready()` implementation. The signal is now reliably sent within a `finally` block during SDK initialization, ensuring the Yandex loading screen clears even if player authorization is bypassed.
+- **Global Types**: Fixed a TypeScript declaration error for the global `Window` object to improve build stability.
+
 ### 🛠 Core Gameplay & Physics
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection. The ball now reliably registers hits with spikes (and predators) even at high velocities.
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring the large "Toxic" skin has accurate hitboxes.
@@ -22,7 +26,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Localization**: Added full English and Russian support for the onboarding system and hazard warnings.
 - **Automatic Language Detection**: Integrated `ysdk.environment.i18n.lang` to automatically set the game's language based on the player's Yandex account settings.
 
-### 📡 Platform Integration
+### 📡 Original Platform Integration
 - **Yandex SDK V2**: Refactored the initialization process with robust retry logic and better handling of player data.
 - **Ad Logic**: Fixed a bug where music would incorrectly unmute during or after ads if the player had manually muted.
 - **Export Optimization**: Configured `next.config.ts` for static export and updated `package.json` with a precise `export-zip` script.
@@ -31,7 +35,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 📄 File Modifications Log
 - `src/components/game/GameManager.ts`: Collision logic, animal models, starting width logic.
-- `src/components/game/HelixGame.tsx`: SDK integration, UI delay, onboarding state, ad callbacks, automatic language detection.
+- `src/components/game/HelixGame.tsx`: SDK V2 refinement, ready signal logic, global type fix.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial.
 - `package.json`: Refined export scripts for Yandex Games and build cleaning.
 - `next.config.ts`: Finalized static export configuration.
