@@ -2,14 +2,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import Script from 'next/script';
-import { Poppins } from 'next/font/google';
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '600', '800'],
-  variable: '--font-poppins',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'HelixSmash - Bouncing Adventure',
@@ -23,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable} font-body antialiased`}>
+      <body className="font-body antialiased">
         {children}
         <Script src="https://yandex.ru/games/sdk/v2" strategy="beforeInteractive" />
       </body>
