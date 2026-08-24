@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -54,8 +53,8 @@ export default function HelixGame() {
 
   const t = translations[lang];
 
+  // Initialize Yandex SDK
   useEffect(() => {
-    // Check for first-time player
     const hasPlayed = localStorage.getItem('stepSmash_hasPlayed');
     if (!hasPlayed) {
       setShowOnboarding(true);
@@ -65,31 +64,35 @@ export default function HelixGame() {
     const maxRetries = 10;
 
     const initYandex = async () => {
-      if (typeof window !== 'undefined') {
-        if (window.YaGames) {
-          try {
-            const sdk = await window.YaGames.init();
-            setYsdk(sdk);
-            
-            try {
-                const p = await sdk.getPlayer({ scopes: false });
-                setPlayer(p);
-            } catch (playerError) {
-                console.warn('Player initialization failed or declined:', playerError);
-            }
+      if (typeof window === 'undefined') return;
 
-            if (sdk.features && sdk.features.LoadingAPI) {
-              sdk.features.LoadingAPI.ready();
-            }
-          } catch (e) {
-            console.error('Yandex SDK failed to initialize', e);
+      if (window.YaGames) {
+        try {
+          const sdk = await window.YaGames.init();
+          setYsdk(sdk);
+          console.log('Yandex SDK initialized successfully');
+
+          // Try to get player data
+          try {
+            const p = await sdk.getPlayer({ scopes: false });
+            setPlayer(p);
+          } catch (playerError) {
+            console.warn('Player initialization failed or declined:', playerError);
           }
-        } else if (retryCount < maxRetries) {
-          retryCount++;
-          setTimeout(initYandex, 500);
+
+          // Signal game is ready
+          if (sdk.features && sdk.features.LoadingAPI) {
+            sdk.features.LoadingAPI.ready();
+          }
+        } catch (e) {
+          console.error('Yandex SDK failed to initialize', e);
         }
+      } else if (retryCount < maxRetries) {
+        retryCount++;
+        setTimeout(initYandex, 500);
       }
     };
+
     initYandex();
   }, []);
 
@@ -99,15 +102,16 @@ export default function HelixGame() {
   };
 
   const submitScore = (finalScore: number) => {
-    if (ysdk && finalScore > 0) {
-      ysdk.getLeaderboards()
-        .then((lb: any) => {
-          lb.setLeaderboardScore('TopScores', finalScore);
-        })
-        .catch((err: any) => {
-          console.error('Leaderboard submission failed:', err);
-        });
-    }
+    if (!ysdk || finalScore <= 0) return;
+
+    ysdk.getLeaderboards()
+      .then((lb: any) => {
+        lb.setLeaderboardScore('TopScores', finalScore);
+        console.log('Score submitted to Yandex Leaderboard:', finalScore);
+      })
+      .catch((err: any) => {
+        console.error('Leaderboard submission failed:', err);
+      });
   };
 
   useEffect(() => {
@@ -136,7 +140,7 @@ export default function HelixGame() {
       const formatted = entries.entries.map((e: any) => ({
         rank: e.rank,
         score: e.score,
-        name: e.player.publicName || 'Anonymous',
+        name: e.player.publicName || (lang === 'en' ? 'Anonymous' : 'Аноним'),
         photo: e.player.getAvatarSrc('small')
       }));
       setLbEntries(formatted);
@@ -147,6 +151,7 @@ export default function HelixGame() {
     }
   };
 
+  // Three.js Management
   useEffect(() => {
     if (!containerRef.current || managerRef.current) return;
 
@@ -164,6 +169,7 @@ export default function HelixGame() {
     };
   }, []);
 
+  // Controls Management
   useEffect(() => {
     const manager = managerRef.current;
     if (!manager) return;
@@ -182,7 +188,8 @@ export default function HelixGame() {
         if (e.cancelable) e.preventDefault();
         
         const deltaPixels = x - lastX;
-        const normalizedDelta = (deltaPixels / window.innerWidth) * 80;
+        // Normalize sensitivity based on screen width
+        const normalizedDelta = (deltaPixels / window.innerWidth) * 100;
         
         manager.moveBall(normalizedDelta); 
         lastX = x;
@@ -209,7 +216,7 @@ export default function HelixGame() {
     let rafId: number;
     const updateKeyboard = () => {
       if (gameState === 'PLAYING') {
-        const moveMultiplier = 1.2;
+        const moveMultiplier = 1.5;
         if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
           manager.moveBall(-moveMultiplier);
         }
@@ -256,17 +263,33 @@ export default function HelixGame() {
   }, [gameState, difficulty, selectedSkin, showGameOverUI, showOnboarding]);
 
   const handleStart = (diff: Difficulty = difficulty) => {
-    if (managerRef.current) {
-        managerRef.current.startGame(diff, selectedSkin);
-        
-        if (ysdk && ysdk.adv) {
-            ysdk.adv.showFullscreenAdv({
-                callbacks: {
-                    onOpen: () => managerRef.current?.toggleMute(),
-                    onClose: () => managerRef.current?.toggleMute()
-                }
-            });
+    if (!managerRef.current) return;
+
+    // Show ad before starting if SDK is available
+    if (ysdk && ysdk.adv) {
+      ysdk.adv.showFullscreenAdv({
+        callbacks: {
+          onOpen: () => {
+            console.log('Ad opened');
+            managerRef.current?.toggleMute();
+          },
+          onClose: (wasShown: boolean) => {
+            console.log('Ad closed, was shown:', wasShown);
+            managerRef.current?.toggleMute();
+            managerRef.current?.startGame(diff, selectedSkin);
+          },
+          onError: (error: any) => {
+            console.error('Ad error:', error);
+            managerRef.current?.startGame(diff, selectedSkin);
+          },
+          onOffline: () => {
+            console.log('Offline: starting game without ad');
+            managerRef.current?.startGame(diff, selectedSkin);
+          }
         }
+      });
+    } else {
+      managerRef.current.startGame(diff, selectedSkin);
     }
   };
 
@@ -333,7 +356,13 @@ export default function HelixGame() {
                                 {entry.rank}
                               </div>
                               <div className="flex items-center gap-3 min-w-0">
-                                <img src={entry.photo} alt={entry.name} className="w-8 h-8 rounded-full bg-black/10 flex-shrink-0" />
+                                {entry.photo ? (
+                                  <img src={entry.photo} alt={entry.name} className="w-8 h-8 rounded-full bg-black/10 flex-shrink-0" />
+                                ) : (
+                                  <div className="w-8 h-8 rounded-full bg-black/10 flex-shrink-0 flex items-center justify-center">
+                                    <Trophy className="w-4 h-4 text-muted-foreground" />
+                                  </div>
+                                )}
                                 <span className="font-bold truncate">{entry.name}</span>
                               </div>
                               <div className="font-black text-right text-accent">{entry.score}</div>
