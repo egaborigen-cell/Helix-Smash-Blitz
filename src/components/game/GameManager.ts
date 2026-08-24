@@ -40,6 +40,7 @@ export class GameManager {
   private gravity: number = -0.015;
   private bounceStrength: number = 0.32; 
   private ballScale: number = 1.0;
+  private baseBallRadius: number = 0.3;
 
   // Physics state
   private ballVelocityY: number = 0;
@@ -83,7 +84,7 @@ export class GameManager {
     directionalLight.castShadow = true;
     this.scene.add(directionalLight);
 
-    const ballGeo = new THREE.SphereGeometry(0.3, 32, 32);
+    const ballGeo = new THREE.SphereGeometry(this.baseBallRadius, 32, 32);
     const ballMat = new THREE.MeshStandardMaterial({ color: this.ballColor, roughness: 0.3 });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
     this.ball.castShadow = true;
@@ -103,7 +104,6 @@ export class GameManager {
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
     
-    // No spikes in Practice mode
     const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 10 ? false : (Math.random() > (0.85 - progressFactor * 0.2) && z > 15));
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
@@ -117,7 +117,6 @@ export class GameManager {
     step.receiveShadow = true;
     
     if (isDanger) {
-      // Significantly larger spikes
       const spikeGeo = new THREE.ConeGeometry(0.45, 1.2, 8);
       const spikeMat = new THREE.MeshStandardMaterial({ 
         color: 0xff0000, 
@@ -130,7 +129,6 @@ export class GameManager {
       const baseGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 8);
       const baseMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 });
 
-      // Broader hazard rings
       const ringGeo = new THREE.RingGeometry(0.8, 1.0, 32);
       const ringMat = new THREE.MeshBasicMaterial({ 
         color: 0xff0000, 
@@ -190,7 +188,6 @@ export class GameManager {
     const speeds = { PRACTICE: 0.1, BEGINNER: 0.12, EASY: 0.15, HARD: 0.22, INSANE: 0.3 };
     this.forwardSpeed = speeds[difficulty];
     
-    // Rhythm Sync: Calculate spacing so the ball lands consistently
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
     this.baseStepSpacing = this.forwardSpeed * bounceTime;
     
@@ -213,7 +210,6 @@ export class GameManager {
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    // Start precisely on first step
     this.ball.position.set(0, 0.4, 0);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
@@ -282,7 +278,8 @@ export class GameManager {
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
-    // Check collisions
+    const currentBallRadius = this.baseBallRadius * this.ballScale;
+
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
@@ -290,11 +287,10 @@ export class GameManager {
 
         const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-        // Broad detection window for step interaction
-        if (dz < 1.8 && dx < width / 2 + 0.8 && dy > -0.5 && dy < 2.0) {
+        if (dz < 1.8 && dx < width / 2 + 1.5 && dy > -0.5 && dy < 2.0) {
             
-            // PRIORITY: Hazard Check
             if (step.userData.isDanger) {
+              const hazardRadius = 1.0; 
               for (const child of step.children) {
                 if (child.name === 'spike') {
                   const spikeGlobalX = step.position.x + child.position.x;
@@ -303,9 +299,12 @@ export class GameManager {
                   const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                 Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                   
-                  // Deadlier collision radius matching the new larger hazard rings (approx 1.0 units)
-                  // Use a slightly larger radius to ensure fairness
-                  if (distSq < 1.0 && dy < 1.6 && dy > -0.2) { 
+                  // Accurate collision: ball touches the hazard zone if distance is less than (ballRadius + hazardRadius)
+                  // However, for gameplay "feel", center-to-hazard proximity usually feels better.
+                  // We use a threshold that accounts for the ball size to ensure fairness for the larger Toxic skin.
+                  const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.5), 2);
+
+                  if (distSq < collisionThreshold && dy < 1.8 && dy > -0.2) { 
                     this.particles.emit(this.ball.position, 0xff0000, 60, 0.6);
                     this.gameOver();
                     return; 
@@ -314,8 +313,7 @@ export class GameManager {
               }
             }
 
-            // Standard platform surface check (only if falling and not dead)
-            if (this.ballVelocityY < 0 && dy < 0.8 && dy > -0.1) {
+            if (this.ballVelocityY < 0 && dy < 0.8 && dy > -0.1 && dx < width / 2 + (currentBallRadius * 0.5)) {
                 this.performBounce(step);
                 return; 
             }
