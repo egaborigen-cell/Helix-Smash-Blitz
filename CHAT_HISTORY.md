@@ -1,3 +1,4 @@
+
 # HelixSmash Development History
 
 This document serves as a record of the changes, bug fixes, and feature implementations requested during the current development session for **HelixSmash**.
@@ -23,10 +24,13 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ### 📡 Platform Integration
 - **Yandex SDK V2**: Refactored the initialization process with robust retry logic and better handling of player data.
 - **Ad Logic**: Fixed a bug where music would incorrectly unmute during or after ads if the player had manually muted.
+- **Export Optimization**: Configured `next.config.ts` for static export and updated `package.json` with a precise `export-zip` script for one-click publishing.
 - **Promo Materials**: Created a `yandex-promo/` directory containing localized marketing copy, AI graphic prompts, and vector assets (`icon.svg`, `cover.svg`).
 
 ## 📄 File Modifications Log
 - `src/components/game/GameManager.ts`: Collision logic, animal models, starting width logic.
 - `src/components/game/HelixGame.tsx`: SDK integration, UI delay, onboarding state, ad callbacks.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial.
+- `package.json`: Refined export scripts for Yandex Games.
+- `next.config.ts`: Finalized static export configuration.
 - `yandex-promo/`: Vector graphics and marketing metadata.
