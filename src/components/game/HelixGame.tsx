@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 
 declare global {
-  interface Window {
+  interface window {
     YaGames?: {
       init: () => Promise<any>;
     };
@@ -70,6 +69,15 @@ export default function HelixGame() {
         try {
           const sdk = await window.YaGames.init();
           setYsdk(sdk);
+
+          // Detect Language from Yandex Environment
+          if (sdk.environment && sdk.environment.i18n && sdk.environment.i18n.lang) {
+            const detectedLang = sdk.environment.i18n.lang;
+            if (detectedLang === 'ru' || detectedLang === 'en') {
+              setLang(detectedLang as Language);
+            }
+          }
+
           try {
             const p = await sdk.getPlayer({ scopes: false });
             setPlayer(p);
