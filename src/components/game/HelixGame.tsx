@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty, SkinConfig } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered, MoveHorizontal } from 'lucide-react';
+import { Trophy, RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, ListOrdered, MoveHorizontal, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 import {
@@ -168,8 +168,12 @@ export default function HelixGame() {
     const onMove = (x: number, e: MouseEvent | TouchEvent) => {
         if (!isDragging) return;
         if (e.cancelable) e.preventDefault();
-        const delta = x - lastX;
-        manager.moveBall(delta * 0.5); 
+        
+        // Normalize delta based on screen width for consistent feel across devices
+        const deltaPixels = x - lastX;
+        const normalizedDelta = (deltaPixels / window.innerWidth) * 80; // Scale to a reasonable movement value
+        
+        manager.moveBall(normalizedDelta); 
         lastX = x;
     };
 
@@ -178,7 +182,6 @@ export default function HelixGame() {
     const handleKeyDown = (e: KeyboardEvent) => {
       keysPressed.add(e.key);
       
-      // Shortcuts for Start / Restart
       if (e.key === 'Enter' || e.key === ' ') {
         if (gameState === 'START' || (gameState === 'GAMEOVER' && showGameOverUI)) {
           handleStart();
@@ -187,17 +190,13 @@ export default function HelixGame() {
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {
-      handleKeyUpInEffect(e);
-    };
-
-    const handleKeyUpInEffect = (e: KeyboardEvent) => {
       keysPressed.delete(e.key);
     };
 
     let rafId: number;
     const updateKeyboard = () => {
       if (gameState === 'PLAYING') {
-        const moveMultiplier = 1.0;
+        const moveMultiplier = 1.2;
         if (keysPressed.has('ArrowLeft') || keysPressed.has('a') || keysPressed.has('A')) {
           manager.moveBall(-moveMultiplier);
         }
@@ -213,14 +212,18 @@ export default function HelixGame() {
     const mouseMove = (e: MouseEvent) => onMove(e.clientX, e);
     const mouseUp = () => onEnd();
 
-    const touchStart = (e: TouchEvent) => onStart(e.touches[0].clientX);
-    const touchMove = (e: TouchEvent) => onMove(e.touches[0].clientX, e);
+    const touchStart = (e: TouchEvent) => {
+        if (e.touches.length > 0) onStart(e.touches[0].clientX);
+    };
+    const touchMove = (e: TouchEvent) => {
+        if (e.touches.length > 0) onMove(e.touches[0].clientX, e);
+    };
     const touchEnd = () => onEnd();
 
     window.addEventListener('mousedown', mouseDown);
     window.addEventListener('mousemove', mouseMove, { passive: false });
     window.addEventListener('mouseup', mouseUp);
-    window.addEventListener('touchstart', touchStart, { passive: false });
+    window.addEventListener('touchstart', touchStart, { passive: true });
     window.addEventListener('touchmove', touchMove, { passive: false });
     window.addEventListener('touchend', touchEnd);
     window.addEventListener('keydown', handleKeyDown);
@@ -500,8 +503,10 @@ export default function HelixGame() {
           </div>
         )}
 
-        <div className="text-xs text-muted-foreground font-medium opacity-50 uppercase tracking-widest pb-4 text-center flex items-center gap-2">
-            <MoveHorizontal className="w-4 h-4" /> {t.instructions}
+        <div className="text-xs text-muted-foreground font-medium opacity-60 uppercase tracking-widest pb-4 text-center flex flex-col md:flex-row items-center gap-2">
+            <div className="flex items-center gap-1"><Smartphone className="w-3 h-3" /> {t.instructionsMobile}</div>
+            <div className="hidden md:flex items-center gap-1 opacity-50">|</div>
+            <div className="flex items-center gap-1"><MoveHorizontal className="w-3 h-3" /> {t.instructions}</div>
         </div>
       </div>
     </div>
