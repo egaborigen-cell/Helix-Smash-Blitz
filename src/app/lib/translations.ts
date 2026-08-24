@@ -24,7 +24,8 @@ export const translations = {
       title: "HOW TO PLAY",
       welcome: "Welcome to Step Smash!",
       goal: "Navigate the bouncing ball across floating platforms. Land on yellow steps to keep moving forward.",
-      hazard: "DANGER: Avoid the wild predators! One touch and the run ends.",
+      hazardTitle: "WILD PREDATORS",
+      hazardDesc: "Avoid the foxes and wolves! One touch and the run ends instantly.",
       controls: "Use Arrows, A/D, or Swipe to move laterally.",
       gotIt: "GOT IT!"
     },
@@ -83,7 +84,8 @@ export const translations = {
       title: "КАК ИГРАТЬ",
       welcome: "Добро пожаловать в Step Smash!",
       goal: "Управляйте прыгающим шаром. Приземляйтесь на желтые платформы, чтобы двигаться вперед.",
-      hazard: "ОПАСНОСТЬ: Избегайте диких хищников! Одно касание — и игра окончена.",
+      hazardTitle: "ДИКИЕ ХИЩНИКИ",
+      hazardDesc: "Избегайте лис и волков! Одно касание — и игра окончена.",
       controls: "Используйте стрелки, A/D или свайпы для движения в стороны.",
       gotIt: "ПОНЯТНО!"
     },

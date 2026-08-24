@@ -4,7 +4,6 @@ export class AudioManager {
   private masterGain: GainNode | null = null;
   private musicOsc: OscillatorNode | null = null;
   private isMuted: boolean = false;
-  private isStarted: boolean = false;
 
   constructor() {
     // Context is initialized on first user interaction
@@ -24,6 +23,11 @@ export class AudioManager {
     }
   }
 
+  public setMuted(muted: boolean) {
+    this.isMuted = muted;
+    this.updateVolume();
+  }
+
   public toggleMute() {
     this.isMuted = !this.isMuted;
     this.updateVolume();
@@ -39,17 +43,14 @@ export class AudioManager {
     const gain = ctx.createGain();
 
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(110, ctx.currentTime); // Low A
+    osc.frequency.setValueAtTime(110, ctx.currentTime);
     
-    // Simple rhythmic pulse
     gain.gain.setValueAtTime(0.05, ctx.currentTime);
     
     osc.connect(gain);
     gain.connect(this.masterGain!);
     osc.start();
     this.musicOsc = osc;
-
-    // Simple melody loop logic could go here, but keeping it basic for now
   }
 
   public stopMusic() {

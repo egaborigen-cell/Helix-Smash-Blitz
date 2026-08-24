@@ -35,20 +35,17 @@ export class GameManager {
   private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
   
-  // Current Skin Settings
   private ballColor: number = 0xb8f53d;
   private gravity: number = -0.015;
   private bounceStrength: number = 0.32; 
   private ballScale: number = 1.0;
   private baseBallRadius: number = 0.3;
 
-  // Physics state
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
   private forwardSpeed: number = 0.15;
   private lateralSensitivity: number = 0.04;
 
-  // Platform Generation
   private steps: THREE.Mesh[] = [];
   private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
@@ -110,24 +107,20 @@ export class GameManager {
     const accentMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.7 });
     const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-    // Body
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.8), bodyMat);
     body.position.y = 0.3;
     body.castShadow = true;
     group.add(body);
 
-    // Head
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), bodyMat);
     head.position.set(0, 0.6, -0.4);
     head.castShadow = true;
     group.add(head);
 
-    // Snout
     const snout = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.2), type === 'fox' ? accentMat : bodyMat);
     snout.position.set(0, 0.55, -0.65);
     group.add(snout);
 
-    // Ears
     const earGeo = new THREE.ConeGeometry(0.1, 0.2, 4);
     const earL = new THREE.Mesh(earGeo, bodyMat);
     earL.position.set(-0.15, 0.85, -0.4);
@@ -137,7 +130,6 @@ export class GameManager {
     earR.position.set(0.15, 0.85, -0.4);
     group.add(earR);
 
-    // Eyes
     const eyeGeo = new THREE.SphereGeometry(0.04, 8, 8);
     const eyeL = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff0000 }) : eyeMat);
     eyeL.position.set(-0.12, 0.65, -0.58);
@@ -147,7 +139,6 @@ export class GameManager {
     eyeR.position.set(0.12, 0.65, -0.58);
     group.add(eyeR);
 
-    // Hazard Ring (the "danger zone")
     const ringGeo = new THREE.RingGeometry(0.8, 1.0, 32);
     const ringMat = new THREE.MeshBasicMaterial({ 
       color: 0xff0000, 
@@ -169,10 +160,7 @@ export class GameManager {
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
     const geo = new THREE.BoxGeometry(width, 0.3, 2);
-    const mat = new THREE.MeshStandardMaterial({ 
-      color: 0xf2cc0d,
-      roughness: 0.5 
-    });
+    const mat = new THREE.MeshStandardMaterial({ color: 0xf2cc0d, roughness: 0.5 });
     
     const step = new THREE.Mesh(geo, mat);
     step.receiveShadow = true;
@@ -185,7 +173,7 @@ export class GameManager {
       for (let i = 0; i < numHazards; i++) {
         const animalType = Math.random() > 0.5 ? 'fox' : 'wolf';
         const animalGroup = this.createAnimalModel(animalType);
-        animalGroup.name = 'spike'; // Keeping name as spike for collision logic compatibility
+        animalGroup.name = 'spike'; 
 
         const randomX = (Math.random() - 0.5) * (width - 1.5);
         const randomZ = (Math.random() - 0.5) * 1.0;
@@ -242,6 +230,10 @@ export class GameManager {
     
     this.particles.clear();
     this.audio.startMusic();
+  }
+
+  public setMuted(muted: boolean) {
+    this.audio.setMuted(muted);
   }
 
   public toggleMute() {
@@ -314,7 +306,6 @@ export class GameManager {
         const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
         if (dz < 1.8 && dx < width / 2 + 1.5 && dy > -0.5 && dy < 2.0) {
-            
             if (step.userData.isDanger) {
               const hazardRadius = 1.0; 
               for (const child of step.children) {
@@ -322,9 +313,7 @@ export class GameManager {
                   const spikeGlobalX = step.position.x + child.position.x;
                   const spikeGlobalZ = step.position.z + child.position.z;
                   
-                  const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
-                                Math.pow(this.ball.position.z - spikeGlobalZ, 2);
-                  
+                  const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) + Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                   const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.5), 2);
 
                   if (distSq < collisionThreshold && dy < 1.8 && dy > -0.2) { 
