@@ -101,9 +101,70 @@ export class GameManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
+  private createAnimalModel(type: 'fox' | 'wolf') {
+    const group = new THREE.Group();
+    const color = type === 'fox' ? 0xff8c00 : 0x4a4a4a;
+    const accentColor = type === 'fox' ? 0xffffff : 0xff0000;
+    
+    const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.7 });
+    const accentMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.7 });
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+    // Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.8), bodyMat);
+    body.position.y = 0.3;
+    body.castShadow = true;
+    group.add(body);
+
+    // Head
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), bodyMat);
+    head.position.set(0, 0.6, -0.4);
+    head.castShadow = true;
+    group.add(head);
+
+    // Snout
+    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.2), type === 'fox' ? accentMat : bodyMat);
+    snout.position.set(0, 0.55, -0.65);
+    group.add(snout);
+
+    // Ears
+    const earGeo = new THREE.ConeGeometry(0.1, 0.2, 4);
+    const earL = new THREE.Mesh(earGeo, bodyMat);
+    earL.position.set(-0.15, 0.85, -0.4);
+    group.add(earL);
+
+    const earR = new THREE.Mesh(earGeo, bodyMat);
+    earR.position.set(0.15, 0.85, -0.4);
+    group.add(earR);
+
+    // Eyes
+    const eyeGeo = new THREE.SphereGeometry(0.04, 8, 8);
+    const eyeL = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff0000 }) : eyeMat);
+    eyeL.position.set(-0.12, 0.65, -0.58);
+    group.add(eyeL);
+
+    const eyeR = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff0000 }) : eyeMat);
+    eyeR.position.set(0.12, 0.65, -0.58);
+    group.add(eyeR);
+
+    // Hazard Ring (the "danger zone")
+    const ringGeo = new THREE.RingGeometry(0.8, 1.0, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ 
+      color: 0xff0000, 
+      transparent: true, 
+      opacity: 0.8, 
+      side: THREE.DoubleSide 
+    });
+    const hazardRing = new THREE.Mesh(ringGeo, ringMat);
+    hazardRing.rotation.x = -Math.PI / 2;
+    hazardRing.position.y = 0.05;
+    group.add(hazardRing);
+
+    return group;
+  }
+
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    
     const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 10 ? false : (Math.random() > (0.85 - progressFactor * 0.2) && z > 15));
     
     const width = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
@@ -117,55 +178,20 @@ export class GameManager {
     step.receiveShadow = true;
     
     if (isDanger) {
-      const spikeGeo = new THREE.ConeGeometry(0.45, 1.2, 8);
-      const spikeMat = new THREE.MeshStandardMaterial({ 
-        color: 0xff0000, 
-        roughness: 0.1,
-        metalness: 0.8,
-        emissive: 0x660000,
-        emissiveIntensity: 0.5
-      });
-
-      const baseGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.2, 8);
-      const baseMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9 });
-
-      const ringGeo = new THREE.RingGeometry(0.8, 1.0, 32);
-      const ringMat = new THREE.MeshBasicMaterial({ 
-        color: 0xff0000, 
-        transparent: true, 
-        opacity: 0.6, 
-        side: THREE.DoubleSide 
-      });
+      let numHazards = 1;
+      if (z > 100) numHazards = 1 + Math.floor(Math.random() * 2);
+      if (z > 300) numHazards = 2 + Math.floor(Math.random() * 2);
       
-      let numSpikes = 1;
-      if (z > 100) numSpikes = 1 + Math.floor(Math.random() * 2);
-      if (z > 300) numSpikes = 2 + Math.floor(Math.random() * 2);
-      
-      for (let i = 0; i < numSpikes; i++) {
-        const spikeGroup = new THREE.Group();
-        spikeGroup.name = 'spike';
-        
-        const spike = new THREE.Mesh(spikeGeo, spikeMat);
-        spike.castShadow = true;
-        spike.position.y = 0.6;
-        
-        const base = new THREE.Mesh(baseGeo, baseMat);
-        base.receiveShadow = true;
-        base.position.y = 0.1;
-
-        const hazardRing = new THREE.Mesh(ringGeo, ringMat);
-        hazardRing.rotation.x = -Math.PI / 2;
-        hazardRing.position.y = 0.16;
-
-        spikeGroup.add(spike);
-        spikeGroup.add(base);
-        spikeGroup.add(hazardRing);
+      for (let i = 0; i < numHazards; i++) {
+        const animalType = Math.random() > 0.5 ? 'fox' : 'wolf';
+        const animalGroup = this.createAnimalModel(animalType);
+        animalGroup.name = 'spike'; // Keeping name as spike for collision logic compatibility
 
         const randomX = (Math.random() - 0.5) * (width - 1.5);
         const randomZ = (Math.random() - 0.5) * 1.0;
-        spikeGroup.position.set(randomX, 0, randomZ);
-        spikeGroup.rotation.y = Math.random() * Math.PI;
-        step.add(spikeGroup);
+        animalGroup.position.set(randomX, 0.1, randomZ);
+        animalGroup.rotation.y = Math.random() * Math.PI;
+        step.add(animalGroup);
       }
     }
     
@@ -299,9 +325,6 @@ export class GameManager {
                   const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) +
                                 Math.pow(this.ball.position.z - spikeGlobalZ, 2);
                   
-                  // Accurate collision: ball touches the hazard zone if distance is less than (ballRadius + hazardRadius)
-                  // However, for gameplay "feel", center-to-hazard proximity usually feels better.
-                  // We use a threshold that accounts for the ball size to ensure fairness for the larger Toxic skin.
                   const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.5), 2);
 
                   if (distSq < collisionThreshold && dy < 1.8 && dy > -0.2) { 
