@@ -23,6 +23,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ### 📱 User Experience (UX)
 - **Mobile Refactor**: Normalized touch controls so lateral movement feels consistent across all screen resolutions and devices.
 - **Onboarding Tutorial**: Implemented a "How to Play" dialog that appears automatically on the first visit (saved via `localStorage`).
+- **Responsive Onboarding**: Optimized the onboarding dialog for mobile portrait orientation, adding scrollability and refined spacing for smaller screens.
 - **Localization**: Added full English and Russian support for the onboarding system and hazard warnings.
 - **Automatic Language Detection**: Integrated `ysdk.environment.i18n.lang` to automatically set the game's language based on the player's Yandex account settings.
 
@@ -35,7 +36,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 📄 File Modifications Log
 - `src/components/game/GameManager.ts`: Collision logic, animal models, starting width logic.
-- `src/components/game/HelixGame.tsx`: SDK V2 refinement, ready signal logic, global type fix.
+- `src/components/game/HelixGame.tsx`: SDK V2 refinement, ready signal logic, global type fix, responsive onboarding UI.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial.
 - `package.json`: Refined export scripts for Yandex Games and build cleaning.
 - `next.config.ts`: Finalized static export configuration.

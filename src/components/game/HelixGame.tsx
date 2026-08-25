@@ -337,34 +337,34 @@ export default function HelixGame() {
         </div>
 
         <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
-          <DialogContent className="max-w-md bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl rounded-3xl p-8 pointer-events-auto">
-            <DialogHeader className="flex flex-col items-center gap-2">
-              <div className="bg-primary/20 p-4 rounded-full"><Info className="w-12 h-12 text-primary" /></div>
-              <DialogTitle className="text-3xl font-black text-primary uppercase tracking-tighter text-center">{t.onboarding.title}</DialogTitle>
+          <DialogContent className="w-[92vw] max-w-md bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl rounded-3xl p-5 sm:p-8 pointer-events-auto max-h-[92vh] overflow-y-auto">
+            <DialogHeader className="flex flex-col items-center gap-1 sm:gap-2">
+              <div className="bg-primary/20 p-3 sm:p-4 rounded-full"><Info className="w-10 h-10 sm:w-12 sm:h-12 text-primary" /></div>
+              <DialogTitle className="text-2xl sm:text-3xl font-black text-primary uppercase tracking-tighter text-center">{t.onboarding.title}</DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col gap-6 mt-4">
-              <div className="flex items-start gap-4 p-4 bg-black/5 rounded-2xl border border-black/5">
-                <Play className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+            <div className="flex flex-col gap-4 sm:gap-6 mt-2 sm:mt-4">
+              <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-black/5 rounded-2xl border border-black/5">
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-bold text-lg leading-tight mb-1">{t.onboarding.welcome}</h4>
-                  <p className="text-sm text-muted-foreground">{t.onboarding.goal}</p>
+                  <h4 className="font-bold text-base sm:text-lg leading-tight mb-1">{t.onboarding.welcome}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.onboarding.goal}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 bg-destructive/5 rounded-2xl border border-destructive/10">
-                <CircleAlert className="w-6 h-6 text-destructive flex-shrink-0 mt-1" />
+              <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-destructive/5 rounded-2xl border border-destructive/10">
+                <CircleAlert className="w-5 h-5 sm:w-6 sm:h-6 text-destructive flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-bold text-lg leading-tight mb-1 text-destructive">{t.onboarding.hazardTitle}</h4>
-                  <p className="text-sm text-muted-foreground">{t.onboarding.hazardDesc}</p>
+                  <h4 className="font-bold text-base sm:text-lg leading-tight mb-1 text-destructive">{t.onboarding.hazardTitle}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.onboarding.hazardDesc}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 bg-accent/5 rounded-2xl border border-accent/10">
-                <MoveHorizontal className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
+              <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-accent/5 rounded-2xl border border-accent/10">
+                <MoveHorizontal className="w-5 h-5 sm:w-6 sm:h-6 text-accent flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-bold text-lg leading-tight mb-1">{t.instructions}</h4>
-                  <p className="text-sm text-muted-foreground">{t.onboarding.controls}</p>
+                  <h4 className="font-bold text-base sm:text-lg leading-tight mb-1">{t.instructions}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.onboarding.controls}</p>
                 </div>
               </div>
-              <Button onClick={closeOnboarding} className="h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-xl shadow-lg hover:bg-primary/90 transition-all">{t.onboarding.gotIt}</Button>
+              <Button onClick={closeOnboarding} className="h-12 sm:h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-lg sm:text-xl shadow-lg hover:bg-primary/90 transition-all">{t.onboarding.gotIt}</Button>
             </div>
           </DialogContent>
         </Dialog>
