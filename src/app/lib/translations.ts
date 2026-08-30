@@ -1,4 +1,3 @@
-
 export type Language = 'en' | 'ru';
 
 export const translations = {
@@ -15,11 +14,6 @@ export const translations = {
     instructions: "Arrows or A-D to Move",
     instructionsMobile: "Swipe to Move",
     selectSkin: "SELECT SKIN",
-    leaderboard: "Leaderboard",
-    loading: "Loading...",
-    noData: "No scores yet",
-    rank: "Rank",
-    player: "Player",
     onboarding: {
       title: "HOW TO PLAY",
       welcome: "Welcome to Step Smash!",
@@ -75,11 +69,6 @@ export const translations = {
     instructions: "Стрелки или A-D для движения",
     instructionsMobile: "Проведи для движения",
     selectSkin: "ВЫБЕРИ СКИН",
-    leaderboard: "Таблица лидеров",
-    loading: "Загрузка...",
-    noData: "Пока нет результатов",
-    rank: "Место",
-    player: "Игрок",
     onboarding: {
       title: "КАК ИГРАТЬ",
       welcome: "Добро пожаловать в Step Smash!",

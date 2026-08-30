@@ -1,7 +1,5 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'HelixSmash - Bouncing Adventure',
@@ -17,7 +15,6 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-body antialiased">
         {children}
-        <Script src="https://yandex.ru/games/sdk/v2" strategy="beforeInteractive" />
       </body>
     </html>
   );
