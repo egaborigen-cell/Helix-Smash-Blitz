@@ -34,7 +34,7 @@ export default function HelixGame() {
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
   const [selectedSkin, setSelectedSkin] = useState(SKINS[0]);
   const [isMuted, setIsMuted] = useState(false);
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLang] = useState<Language>('ru');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingApi, setOnboardingApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);

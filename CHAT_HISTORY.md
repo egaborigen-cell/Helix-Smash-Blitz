@@ -9,6 +9,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Standalone Version**: Removed all Yandex Games SDK logic. The game is now a purely standalone web app.
 - **Global Types**: Fixed a TypeScript declaration error for the global `Window` interface declaration.
 - **Static Export**: Verified `next.config.ts` for `output: 'export'` and added `export-zip` script to `package.json` that cleans the `404` directory before zipping.
+- **Localization**: Set Russian ('ru') as the default language for the application.
 
 ### 🛠 Core Gameplay & Physics
 - **Expanded Platforms**: Platforms are now significantly wider (up to 9 units) and are placed randomly across a much wider lane (16 units).
@@ -28,7 +29,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 📄 File Modifications Log
 - `src/components/game/GameManager.ts`: Increased platform width, expanded lane width to 16, refined lateral placement randomness, and implemented predator models.
-- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, and removal of Yandex SDK hooks.
+- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
 - `package.json`: Added `export-zip` script and updated dependencies.
 - `next.config.ts`: Configured for static web export.
