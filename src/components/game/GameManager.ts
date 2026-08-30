@@ -44,12 +44,12 @@ export class GameManager {
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
   private forwardSpeed: number = 0.15;
-  private lateralSensitivity: number = 0.04;
+  private lateralSensitivity: number = 0.045; // Slightly increased for wider lane
 
   private steps: THREE.Mesh[] = [];
   private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
-  private laneWidth: number = 8;
+  private laneWidth: number = 16; // Increased from 8 to allow more lateral spread
 
   constructor(options: GameOptions) {
     this.options = options;
@@ -59,7 +59,7 @@ export class GameManager {
     this.particles = new ParticleSystem(this.scene);
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set(0, 5, 8);
+    this.camera.position.set(0, 6, 10); // Pulled back slightly for wider view
     this.camera.lookAt(0, 0, 0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -77,7 +77,7 @@ export class GameManager {
     this.scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
+    directionalLight.position.set(5, 15, 5);
     directionalLight.castShadow = true;
     this.scene.add(directionalLight);
 
@@ -156,16 +156,16 @@ export class GameManager {
 
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 15 ? false : (Math.random() > (0.85 - progressFactor * 0.2) && z > 20));
+    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
     
-    const baseWidth = this.difficulty === 'INSANE' ? 2.5 : this.difficulty === 'HARD' ? 4.0 : 5.5;
+    // Increased platform widths
+    const baseWidth = this.difficulty === 'INSANE' ? 4.0 : this.difficulty === 'HARD' ? 6.0 : 8.5;
     
-    // Platforms are wider at the start to ease the player into the pace
-    // Multiplier starts at 3x and linearly decreases to 1x over the first 60 units of distance
-    const startWidthMultiplier = Math.max(1, 3 - (z / 60) * 2);
+    // Initial platforms are even wider
+    const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
     const width = baseWidth * startWidthMultiplier;
     
-    const geo = new THREE.BoxGeometry(width, 0.3, 2);
+    const geo = new THREE.BoxGeometry(width, 0.3, 2.5); // Slightly deeper steps too
     const mat = new THREE.MeshStandardMaterial({ color: 0xf2cc0d, roughness: 0.5 });
     
     const step = new THREE.Mesh(geo, mat);
@@ -173,23 +173,24 @@ export class GameManager {
     
     if (isDanger) {
       let numHazards = 1;
-      if (z > 100) numHazards = 1 + Math.floor(Math.random() * 2);
-      if (z > 300) numHazards = 2 + Math.floor(Math.random() * 2);
+      if (z > 150) numHazards = 1 + Math.floor(Math.random() * 2);
+      if (z > 400) numHazards = 2 + Math.floor(Math.random() * 2);
       
       for (let i = 0; i < numHazards; i++) {
         const animalType = Math.random() > 0.5 ? 'fox' : 'wolf';
         const animalGroup = this.createAnimalModel(animalType);
         animalGroup.name = 'spike'; 
 
-        const randomX = (Math.random() - 0.5) * (width - 2.0);
-        const randomZ = (Math.random() - 0.5) * 1.0;
+        const randomX = (Math.random() - 0.5) * (width - 2.5);
+        const randomZ = (Math.random() - 0.5) * 1.2;
         animalGroup.position.set(randomX, 0.1, randomZ);
         animalGroup.rotation.y = Math.random() * Math.PI;
         step.add(animalGroup);
       }
     }
     
-    const range = this.laneWidth - Math.min(this.laneWidth, width);
+    // More pronounced left-to-right randomness across the new lane width
+    const range = this.laneWidth - width;
     const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
     step.position.set(xPos, 0, -z);
     step.userData = { isDanger, z };
@@ -205,7 +206,7 @@ export class GameManager {
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
 
-    const speeds = { PRACTICE: 0.1, BEGINNER: 0.12, EASY: 0.15, HARD: 0.22, INSANE: 0.3 };
+    const speeds = { PRACTICE: 0.12, BEGINNER: 0.15, EASY: 0.18, HARD: 0.25, INSANE: 0.35 };
     this.forwardSpeed = speeds[difficulty];
     
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
@@ -230,7 +231,7 @@ export class GameManager {
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    this.ball.position.set(0, 0.4, 0);
+    this.ball.position.set(0, 0.6, 0);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     
@@ -262,27 +263,27 @@ export class GameManager {
     
     this.particles.update(delta);
     
-    const targetCamX = this.ball.position.x * 0.5;
-    const targetCamY = this.ball.position.y + 4;
-    const targetCamZ = this.ball.position.z + 8;
+    const targetCamX = this.ball.position.x * 0.6;
+    const targetCamY = this.ball.position.y + 5;
+    const targetCamZ = this.ball.position.z + 10;
     
     this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
     this.camera.position.y += (targetCamY - this.camera.position.y) * 0.05;
     this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.1;
-    this.camera.lookAt(this.ball.position.x, this.ball.position.y, this.ball.position.z - 5);
+    this.camera.lookAt(this.ball.position.x, this.ball.position.y, this.ball.position.z - 6);
     
     this.renderer.render(this.scene, this.camera);
   };
 
   private spawnSteps() {
-    if (Math.abs(this.ball.position.z) + 50 > this.nextStepZ) {
+    if (Math.abs(this.ball.position.z) + 60 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    if (this.steps.length > 30) {
+    if (this.steps.length > 35) {
         const first = this.steps[0];
-        if (first.position.z > this.ball.position.z + 20) {
+        if (first.position.z > this.ball.position.z + 25) {
             this.stepsGroup.remove(first);
             this.steps.shift();
         }
@@ -294,7 +295,8 @@ export class GameManager {
     this.ball.position.x += this.ballVelocityX;
     this.ballVelocityX *= 0.85;
     
-    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.2) {
+    // Boundary check adjusted for wider lane
+    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.5) {
         this.gameOver();
         return;
     }
@@ -304,13 +306,13 @@ export class GameManager {
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
 
-    // 1. Hazard Collision (Priority)
+    // 1. Hazard Collision
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
         const dy = this.ball.position.y - step.position.y;
 
-        if (step.userData.isDanger && dz < 2.0 && dy < 1.5 && dy > -0.5) {
+        if (step.userData.isDanger && dz < 2.5 && dy < 1.8 && dy > -0.8) {
             const hazardRadius = 1.3; 
             for (const child of step.children) {
                 if (child.name === 'spike') {
@@ -321,7 +323,7 @@ export class GameManager {
                     const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.5), 2);
 
                     if (distSq < collisionThreshold) {
-                        this.particles.emit(this.ball.position, 0xff0000, 60, 0.6);
+                        this.particles.emit(this.ball.position, 0xff0000, 70, 0.7);
                         this.gameOver();
                         return; 
                     }
@@ -337,13 +339,13 @@ export class GameManager {
         const dy = this.ball.position.y - step.position.y;
         const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-        if (this.ballVelocityY < 0 && dz < 1.0 && dy < 0.8 && dy > -0.2 && dx < width / 2 + (currentBallRadius * 0.5)) {
+        if (this.ballVelocityY < 0 && dz < 1.25 && dy < 0.8 && dy > -0.3 && dx < width / 2 + (currentBallRadius * 0.5)) {
             this.performBounce(step);
             return;
         }
     }
 
-    if (this.ball.position.y < -12) {
+    if (this.ball.position.y < -15) {
         this.gameOver();
     }
   }
@@ -352,7 +354,7 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = step.position.y + 0.4;
     this.audio.playBounce();
-    this.particles.emit(this.ball.position, 0xf2cc0d, 12, 0.15);
+    this.particles.emit(this.ball.position, 0xf2cc0d, 15, 0.2);
     
     const newScore = Math.floor(Math.abs(this.ball.position.z));
     if (newScore > this.score) {
