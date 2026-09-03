@@ -3,6 +3,10 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# Generate date string (e.g., 2025-05-28)
+DATE_STR=$(date +%Y-%m-%d)
+ZIP_NAME="game-$DATE_STR.zip"
+
 echo "🚀 Starting HelixSmash Static Web Export..."
 
 # 1. Run Next.js build (which produces the 'out' directory due to output: 'export')
@@ -19,17 +23,17 @@ if [ -d "out" ]; then
         echo "✅ Removed out/404 directory."
     fi
     
-    echo "🗜️  Creating game.zip archive..."
+    echo "🗜️  Creating $ZIP_NAME archive..."
     
-    # Ensure any existing game.zip is removed to avoid appending
-    rm -f game.zip
+    # Remove existing zips to avoid confusion
+    rm -f game-*.zip game.zip
     
     # Navigate into the out directory to ensure the ZIP contains contents, not the folder itself
     cd out
-    zip -r ../game.zip .
+    zip -r ../$ZIP_NAME .
     cd ..
     
-    echo "✨ Export successful! Your game is ready at: game.zip"
+    echo "✨ Export successful! Your game is ready at: $ZIP_NAME"
 else
     echo "❌ Error: 'out' directory not found. Did the build fail?"
     exit 1
