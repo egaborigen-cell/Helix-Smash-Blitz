@@ -290,8 +290,8 @@ export default function HelixGame() {
                         <button key={skin.id} onClick={() => setSelectedSkin(skin)} className={cn("flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all", selectedSkin.id === skin.id ? "bg-white/20 border-white" : "bg-white/5 border-transparent opacity-60")}>
                             <div className="w-8 h-8 rounded-full shadow-lg border border-white/20" style={{ backgroundColor: skin.hex }} />
                             <div className="flex flex-col items-center">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-center">{t.skins[skin.id as keyof typeof t.skins]}</span>
-                                <span className="text-[8px] opacity-70 font-medium text-center leading-tight">{t.skins.traits[skin.id as keyof typeof t.skins.traits]}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-center">{t.skins[skin.id as 'toxic' | 'neon' | 'aqua']}</span>
+                                <span className="text-[8px] opacity-70 font-medium text-center leading-tight">{t.skins.traits[skin.id as 'toxic' | 'neon' | 'aqua']}</span>
                             </div>
                         </button>
                     ))}

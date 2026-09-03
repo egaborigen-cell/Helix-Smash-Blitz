@@ -30,10 +30,11 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ### 🐛 Bug Fixes
 - **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface in `GameManager.ts` to resolve a property literal error in the skin selection UI.
+- **Translation Indexing Fix**: Resolved a TypeScript error where indexing the translation object with broad keys caused a ReactNode mismatch.
 
 ## 📄 File Modifications Log
 - `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
-- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian.
+- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
 - `package.json`: Added `export-zip` script and updated dependencies.
 - `next.config.ts`: Configured for static web export.
