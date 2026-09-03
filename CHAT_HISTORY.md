@@ -11,6 +11,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Static Export**: Verified `next.config.ts` for `output: 'export'` and implemented a dedicated `scripts/build-export.sh` shell script for robust packaging.
 - **Localization**: Set Russian ('ru') as the default language for the application.
 - **Export Automation**: Refined the export script to include the current date in the ZIP filename (e.g., `game-2025-05-28.zip`) and store generated archives in a dedicated `archives/` directory for better organization.
+- **Executable Export Script**: Ensured the build export script is executable by using the `bash` prefix in `package.json`, bypassing potential permission issues on various operating systems.
 
 ### 🛠 Core Gameplay & Physics
 - **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale. This ensures all ball types (Toxic, Neon, Aqua) touch the platforms perfectly without clipping or floating.
@@ -39,5 +40,5 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
-- `package.json`: Updated `export-zip` script to call the new shell script.
+- `package.json`: Updated `export-zip` script to call the new shell script using `bash` for reliability.
 - `next.config.ts`: Configured for static web export.
