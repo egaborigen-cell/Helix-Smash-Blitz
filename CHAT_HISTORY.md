@@ -10,7 +10,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Global Types**: Fixed a TypeScript declaration error for the global `Window` interface declaration.
 - **Static Export**: Verified `next.config.ts` for `output: 'export'` and implemented a dedicated `scripts/build-export.sh` shell script for robust packaging.
 - **Localization**: Set Russian ('ru') as the default language for the application.
-- **Export Automation**: Refined the export script to include the current date in the ZIP filename (e.g., `game-2025-05-28.zip`) for better version tracking.
+- **Export Automation**: Refined the export script to include the current date in the ZIP filename (e.g., `game-2025-05-28.zip`) and store generated archives in a dedicated `archives/` directory for better organization.
 
 ### 🛠 Core Gameplay & Physics
 - **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale. This ensures all ball types (Toxic, Neon, Aqua) touch the platforms perfectly without clipping or floating.
@@ -32,10 +32,10 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ### 🐛 Bug Fixes
 - **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface in `GameManager.ts` to resolve a property literal error in the skin selection UI.
 - **Translation Indexing Fix**: Resolved a TypeScript error where indexing the translation object with broad keys caused a ReactNode mismatch.
-- **Export Script**: Created `scripts/build-export.sh` to handle cleaning and zipping in a single automated step.
+- **Export Script**: Created `scripts/build-export.sh` to handle cleaning and zipping in a single automated step. Updated to support dated filenames and an `archives/` output folder.
 
 ## 📄 File Modifications Log
-- `scripts/build-export.sh`: Updated to include dynamic dating in the output filename.
+- `scripts/build-export.sh`: Updated to include dynamic dating and output to `archives/` folder.
 - `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
