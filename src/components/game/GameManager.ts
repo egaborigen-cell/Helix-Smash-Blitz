@@ -9,6 +9,7 @@ export type Difficulty = 'PRACTICE' | 'BEGINNER' | 'EASY' | 'HARD' | 'INSANE';
 export interface SkinConfig {
   id: string;
   color: number;
+  hex: string;
   gravity: number;
   bounceStrength: number;
   scale: number;
