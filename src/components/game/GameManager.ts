@@ -40,16 +40,18 @@ export class GameManager {
   private bounceStrength: number = 0.32; 
   private ballScale: number = 1.0;
   private baseBallRadius: number = 0.3;
+  private stepThickness: number = 0.3;
+  private stepDepth: number = 2.5;
 
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
   private forwardSpeed: number = 0.15;
-  private lateralSensitivity: number = 0.045; // Slightly increased for wider lane
+  private lateralSensitivity: number = 0.045;
 
   private steps: THREE.Mesh[] = [];
   private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
-  private laneWidth: number = 16; // Increased from 8 to allow more lateral spread
+  private laneWidth: number = 16;
 
   constructor(options: GameOptions) {
     this.options = options;
@@ -59,7 +61,7 @@ export class GameManager {
     this.particles = new ParticleSystem(this.scene);
     
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set(0, 6, 10); // Pulled back slightly for wider view
+    this.camera.position.set(0, 6, 10);
     this.camera.lookAt(0, 0, 0);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -158,14 +160,11 @@ export class GameManager {
     const progressFactor = Math.min(this.score / 500, 1);
     const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
     
-    // Increased platform widths
     const baseWidth = this.difficulty === 'INSANE' ? 4.0 : this.difficulty === 'HARD' ? 6.0 : 8.5;
-    
-    // Initial platforms are even wider
     const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
     const width = baseWidth * startWidthMultiplier;
     
-    const geo = new THREE.BoxGeometry(width, 0.3, 2.5); // Slightly deeper steps too
+    const geo = new THREE.BoxGeometry(width, this.stepThickness, this.stepDepth);
     const mat = new THREE.MeshStandardMaterial({ color: 0xf2cc0d, roughness: 0.5 });
     
     const step = new THREE.Mesh(geo, mat);
@@ -189,7 +188,6 @@ export class GameManager {
       }
     }
     
-    // More pronounced left-to-right randomness across the new lane width
     const range = this.laneWidth - width;
     const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
     step.position.set(xPos, 0, -z);
@@ -231,7 +229,8 @@ export class GameManager {
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    this.ball.position.set(0, 0.6, 0);
+    const currentBallRadius = this.baseBallRadius * this.ballScale;
+    this.ball.position.set(0, this.stepThickness / 2 + currentBallRadius + 0.1, 0);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     
@@ -295,7 +294,6 @@ export class GameManager {
     this.ball.position.x += this.ballVelocityX;
     this.ballVelocityX *= 0.85;
     
-    // Boundary check adjusted for wider lane
     if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.5) {
         this.gameOver();
         return;
@@ -306,13 +304,12 @@ export class GameManager {
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
 
-    // 1. Hazard Collision
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
         const dy = this.ball.position.y - step.position.y;
 
-        if (step.userData.isDanger && dz < 2.5 && dy < 1.8 && dy > -0.8) {
+        if (step.userData.isDanger && dz < this.stepDepth / 2 + 0.5 && dy < 1.8 && dy > -0.8) {
             const hazardRadius = 1.3; 
             for (const child of step.children) {
                 if (child.name === 'spike') {
@@ -320,7 +317,7 @@ export class GameManager {
                     const spikeGlobalZ = step.position.z + child.position.z;
                     
                     const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) + Math.pow(this.ball.position.z - spikeGlobalZ, 2);
-                    const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.5), 2);
+                    const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.4), 2);
 
                     if (distSq < collisionThreshold) {
                         this.particles.emit(this.ball.position, 0xff0000, 70, 0.7);
@@ -332,15 +329,23 @@ export class GameManager {
         }
     }
 
-    // 2. Platform Bounce
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
         const dy = this.ball.position.y - step.position.y;
         const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
-        if (this.ballVelocityY < 0 && dz < 1.25 && dy < 0.8 && dy > -0.3 && dx < width / 2 + (currentBallRadius * 0.5)) {
-            this.performBounce(step);
+        const surfaceY = step.position.y + this.stepThickness / 2;
+        const targetLandingY = surfaceY + currentBallRadius;
+        const landingThreshold = 0.35; 
+
+        if (this.ballVelocityY < 0 && 
+            dz < this.stepDepth / 2 && 
+            dx < width / 2 + (currentBallRadius * 0.4) &&
+            this.ball.position.y < targetLandingY + landingThreshold && 
+            this.ball.position.y > surfaceY - 0.2) {
+            
+            this.performBounce(step, targetLandingY);
             return;
         }
     }
@@ -350,9 +355,9 @@ export class GameManager {
     }
   }
 
-  private performBounce(step: THREE.Mesh) {
+  private performBounce(step: THREE.Mesh, landingY: number) {
     this.ballVelocityY = this.bounceStrength;
-    this.ball.position.y = step.position.y + 0.4;
+    this.ball.position.y = landingY;
     this.audio.playBounce();
     this.particles.emit(this.ball.position, 0xf2cc0d, 15, 0.2);
     

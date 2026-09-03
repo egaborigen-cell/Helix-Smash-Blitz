@@ -12,6 +12,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Localization**: Set Russian ('ru') as the default language for the application.
 
 ### 🛠 Core Gameplay & Physics
+- **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale. This ensures all ball types (Toxic, Neon, Aqua) touch the platforms perfectly without clipping or floating.
 - **Expanded Platforms**: Platforms are now significantly wider (up to 9 units) and are placed randomly across a much wider lane (16 units).
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection and handle the expanded lane dimensions.
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
@@ -28,7 +29,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Instructions**: Updated movement labels to reflect both touch and keyboard controls.
 
 ## 📄 File Modifications Log
-- `src/components/game/GameManager.ts`: Increased platform width, expanded lane width to 16, refined lateral placement randomness, and implemented predator models.
+- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, and implemented predator models.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
 - `package.json`: Added `export-zip` script and updated dependencies.
