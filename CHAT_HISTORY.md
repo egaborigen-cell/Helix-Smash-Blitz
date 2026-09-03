@@ -8,7 +8,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ### 📡 Platform Integration Refinement
 - **Standalone Version**: Removed all Yandex Games SDK logic. The game is now a purely standalone web app.
 - **Global Types**: Fixed a TypeScript declaration error for the global `Window` interface declaration.
-- **Static Export**: Verified `next.config.ts` for `output: 'export'` and added `export-zip` script to `package.json` that cleans the `404` directory before zipping.
+- **Static Export**: Verified `next.config.ts` for `output: 'export'` and implemented a dedicated `scripts/build-export.sh` shell script for robust packaging.
 - **Localization**: Set Russian ('ru') as the default language for the application.
 
 ### 🛠 Core Gameplay & Physics
@@ -31,10 +31,12 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ### 🐛 Bug Fixes
 - **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface in `GameManager.ts` to resolve a property literal error in the skin selection UI.
 - **Translation Indexing Fix**: Resolved a TypeScript error where indexing the translation object with broad keys caused a ReactNode mismatch.
+- **Export Script**: Created `scripts/build-export.sh` to handle cleaning and zipping in a single automated step.
 
 ## 📄 File Modifications Log
 - `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
-- `package.json`: Added `export-zip` script and updated dependencies.
+- `package.json`: Updated `export-zip` script to call the new shell script.
+- `scripts/build-export.sh`: New shell script for automated static web export and packaging.
 - `next.config.ts`: Configured for static web export.
