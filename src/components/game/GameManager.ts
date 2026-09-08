@@ -292,9 +292,12 @@ export class GameManager {
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    if (this.steps.length > 35) {
+    // Lenient cleanup to prevent deleting platforms during respawn
+    if (this.steps.length > 50) {
         const first = this.steps[0];
-        if (first.position.z > this.ball.position.z + 25) {
+        // Only remove if it's significantly behind both the ball AND the last safe position
+        const threshold = Math.max(this.ball.position.z, this.lastSafePosition.z) + 30;
+        if (first.position.z > threshold) {
             this.stepsGroup.remove(first);
             this.steps.shift();
         }
@@ -379,6 +382,7 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
+    // Store exact center of platform for safe respawn
     this.lastSafePosition.set(step.position.x, landingY, step.position.z);
     
     this.audio.playBounce();
@@ -403,10 +407,17 @@ export class GameManager {
     } else {
       this.audio.playGameOver(); 
       
+      // Respawn precisely at the center of the last safe platform
       this.ball.position.copy(this.lastSafePosition);
-      this.ball.position.y += 2.5; 
       
-      this.ballVelocityY = 0.1; 
+      // Add a slight Z-offset "behind" the center so the ball moves INTO the platform center
+      // Since forward is negative Z, "behind" is positive Z.
+      this.ball.position.z += 0.5;
+      
+      // Lift the ball up so it falls and hits the platform
+      this.ball.position.y += 3.0; 
+      
+      this.ballVelocityY = 0; // Neutral fall
       this.ballVelocityX = 0;
       this.respawnInvulnerability = 2.0; 
     }

@@ -20,7 +20,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
 - **Gentle Starting Flow**: Initial platforms are 2.5x wider at the start to allow players to adjust to the new lateral speed requirements.
 - **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. Players now respawn centered on the last safe platform with a 1.5-second invulnerability period.
-- **Guaranteed Safe Respawn**: Refactored the safe position tracker to store the exact center of the last platform landed on, ensuring players never miss a platform upon respawning.
+- **Guaranteed Safe Respawn**: Refactored the safe position tracker to store the exact center of the last platform landed on. Implemented a Z-axis safety offset and lenient platform cleanup logic to ensure the ball never misses a platform or triggers premature deletion upon respawning.
 
 ### 🦊 Visuals & Aesthetics
 - **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.
@@ -43,7 +43,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 📄 File Modifications Log
 - `scripts/build-export.sh`: Updated to include dynamic dating and output to `archives/` folder.
-- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, significantly increased platform width (base widths: 6, 8.5, 11), expanded lane width to 16, refined lateral placement randomness, implemented predator models, fixed `SkinConfig` interface, and added lives/respawn logic with invulnerability. Refactored respawn to use platform centers.
+- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, significantly increased platform width (base widths: 6, 8.5, 11), expanded lane width to 16, refined lateral placement randomness, implemented predator models, fixed `SkinConfig` interface, and added lives/respawn logic with invulnerability. Refactored respawn to use platform centers and improved cleanup logic.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types. Skin selection refactored into a separate dialog. Refined start menu responsiveness. Added lives indicator HUD.
 - `src/app/lib/translations.ts`: Localization for predators, tutorial slides, and lives system.
 - `package.json`: Updated `export-zip` script to call the new shell script using `bash` for reliability.
