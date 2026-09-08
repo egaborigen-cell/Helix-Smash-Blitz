@@ -19,8 +19,8 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection and handle the expanded lane dimensions.
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
 - **Gentle Starting Flow**: Initial platforms are 2.5x wider at the start to allow players to adjust to the new lateral speed requirements.
-- **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. Players now respawn centered on the last safe platform with a 2-second invulnerability period.
-- **Guaranteed Safe Respawn**: Refactored the safe position tracker to store the exact center of the last platform landed on. Fixed a bug where high respawn height caused the ball to miss the platform due to forward velocity; implemented a momentum compensator (Z-offset) and a ultra-low, fast-landing respawn position to guarantee a hit on the platform center even at "Insane" speeds.
+- **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. 
+- **Bulletproof Respawn Management**: Refactored the respawn system to use a "snap and bounce" mechanism. Instead of dropping the ball from a height (which risked missing platforms at high speeds), the ball now resets precisely to its last successful landing point and triggers an immediate bounce, guaranteed to be on the platform.
 
 ### 🦊 Visuals & Aesthetics
 - **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.

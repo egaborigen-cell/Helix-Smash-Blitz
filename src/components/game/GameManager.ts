@@ -242,7 +242,7 @@ export class GameManager {
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
     this.ball.position.set(0, this.stepThickness / 2 + currentBallRadius + 0.1, 0);
-    this.lastSafePosition.set(0, this.ball.position.y, 0);
+    this.lastSafePosition.copy(this.ball.position);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     
@@ -294,6 +294,7 @@ export class GameManager {
 
     if (this.steps.length > 50) {
         const first = this.steps[0];
+        // Ensure we don't delete the platform the player is about to respawn on
         const threshold = Math.max(this.ball.position.z, this.lastSafePosition.z) + 30;
         if (first.position.z > threshold) {
             this.stepsGroup.remove(first);
@@ -380,6 +381,7 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
+    // Store the exact safe landing position
     this.lastSafePosition.set(step.position.x, landingY, step.position.z);
     
     this.audio.playBounce();
@@ -404,19 +406,15 @@ export class GameManager {
     } else {
       this.audio.playGameOver(); 
       
-      // Fine-tuned respawn offsets for ultra-reliable landing.
-      // We start even closer to the surface with a tighter momentum compensator.
-      const zOffset = this.forwardSpeed * 1.5; 
-
-      this.ball.position.set(
-        this.lastSafePosition.x,
-        this.lastSafePosition.y + 0.4, // Extremely low height for instant landing
-        this.lastSafePosition.z + zOffset
-      );
-      
-      this.ballVelocityY = -0.1; // Aggressive downward punch to guarantee immediate hit
+      // REFACTOR: Snap the ball exactly to the last safe landing position 
+      // and trigger an immediate bounce from there. This is 100% reliable.
+      this.ball.position.copy(this.lastSafePosition);
+      this.ballVelocityY = this.bounceStrength; 
       this.ballVelocityX = 0;
       this.respawnInvulnerability = 2.0; 
+      
+      // Secondary particle burst to indicate respawn
+      this.particles.emit(this.ball.position, this.ballColor, 20, 0.3);
     }
   }
 
