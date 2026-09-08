@@ -19,8 +19,8 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection and handle the expanded lane dimensions.
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
 - **Gentle Starting Flow**: Initial platforms are 2.5x wider at the start to allow players to adjust to the new lateral speed requirements.
-- **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. Players now respawn centered on the last safe platform with a 1.5-second invulnerability period.
-- **Guaranteed Safe Respawn**: Refactored the safe position tracker to store the exact center of the last platform landed on. Fixed a bug where high respawn height caused the ball to miss the platform due to forward velocity; implemented a lower, faster-landing respawn position to guarantee a hit on the platform center.
+- **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. Players now respawn centered on the last safe platform with a 2-second invulnerability period.
+- **Guaranteed Safe Respawn**: Refactored the safe position tracker to store the exact center of the last platform landed on. Fixed a bug where high respawn height caused the ball to miss the platform due to forward velocity; implemented a momentum compensator (Z-offset) and a lower, faster-landing respawn position to guarantee a hit on the platform center even at "Insane" speeds.
 
 ### 🦊 Visuals & Aesthetics
 - **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.
@@ -40,11 +40,4 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface in `GameManager.ts` to resolve a property literal error in the skin selection UI.
 - **Translation Indexing Fix**: Resolved a TypeScript error where indexing the translation object with broad keys caused a ReactNode mismatch.
 - **Export Script**: Created `scripts/build-export.sh` to handle cleaning and zipping in a single automated step. Updated to support dated filenames and an `archives/` output folder.
-
-## 📄 File Modifications Log
-- `scripts/build-export.sh`: Updated to include dynamic dating and output to `archives/` folder.
-- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, significantly increased platform width (base widths: 6, 8.5, 11), expanded lane width to 16, refined lateral placement randomness, implemented predator models, fixed `SkinConfig` interface, and added lives/respawn logic with invulnerability. Fixed respawn height and velocity to guarantee landing on the platform center.
-- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types. Skin selection refactored into a separate dialog. Refined start menu responsiveness. Added lives indicator HUD.
-- `src/app/lib/translations.ts`: Localization for predators, tutorial slides, and lives system.
-- `package.json`: Updated `export-zip` script to call the new shell script using `bash` for reliability.
-- `next.config.ts`: Configured for static web export.
+- **Context Menu**: Disabled the global browser context menu to prevent gameplay interruptions.
