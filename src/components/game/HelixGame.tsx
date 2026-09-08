@@ -195,15 +195,15 @@ export default function HelixGame() {
   return (
     <div className="game-container touch-none select-none relative overflow-hidden bg-background">
       <div ref={containerRef} className="w-full h-full relative z-10" />
-      <div className="absolute inset-0 z-20 ui-overlay flex flex-col items-center justify-between p-8 pointer-events-none">
+      <div className="absolute inset-0 z-20 ui-overlay flex flex-col items-center justify-between p-4 sm:p-8 pointer-events-none">
         <div className="w-full flex justify-between items-start pointer-events-auto">
             <div className="flex flex-col items-start gap-1">
-                <div className="text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.score}</div>
-                <div className="text-4xl font-extrabold text-accent drop-shadow-lg">{score}m</div>
+                <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.score}</div>
+                <div className="text-2xl sm:text-4xl font-extrabold text-accent drop-shadow-lg">{score}m</div>
             </div>
             <div className="flex gap-2">
-                <Button variant="outline" size="icon" onClick={toggleLang} className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40"><Languages className="w-5 h-5" /></Button>
-                <Button variant="outline" size="icon" onClick={toggleMute} className="rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40">{isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</Button>
+                <Button variant="outline" size="icon" onClick={toggleLang} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40"><Languages className="w-4 h-4 sm:w-5 sm:h-5" /></Button>
+                <Button variant="outline" size="icon" onClick={toggleMute} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40">{isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}</Button>
             </div>
         </div>
 
@@ -322,33 +322,33 @@ export default function HelixGame() {
         </Dialog>
 
         {gameState === 'START' && (
-          <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full overflow-y-auto max-h-[85vh]">
-            <h1 className="text-4xl font-extrabold text-primary tracking-tighter text-center">{t.title}</h1>
+          <div className="flex flex-col items-center gap-4 sm:gap-6 bg-white/10 backdrop-blur-md p-6 sm:p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full overflow-y-auto max-h-[85vh]">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-primary tracking-tighter text-center">{t.title}</h1>
             
             <div className="w-full">
               <button 
                 onClick={() => setShowSkinDialog(true)}
-                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all pointer-events-auto group"
+                className="w-full flex items-center justify-between p-3 sm:p-4 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all pointer-events-auto group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full border border-white/30 shadow-inner" style={{ backgroundColor: selectedSkin.hex }} />
                   <div className="text-left">
                     <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t.selectSkin}</div>
-                    <div className="font-bold text-foreground">{t.skins[selectedSkin.id as 'toxic' | 'neon' | 'aqua']}</div>
+                    <div className="font-bold text-foreground text-sm sm:text-base">{t.skins[selectedSkin.id as 'toxic' | 'neon' | 'aqua']}</div>
                   </div>
                 </div>
                 <Palette className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
               </button>
             </div>
 
-            <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col gap-2 sm:gap-3 w-full">
                 {['PRACTICE', 'BEGINNER', 'EASY', 'HARD', 'INSANE'].map((mode) => (
-                  <button key={mode} onClick={() => { setDifficulty(mode as Difficulty); handleStart(mode as Difficulty); }} className={cn("flex items-center justify-between p-4 rounded-2xl border-2 transition-all group", difficulty === mode ? "bg-primary/20 border-primary shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100")}>
+                  <button key={mode} onClick={() => { setDifficulty(mode as Difficulty); handleStart(mode as Difficulty); }} className={cn("flex items-center justify-between p-3 sm:p-4 rounded-2xl border-2 transition-all group", difficulty === mode ? "bg-primary/20 border-primary shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100")}>
                       <div className="flex items-center gap-3">
-                          {mode === 'PRACTICE' ? <Baby className="w-6 h-6 text-green-500" /> : mode === 'BEGINNER' ? <Smile className="w-6 h-6 text-cyan-500" /> : mode === 'EASY' ? <Shield className="w-6 h-6 text-primary" /> : mode === 'HARD' ? <Zap className="w-6 h-6 text-orange-500" /> : <Skull className="w-6 h-6 text-red-500" />}
+                          {mode === 'PRACTICE' ? <Baby className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" /> : mode === 'BEGINNER' ? <Smile className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-500" /> : mode === 'EASY' ? <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" /> : mode === 'HARD' ? <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" /> : <Skull className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />}
                           <div className="text-left">
-                              <div className="font-bold">{t.difficulty[mode as keyof typeof t.difficulty].name}</div>
-                              <div className="text-xs opacity-70">{t.difficulty[mode as keyof typeof t.difficulty].desc}</div>
+                              <div className="font-bold text-sm sm:text-base">{t.difficulty[mode as keyof typeof t.difficulty].name}</div>
+                              <div className="text-[10px] sm:text-xs opacity-70">{t.difficulty[mode as keyof typeof t.difficulty].desc}</div>
                           </div>
                       </div>
                       <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
@@ -359,19 +359,19 @@ export default function HelixGame() {
         )}
 
         {showGameOverUI && (
-          <div className="flex flex-col items-center gap-6 bg-white/80 backdrop-blur-xl p-10 rounded-3xl border border-destructive/20 shadow-2xl animate-in fade-in zoom-in-95 pointer-events-auto">
-            <div className="bg-destructive/10 p-4 rounded-full"><RefreshCcw className="w-12 h-12 text-destructive" /></div>
-            <h2 className="text-4xl font-extrabold text-foreground">{t.gameOver}</h2>
+          <div className="flex flex-col items-center gap-4 sm:gap-6 bg-white/80 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-destructive/20 shadow-2xl animate-in fade-in zoom-in-95 pointer-events-auto max-w-[90vw]">
+            <div className="bg-destructive/10 p-3 rounded-full"><RefreshCcw className="w-10 h-10 sm:w-12 sm:h-12 text-destructive" /></div>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground text-center">{t.gameOver}</h2>
             <div className="text-center">
-                <p className="text-muted-foreground">{t.finalScore}</p>
-                <p className="text-5xl font-black text-accent">{score}m</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t.finalScore}</p>
+                <p className="text-4xl sm:text-5xl font-black text-accent">{score}m</p>
             </div>
-            <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl">{t.tryAgain}</Button>
-            <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground">{t.backToMenu}</Button>
+            <Button size="lg" onClick={() => handleStart()} className="h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl w-full">{t.tryAgain}</Button>
+            <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground text-sm">{t.backToMenu}</Button>
           </div>
         )}
 
-        <div className="text-xs text-muted-foreground font-medium opacity-60 uppercase tracking-widest pb-4 text-center flex flex-col md:flex-row items-center gap-2">
+        <div className="text-[10px] text-muted-foreground font-medium opacity-60 uppercase tracking-widest pb-4 text-center flex flex-col md:flex-row items-center gap-2">
             <div className="flex items-center gap-1"><Smartphone className="w-3 h-3" /> {t.instructionsMobile}</div>
             <div className="hidden md:flex items-center gap-1 opacity-50">|</div>
             <div className="flex items-center gap-1"><MoveHorizontal className="w-3 h-3" /> {t.instructions}</div>
