@@ -371,6 +371,7 @@ export class GameManager {
 
     if (this.ball.position.y < -15) {
         this.loseLife();
+        return;
     }
   }
 
@@ -378,8 +379,6 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
-    // Update last safe position to the center of the current step
-    // This guarantees the ball respawns over a platform
     this.lastSafePosition.set(step.position.x, landingY, step.position.z);
     
     this.audio.playBounce();
@@ -404,16 +403,12 @@ export class GameManager {
     } else {
       this.audio.playGameOver(); 
       
-      // Respawn at last safe platform's center, but a bit higher
-      // We also offset the Z slightly backwards (positive Z) to give the player 
-      // the full length of the platform to recover.
       this.ball.position.copy(this.lastSafePosition);
-      this.ball.position.y += 2.0; 
-      this.ball.position.z += 0.5;
+      this.ball.position.y += 2.5; 
       
-      this.ballVelocityY = 0;
+      this.ballVelocityY = 0.1; 
       this.ballVelocityX = 0;
-      this.respawnInvulnerability = 1.5; // 1.5 seconds of safety
+      this.respawnInvulnerability = 2.0; 
     }
   }
 
