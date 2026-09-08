@@ -56,6 +56,7 @@ export class GameManager {
   private laneWidth: number = 16;
 
   private lastSafePosition: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
+  private respawnInvulnerability: number = 0;
 
   constructor(options: GameOptions) {
     this.options = options;
@@ -88,7 +89,7 @@ export class GameManager {
     this.scene.add(directionalLight);
 
     const ballGeo = new THREE.SphereGeometry(this.baseBallRadius, 32, 32);
-    const ballMat = new THREE.MeshStandardMaterial({ color: this.ballColor, roughness: 0.3 });
+    const ballMat = new THREE.MeshStandardMaterial({ color: this.ballColor, roughness: 0.3, transparent: true });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
     this.ball.castShadow = true;
     this.ball.position.set(0, 2, 0);
@@ -216,6 +217,7 @@ export class GameManager {
     
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
+    (this.ball.material as THREE.MeshStandardMaterial).opacity = 1.0;
 
     this.gameState = 'PLAYING';
     this.options.onGameStateChange(this.gameState);
@@ -225,6 +227,7 @@ export class GameManager {
     
     this.lives = 3;
     this.options.onLivesUpdate(this.lives);
+    this.respawnInvulnerability = 0;
     
     while(this.stepsGroup.children.length > 0) { 
         this.stepsGroup.remove(this.stepsGroup.children[0]); 
@@ -265,7 +268,7 @@ export class GameManager {
     requestAnimationFrame(this.animate);
     
     if (this.gameState === 'PLAYING') {
-      this.updatePhysics();
+      this.updatePhysics(delta);
       this.spawnSteps();
     }
     
@@ -298,7 +301,15 @@ export class GameManager {
     }
   }
 
-  private updatePhysics() {
+  private updatePhysics(delta: number) {
+    if (this.respawnInvulnerability > 0) {
+      this.respawnInvulnerability -= delta;
+      (this.ball.material as THREE.MeshStandardMaterial).opacity = 0.5 + Math.sin(this.clock.elapsedTime * 20) * 0.2;
+      if (this.respawnInvulnerability <= 0) {
+        (this.ball.material as THREE.MeshStandardMaterial).opacity = 1.0;
+      }
+    }
+
     this.ball.position.z -= this.forwardSpeed;
     this.ball.position.x += this.ballVelocityX;
     this.ballVelocityX *= 0.85;
@@ -313,35 +324,34 @@ export class GameManager {
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
 
-    for (const step of this.steps) {
-        const dx = Math.abs(this.ball.position.x - step.position.x);
-        const dz = Math.abs(this.ball.position.z - step.position.z);
-        const dy = this.ball.position.y - step.position.y;
+    if (this.respawnInvulnerability <= 0) {
+      for (const step of this.steps) {
+          const dz = Math.abs(this.ball.position.z - step.position.z);
+          const dy = this.ball.position.y - step.position.y;
 
-        if (step.userData.isDanger && dz < this.stepDepth / 2 + 0.5 && dy < 1.8 && dy > -0.8) {
-            const hazardRadius = 1.3; 
-            for (const child of step.children) {
-                if (child.name === 'spike') {
-                    const spikeGlobalX = step.position.x + child.position.x;
-                    const spikeGlobalZ = step.position.z + child.position.z;
-                    
-                    const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) + Math.pow(this.ball.position.z - spikeGlobalZ, 2);
-                    const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.4), 2);
+          if (step.userData.isDanger && dz < this.stepDepth / 2 + 0.5 && dy < 1.8 && dy > -0.8) {
+              const hazardRadius = 1.3; 
+              for (const child of step.children) {
+                  if (child.name === 'spike') {
+                      const spikeGlobalX = step.position.x + child.position.x;
+                      const spikeGlobalZ = step.position.z + child.position.z;
+                      
+                      const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) + Math.pow(this.ball.position.z - spikeGlobalZ, 2);
+                      const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.4), 2);
 
-                    if (distSq < collisionThreshold) {
-                        this.particles.emit(this.ball.position, 0xff0000, 70, 0.7);
-                        this.loseLife();
-                        return; 
-                    }
-                }
-            }
-        }
+                      if (distSq < collisionThreshold) {
+                          this.loseLife();
+                          return; 
+                      }
+                  }
+              }
+          }
+      }
     }
 
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
-        const dy = this.ball.position.y - step.position.y;
         const width = (step.geometry as THREE.BoxGeometry).parameters.width;
 
         const surfaceY = step.position.y + this.stepThickness / 2;
@@ -368,6 +378,7 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
+    // Update last safe position at the moment of a successful bounce
     this.lastSafePosition.copy(this.ball.position);
     
     this.audio.playBounce();
@@ -381,21 +392,25 @@ export class GameManager {
   }
 
   private loseLife() {
-    if (this.gameState !== 'PLAYING') return;
+    if (this.gameState !== 'PLAYING' || this.respawnInvulnerability > 0) return;
     
     this.lives--;
     this.options.onLivesUpdate(this.lives);
-    this.audio.playGameOver(); 
-    this.particles.emit(this.ball.position, 0xff0000, 40, 0.5);
+    this.particles.emit(this.ball.position, 0xff0000, 50, 0.6);
 
     if (this.lives <= 0) {
       this.gameOver();
     } else {
-      // Respawn at last safe position
+      this.audio.playGameOver(); 
+      
+      // Respawn at last safe position, but a bit higher and slightly back to give the player time to adjust
       this.ball.position.copy(this.lastSafePosition);
-      this.ball.position.y += 2; // Little extra height to give player time to react
+      this.ball.position.y += 2.5; 
+      this.ball.position.z += 1.0; 
+      
       this.ballVelocityY = 0;
       this.ballVelocityX = 0;
+      this.respawnInvulnerability = 1.5; // 1.5 seconds of safety
     }
   }
 

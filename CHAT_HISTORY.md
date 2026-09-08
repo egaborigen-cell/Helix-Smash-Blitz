@@ -19,13 +19,14 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection and handle the expanded lane dimensions.
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
 - **Gentle Starting Flow**: Initial platforms are 2.5x wider at the start to allow players to adjust to the new lateral speed requirements.
-- **Lives System**: Implemented a three-lives system. Players now respawn at the last safe platform upon hitting a hazard or falling, only triggering Game Over after three strikes.
+- **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. Players now respawn slightly above and behind the last safe landing position with a 1.5-second invulnerability period to ensure a fair second chance.
 
 ### 🦊 Visuals & Aesthetics
 - **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.
 - **Camera Adjustments**: Updated the camera to provide a wider field of view, accommodating the increased platform spread.
 - **Font Optimization**: Switched from `next/font` to native system fonts for better performance and simplicity.
 - **Lives HUD**: Added a heart-based lives indicator to the game's header.
+- **Respawn Effects**: Added a visual blinking effect during invulnerability after losing a life.
 
 ### 📱 User Experience (UX)
 - **Swipeable Onboarding**: Refactored the tutorial into a mobile-friendly carousel that supports touch swipes.
@@ -41,7 +42,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 📄 File Modifications Log
 - `scripts/build-export.sh`: Updated to include dynamic dating and output to `archives/` folder.
-- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, significantly increased platform width (base widths: 6, 8.5, 11), expanded lane width to 16, refined lateral placement randomness, implemented predator models, fixed `SkinConfig` interface, and added lives/respawn logic.
+- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, significantly increased platform width (base widths: 6, 8.5, 11), expanded lane width to 16, refined lateral placement randomness, implemented predator models, fixed `SkinConfig` interface, and added lives/respawn logic with invulnerability.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types. Skin selection refactored into a separate dialog. Refined start menu responsiveness. Added lives indicator HUD.
 - `src/app/lib/translations.ts`: Localization for predators, tutorial slides, and lives system.
 - `package.json`: Updated `export-zip` script to call the new shell script using `bash` for reliability.
