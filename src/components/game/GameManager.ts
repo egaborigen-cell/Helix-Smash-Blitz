@@ -294,7 +294,6 @@ export class GameManager {
 
     if (this.steps.length > 50) {
         const first = this.steps[0];
-        // Ensure we don't delete steps the player might be respawning on
         const threshold = Math.max(this.ball.position.z, this.lastSafePosition.z) + 30;
         if (first.position.z > threshold) {
             this.stepsGroup.remove(first);
@@ -405,19 +404,17 @@ export class GameManager {
     } else {
       this.audio.playGameOver(); 
       
-      // Calculate a "lead" offset for Z to compensate for the forward momentum 
-      // during the frames the ball is falling to land.
-      // At higher difficulty (INSANE), forwardSpeed is up to 0.35.
-      // We start slightly behind (positive Z) so the momentum carries us into the center.
-      const zOffset = this.forwardSpeed * 2.5; 
+      // Fine-tuned respawn offsets for ultra-reliable landing.
+      // We start even closer to the surface with a tighter momentum compensator.
+      const zOffset = this.forwardSpeed * 1.5; 
 
       this.ball.position.set(
         this.lastSafePosition.x,
-        this.lastSafePosition.y + 0.8, // Lower height for faster landing
+        this.lastSafePosition.y + 0.4, // Extremely low height for instant landing
         this.lastSafePosition.z + zOffset
       );
       
-      this.ballVelocityY = -0.06; // Stronger downward punch to land quickly
+      this.ballVelocityY = -0.1; // Aggressive downward punch to guarantee immediate hit
       this.ballVelocityX = 0;
       this.respawnInvulnerability = 2.0; 
     }
