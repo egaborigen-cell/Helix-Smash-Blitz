@@ -3,6 +3,7 @@ export type Language = 'en' | 'ru';
 export const translations = {
   en: {
     score: "Distance",
+    lives: "Lives",
     title: "STEP SMASH",
     play: "START RUN",
     tryAgain: "TRY AGAIN",
@@ -19,7 +20,7 @@ export const translations = {
       welcome: "Welcome to Step Smash!",
       goal: "Navigate the bouncing ball across floating platforms. Land on yellow steps to keep moving forward.",
       hazardTitle: "WILD PREDATORS",
-      hazardDesc: "Avoid the foxes and wolves! One touch and the run ends instantly.",
+      hazardDesc: "Avoid the foxes and wolves! One touch and you lose a life. Three strikes and you're out!",
       controls: "Use Arrows, A/D, or Swipe to move laterally.",
       gotIt: "GOT IT!"
     },
@@ -58,6 +59,7 @@ export const translations = {
   },
   ru: {
     score: "Дистанция",
+    lives: "Жизни",
     title: "STEP SMASH",
     play: "НАЧАТЬ ЗАБЕГ",
     tryAgain: "ЕЩЁ РАЗ",
@@ -74,7 +76,7 @@ export const translations = {
       welcome: "Добро пожаловать в Step Smash!",
       goal: "Управляйте прыгающим шаром. Приземляйтесь на желтые платформы, чтобы двигаться вперед.",
       hazardTitle: "ДИКИЕ ХИЩНИКИ",
-      hazardDesc: "Избегайте лис и волков! Одно касание — и игра окончена.",
+      hazardDesc: "Избегайте хищников! Одно касание — минус жизнь. Всего у вас 3 попытки.",
       controls: "Используйте стрелки, A/D или свайпы для движения в стороны.",
       gotIt: "ПОНЯТНО!"
     },

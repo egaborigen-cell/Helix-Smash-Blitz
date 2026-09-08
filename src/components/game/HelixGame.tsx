@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GameManager, GameState, Difficulty, SkinConfig } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, MoveHorizontal, Smartphone, Info, CircleAlert, ChevronRight } from 'lucide-react';
+import { RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, MoveHorizontal, Smartphone, Info, CircleAlert, ChevronRight, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 import {
@@ -29,6 +29,7 @@ export default function HelixGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const managerRef = useRef<GameManager | null>(null);
   const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
   const [gameState, setGameState] = useState<GameState>('START');
   const [showGameOverUI, setShowGameOverUI] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
@@ -82,6 +83,7 @@ export default function HelixGame() {
     const manager = new GameManager({
       container: containerRef.current,
       onScoreUpdate: (s) => setScore(s),
+      onLivesUpdate: (l) => setLives(l),
       onGameStateChange: (state) => setGameState(state),
     });
     managerRef.current = manager;
@@ -197,9 +199,25 @@ export default function HelixGame() {
       <div ref={containerRef} className="w-full h-full relative z-10" />
       <div className="absolute inset-0 z-20 ui-overlay flex flex-col items-center justify-between p-4 sm:p-8 pointer-events-none">
         <div className="w-full flex justify-between items-start pointer-events-auto">
-            <div className="flex flex-col items-start gap-1">
-                <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.score}</div>
-                <div className="text-2xl sm:text-4xl font-extrabold text-accent drop-shadow-lg">{score}m</div>
+            <div className="flex gap-4 sm:gap-8">
+                <div className="flex flex-col items-start gap-1">
+                    <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.score}</div>
+                    <div className="text-2xl sm:text-4xl font-extrabold text-accent drop-shadow-lg">{score}m</div>
+                </div>
+                <div className="flex flex-col items-start gap-1">
+                    <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.lives}</div>
+                    <div className="flex gap-1 items-center h-8 sm:h-10">
+                        {[1, 2, 3].map((heart) => (
+                            <Heart 
+                                key={heart} 
+                                className={cn(
+                                    "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300", 
+                                    heart <= lives ? "text-red-500 fill-red-500" : "text-white/20 fill-none scale-90"
+                                )} 
+                            />
+                        ))}
+                    </div>
+                </div>
             </div>
             <div className="flex gap-2">
                 <Button variant="outline" size="icon" onClick={toggleLang} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm border-white/30 text-foreground hover:bg-white/40"><Languages className="w-4 h-4 sm:w-5 sm:h-5" /></Button>

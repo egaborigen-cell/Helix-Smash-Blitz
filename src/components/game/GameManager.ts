@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
@@ -17,6 +16,7 @@ export interface SkinConfig {
 
 interface GameOptions {
   onScoreUpdate: (score: number) => void;
+  onLivesUpdate: (lives: number) => void;
   onGameStateChange: (state: GameState) => void;
   container: HTMLDivElement;
 }
@@ -32,6 +32,7 @@ export class GameManager {
   private particles: ParticleSystem;
 
   private score: number = 0;
+  private lives: number = 3;
   private gameState: GameState = 'START';
   private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
@@ -53,6 +54,8 @@ export class GameManager {
   private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
   private laneWidth: number = 16;
+
+  private lastSafePosition: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
 
   constructor(options: GameOptions) {
     this.options = options;
@@ -161,7 +164,6 @@ export class GameManager {
     const progressFactor = Math.min(this.score / 500, 1);
     const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
     
-    // Increased base widths for all difficulties
     const baseWidth = this.difficulty === 'INSANE' ? 6.0 : this.difficulty === 'HARD' ? 8.5 : 11.0;
     const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
     const width = Math.min(this.laneWidth + 4, baseWidth * startWidthMultiplier);
@@ -217,8 +219,12 @@ export class GameManager {
 
     this.gameState = 'PLAYING';
     this.options.onGameStateChange(this.gameState);
+    
     this.score = 0;
     this.options.onScoreUpdate(this.score);
+    
+    this.lives = 3;
+    this.options.onLivesUpdate(this.lives);
     
     while(this.stepsGroup.children.length > 0) { 
         this.stepsGroup.remove(this.stepsGroup.children[0]); 
@@ -233,6 +239,7 @@ export class GameManager {
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
     this.ball.position.set(0, this.stepThickness / 2 + currentBallRadius + 0.1, 0);
+    this.lastSafePosition.copy(this.ball.position);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     
@@ -296,8 +303,8 @@ export class GameManager {
     this.ball.position.x += this.ballVelocityX;
     this.ballVelocityX *= 0.85;
     
-    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 1.5) {
-        this.gameOver();
+    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 3.0) {
+        this.loseLife();
         return;
     }
 
@@ -323,7 +330,7 @@ export class GameManager {
 
                     if (distSq < collisionThreshold) {
                         this.particles.emit(this.ball.position, 0xff0000, 70, 0.7);
-                        this.gameOver();
+                        this.loseLife();
                         return; 
                     }
                 }
@@ -353,13 +360,16 @@ export class GameManager {
     }
 
     if (this.ball.position.y < -15) {
-        this.gameOver();
+        this.loseLife();
     }
   }
 
   private performBounce(step: THREE.Mesh, landingY: number) {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
+    
+    this.lastSafePosition.copy(this.ball.position);
+    
     this.audio.playBounce();
     this.particles.emit(this.ball.position, 0xf2cc0d, 15, 0.2);
     
@@ -367,6 +377,25 @@ export class GameManager {
     if (newScore > this.score) {
         this.score = newScore;
         this.options.onScoreUpdate(this.score);
+    }
+  }
+
+  private loseLife() {
+    if (this.gameState !== 'PLAYING') return;
+    
+    this.lives--;
+    this.options.onLivesUpdate(this.lives);
+    this.audio.playGameOver(); 
+    this.particles.emit(this.ball.position, 0xff0000, 40, 0.5);
+
+    if (this.lives <= 0) {
+      this.gameOver();
+    } else {
+      // Respawn at last safe position
+      this.ball.position.copy(this.lastSafePosition);
+      this.ball.position.y += 2; // Little extra height to give player time to react
+      this.ballVelocityY = 0;
+      this.ballVelocityX = 0;
     }
   }
 
