@@ -15,10 +15,10 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ### 🛠 Core Gameplay & Physics
 - **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale. This ensures all ball types (Toxic, Neon, Aqua) touch the platforms perfectly without clipping or floating.
-- **Expanded Platforms**: Platforms are now significantly wider (up to 9 units) and are placed randomly across a much wider lane (16 units).
+- **Expanded Platforms**: Platforms are now significantly wider (up to 11 units base width) and are placed randomly across a much wider lane (16 units).
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection and handle the expanded lane dimensions.
 - **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
-- **Gentle Starting Flow**: Initial platforms are 3x wider at the start to allow players to adjust to the new lateral speed requirements.
+- **Gentle Starting Flow**: Initial platforms are 2.5x wider at the start to allow players to adjust to the new lateral speed requirements.
 
 ### 🦊 Visuals & Aesthetics
 - **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.
@@ -39,7 +39,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ## 📄 File Modifications Log
 - `scripts/build-export.sh`: Updated to include dynamic dating and output to `archives/` folder.
-- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
+- `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, significantly increased platform width (base widths: 6, 8.5, 11), expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
 - `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types. Skin selection refactored into a separate dialog. Refined start menu responsiveness.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
 - `package.json`: Updated `export-zip` script to call the new shell script using `bash` for reliability.

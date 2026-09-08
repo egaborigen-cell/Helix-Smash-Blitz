@@ -161,9 +161,10 @@ export class GameManager {
     const progressFactor = Math.min(this.score / 500, 1);
     const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
     
-    const baseWidth = this.difficulty === 'INSANE' ? 4.0 : this.difficulty === 'HARD' ? 6.0 : 8.5;
+    // Increased base widths for all difficulties
+    const baseWidth = this.difficulty === 'INSANE' ? 6.0 : this.difficulty === 'HARD' ? 8.5 : 11.0;
     const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
-    const width = baseWidth * startWidthMultiplier;
+    const width = Math.min(this.laneWidth + 4, baseWidth * startWidthMultiplier);
     
     const geo = new THREE.BoxGeometry(width, this.stepThickness, this.stepDepth);
     const mat = new THREE.MeshStandardMaterial({ color: 0xf2cc0d, roughness: 0.5 });
@@ -189,7 +190,7 @@ export class GameManager {
       }
     }
     
-    const range = this.laneWidth - width;
+    const range = Math.max(0, this.laneWidth - width);
     const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
     step.position.set(xPos, 0, -z);
     step.userData = { isDanger, z };
