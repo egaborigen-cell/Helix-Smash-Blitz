@@ -53,6 +53,11 @@ export default function HelixGame() {
     if (!hasPlayed) {
       setShowOnboarding(true);
     }
+    
+    // Disable context menu globally
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    window.addEventListener('contextmenu', handleContextMenu);
+    return () => window.removeEventListener('contextmenu', handleContextMenu);
   }, []);
 
   const closeOnboarding = () => {
