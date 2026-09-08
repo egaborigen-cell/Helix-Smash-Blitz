@@ -36,6 +36,7 @@ export default function HelixGame() {
   const [isMuted, setIsMuted] = useState(false);
   const [lang, setLang] = useState<Language>('ru');
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showSkinDialog, setShowSkinDialog] = useState(false);
   const [onboardingApi, setOnboardingApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -115,7 +116,7 @@ export default function HelixGame() {
     const handleKeyDown = (e: KeyboardEvent) => {
       keysPressed.add(e.key);
       if (e.key === 'Enter' || e.key === ' ') {
-        if (gameState === 'START' && !showOnboarding) {
+        if (gameState === 'START' && !showOnboarding && !showSkinDialog) {
           handleStart();
         } else if (gameState === 'GAMEOVER' && showGameOverUI) {
           handleStart();
@@ -174,7 +175,7 @@ export default function HelixGame() {
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(rafId);
     };
-  }, [gameState, showGameOverUI, showOnboarding]);
+  }, [gameState, showGameOverUI, showOnboarding, showSkinDialog]);
 
   const handleStart = (diff: Difficulty = difficulty) => {
     const manager = managerRef.current;
@@ -285,23 +286,61 @@ export default function HelixGame() {
           </DialogContent>
         </Dialog>
 
+        <Dialog open={showSkinDialog} onOpenChange={setShowSkinDialog}>
+          <DialogContent className="w-[92vw] max-w-sm bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl rounded-3xl p-6 pointer-events-auto">
+            <DialogHeader className="flex flex-col items-center gap-2 mb-4">
+              <div className="bg-primary/20 p-3 rounded-full"><Palette className="w-8 h-8 text-primary" /></div>
+              <DialogTitle className="text-2xl font-black text-primary uppercase tracking-tighter text-center">{t.selectSkin}</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 gap-3">
+              {SKINS.map((skin) => (
+                <button 
+                  key={skin.id} 
+                  onClick={() => {
+                    setSelectedSkin(skin);
+                    setShowSkinDialog(false);
+                  }} 
+                  className={cn(
+                    "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group", 
+                    selectedSkin.id === skin.id 
+                      ? "bg-primary/10 border-primary shadow-md" 
+                      : "bg-white border-transparent hover:border-muted"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full shadow-lg border-2 border-white" style={{ backgroundColor: skin.hex }} />
+                    <div className="text-left">
+                      <div className="font-bold text-lg">{t.skins[skin.id as 'toxic' | 'neon' | 'aqua']}</div>
+                      <div className="text-xs text-muted-foreground">{t.skins.traits[skin.id as 'toxic' | 'neon' | 'aqua']}</div>
+                    </div>
+                  </div>
+                  {selectedSkin.id === skin.id && <div className="w-3 h-3 rounded-full bg-primary" />}
+                </button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {gameState === 'START' && (
           <div className="flex flex-col items-center gap-6 bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full overflow-y-auto max-h-[85vh]">
             <h1 className="text-4xl font-extrabold text-primary tracking-tighter text-center">{t.title}</h1>
-            <div className="w-full flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground tracking-widest uppercase mb-1"><Palette className="w-4 h-4" /> {t.selectSkin}</div>
-                <div className="grid grid-cols-3 gap-3">
-                    {SKINS.map((skin) => (
-                        <button key={skin.id} onClick={() => setSelectedSkin(skin)} className={cn("flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all", selectedSkin.id === skin.id ? "bg-white/20 border-white" : "bg-white/5 border-transparent opacity-60")}>
-                            <div className="w-8 h-8 rounded-full shadow-lg border border-white/20" style={{ backgroundColor: skin.hex }} />
-                            <div className="flex flex-col items-center">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-center">{t.skins[skin.id as 'toxic' | 'neon' | 'aqua']}</span>
-                                <span className="text-[8px] opacity-70 font-medium text-center leading-tight">{t.skins.traits[skin.id as 'toxic' | 'neon' | 'aqua']}</span>
-                            </div>
-                        </button>
-                    ))}
+            
+            <div className="w-full">
+              <button 
+                onClick={() => setShowSkinDialog(true)}
+                className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all pointer-events-auto group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full border border-white/30 shadow-inner" style={{ backgroundColor: selectedSkin.hex }} />
+                  <div className="text-left">
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t.selectSkin}</div>
+                    <div className="font-bold text-foreground">{t.skins[selectedSkin.id as 'toxic' | 'neon' | 'aqua']}</div>
+                  </div>
                 </div>
+                <Palette className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+              </button>
             </div>
+
             <div className="flex flex-col gap-3 w-full">
                 {['PRACTICE', 'BEGINNER', 'EASY', 'HARD', 'INSANE'].map((mode) => (
                   <button key={mode} onClick={() => { setDifficulty(mode as Difficulty); handleStart(mode as Difficulty); }} className={cn("flex items-center justify-between p-4 rounded-2xl border-2 transition-all group", difficulty === mode ? "bg-primary/20 border-primary shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100")}>

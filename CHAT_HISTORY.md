@@ -29,6 +29,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Swipeable Onboarding**: Refactored the tutorial into a mobile-friendly carousel that supports touch swipes.
 - **Responsive UI**: Optimized onboarding and game overlays for mobile portrait orientation.
 - **Instructions**: Updated movement labels to reflect both touch and keyboard controls.
+- **Skin Selection Refinement**: Moved the skin selection grid from the main start menu to a dedicated, high-fidelity dialog. The start menu now features a clean preview button that displays the currently active skin and triggers the selection modal.
 
 ### 🐛 Bug Fixes
 - **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface in `GameManager.ts` to resolve a property literal error in the skin selection UI.
@@ -38,7 +39,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ## 📄 File Modifications Log
 - `scripts/build-export.sh`: Updated to include dynamic dating and output to `archives/` folder.
 - `src/components/game/GameManager.ts`: Refined bounce physics for precision landing, increased platform width, expanded lane width to 16, refined lateral placement randomness, implemented predator models, and fixed `SkinConfig` interface.
-- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types.
+- `src/components/game/HelixGame.tsx`: Onboarding carousel implementation, mobile responsiveness, removal of Yandex SDK hooks, and set default language to Russian. Fixed translation indexing types. Skin selection refactored into a separate dialog.
 - `src/app/lib/translations.ts`: Localization for predators and tutorial slides.
 - `package.json`: Updated `export-zip` script to call the new shell script using `bash` for reliability.
 - `next.config.ts`: Configured for static web export.

@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.10.0] - 2025-05-28
+### Added
+- **UI Refactoring**: Moved skin selection to a dedicated modal dialog, simplifying the main start screen and improving visual hierarchy.
+
 ## [1.9.1] - 2025-05-27
 ### Fixed
 - **Yandex Games SDK**: Refined `LoadingAPI.ready()` signaling to ensure it is always called regardless of player authorization status.
