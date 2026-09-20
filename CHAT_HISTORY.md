@@ -24,6 +24,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 
 ### 🦊 Visuals & Aesthetics
 - **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.
+- **Environment Decoration**: Added non-interactive side platforms with low-poly trees on both the left and right sides of the main track, enhancing the visual depth of the forest environment.
 - **Camera Adjustments**: Updated the camera to provide a wider field of view, accommodating the increased platform spread.
 - **Font Optimization**: Switched from `next/font` to native system fonts for better performance and simplicity.
 - **Lives HUD**: Added a heart-based lives indicator to the game's header.

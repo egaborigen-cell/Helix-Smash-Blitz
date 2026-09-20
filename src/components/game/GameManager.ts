@@ -105,6 +105,24 @@ export class GameManager {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
+  private createTreeModel() {
+    const group = new THREE.Group();
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.8 });
+    const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32, roughness: 0.8 });
+
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 0.8, 8), trunkMat);
+    trunk.position.y = 0.4;
+    trunk.castShadow = true;
+    group.add(trunk);
+
+    const leaves = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 8), leavesMat);
+    leaves.position.y = 1.2;
+    leaves.castShadow = true;
+    group.add(leaves);
+
+    return group;
+  }
+
   private createAnimalModel(type: 'fox' | 'wolf') {
     const group = new THREE.Group();
     const color = type === 'fox' ? 0xff8c00 : 0x4a4a4a;
@@ -198,6 +216,30 @@ export class GameManager {
     step.position.set(xPos, 0, -z);
     step.userData = { isDanger, z };
     
+    // Add side decorations (non-interactive)
+    const sideWidth = 6;
+    const sideGeo = new THREE.BoxGeometry(sideWidth, this.stepThickness, this.stepDepth);
+    const sideMat = new THREE.MeshStandardMaterial({ color: 0x66bb6a, roughness: 0.9 });
+    const sideOffset = 18; // Distance from center where player can't reach
+    
+    const leftSide = new THREE.Mesh(sideGeo, sideMat);
+    leftSide.position.set(-sideOffset - xPos, 0, 0);
+    leftSide.receiveShadow = true;
+    step.add(leftSide);
+
+    const treeL = this.createTreeModel();
+    treeL.position.y = this.stepThickness / 2;
+    leftSide.add(treeL);
+
+    const rightSide = new THREE.Mesh(sideGeo, sideMat);
+    rightSide.position.set(sideOffset - xPos, 0, 0);
+    rightSide.receiveShadow = true;
+    step.add(rightSide);
+    
+    const treeR = this.createTreeModel();
+    treeR.position.y = this.stepThickness / 2;
+    rightSide.add(treeR);
+
     this.stepsGroup.add(step);
     this.steps.push(step);
   }
@@ -209,8 +251,8 @@ export class GameManager {
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
 
-    const speeds = { PRACTICE: 0.12, BEGINNER: 0.15, EASY: 0.18, HARD: 0.25, INSANE: 0.35 };
-    this.forwardSpeed = speeds[difficulty];
+    const speeds = { PRACTICE: 0.12, BEGINNER: 0.15, EASY: 0.18, HARD: 0.25, HARD_CORE: 0.35, INSANE: 0.35 };
+    this.forwardSpeed = speeds[difficulty] || 0.18;
     
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
     this.baseStepSpacing = this.forwardSpeed * bounceTime;
@@ -294,7 +336,6 @@ export class GameManager {
 
     if (this.steps.length > 50) {
         const first = this.steps[0];
-        // Ensure we don't delete the platform the player is about to respawn on
         const threshold = Math.max(this.ball.position.z, this.lastSafePosition.z) + 30;
         if (first.position.z > threshold) {
             this.stepsGroup.remove(first);
@@ -381,7 +422,6 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
-    // Store the exact safe landing position
     this.lastSafePosition.set(step.position.x, landingY, step.position.z);
     
     this.audio.playBounce();
@@ -405,15 +445,10 @@ export class GameManager {
       this.gameOver();
     } else {
       this.audio.playGameOver(); 
-      
-      // REFACTOR: Snap the ball exactly to the last safe landing position 
-      // and trigger an immediate bounce from there. This is 100% reliable.
       this.ball.position.copy(this.lastSafePosition);
       this.ballVelocityY = this.bounceStrength; 
       this.ballVelocityX = 0;
       this.respawnInvulnerability = 2.0; 
-      
-      // Secondary particle burst to indicate respawn
       this.particles.emit(this.ball.position, this.ballColor, 20, 0.3);
     }
   }
