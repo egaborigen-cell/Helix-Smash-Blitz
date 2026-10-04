@@ -23,7 +23,8 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Bulletproof Respawn Management**: Refactored the respawn system to use a "snap and bounce" mechanism. Instead of dropping the ball from a height (which risked missing platforms at high speeds), the ball now resets precisely to its last successful landing point and triggers an immediate bounce, guaranteed to be on the platform.
 
 ### 🦊 Visuals & Aesthetics
-- **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox** and **Wolf** models with glowing hazard rings.
+- **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox**, **Wolf**, and new **Bear** models with glowing hazard rings.
+- **Jumping Hazards**: Predators now cross the player's path by jumping from side forest platforms, adding a dynamic horizontal threat.
 - **Environment Decoration**: Added non-interactive side platforms with low-poly trees on both the left and right sides of the main track, enhancing the visual depth of the forest environment.
 - **Camera Adjustments**: Updated the camera to provide a wider field of view, accommodating the increased platform spread.
 - **Font Optimization**: Switched from `next/font` to native system fonts for better performance and simplicity.

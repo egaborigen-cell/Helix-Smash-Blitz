@@ -21,6 +21,14 @@ interface GameOptions {
   container: HTMLDivElement;
 }
 
+interface JumperAnimal {
+  mesh: THREE.Group;
+  startX: number;
+  direction: number;
+  isJumping: boolean;
+  jumpProgress: number;
+}
+
 export class GameManager {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
@@ -123,10 +131,23 @@ export class GameManager {
     return group;
   }
 
-  private createAnimalModel(type: 'fox' | 'wolf') {
+  private createAnimalModel(type: 'fox' | 'wolf' | 'bear') {
     const group = new THREE.Group();
-    const color = type === 'fox' ? 0xff8c00 : 0x4a4a4a;
-    const accentColor = type === 'fox' ? 0xffffff : 0xff0000;
+    let color = 0x4a4a4a;
+    let accentColor = 0xffffff;
+    let scale = 1.0;
+
+    if (type === 'fox') {
+      color = 0xff8c00;
+      accentColor = 0xffffff;
+    } else if (type === 'wolf') {
+      color = 0x4a4a4a;
+      accentColor = 0xff0000;
+    } else if (type === 'bear') {
+      color = 0x3d2b1f;
+      accentColor = 0x000000;
+      scale = 1.4;
+    }
     
     const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.7 });
     const accentMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.7 });
@@ -176,12 +197,12 @@ export class GameManager {
     hazardRing.position.y = 0.05;
     group.add(hazardRing);
 
+    group.scale.setScalar(scale);
     return group;
   }
 
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
-    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
     
     const baseWidth = this.difficulty === 'INSANE' ? 6.0 : this.difficulty === 'HARD' ? 8.5 : 11.0;
     const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
@@ -193,13 +214,20 @@ export class GameManager {
     const step = new THREE.Mesh(geo, mat);
     step.receiveShadow = true;
     
+    const range = Math.max(0, this.laneWidth - width);
+    const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
+    step.position.set(xPos, 0, -z);
+
+    // Static Hazards
+    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
     if (isDanger) {
       let numHazards = 1;
       if (z > 150) numHazards = 1 + Math.floor(Math.random() * 2);
       if (z > 400) numHazards = 2 + Math.floor(Math.random() * 2);
       
       for (let i = 0; i < numHazards; i++) {
-        const animalType = Math.random() > 0.5 ? 'fox' : 'wolf';
+        const types: ('fox' | 'wolf' | 'bear')[] = ['fox', 'wolf', 'bear'];
+        const animalType = types[Math.floor(Math.random() * types.length)];
         const animalGroup = this.createAnimalModel(animalType);
         animalGroup.name = 'spike'; 
 
@@ -210,17 +238,37 @@ export class GameManager {
         step.add(animalGroup);
       }
     }
-    
-    const range = Math.max(0, this.laneWidth - width);
-    const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
-    step.position.set(xPos, 0, -z);
-    step.userData = { isDanger, z };
+
+    // Dynamic Hazards (Jumping Animals)
+    const sideOffset = 18;
+    const hasJumper = this.difficulty !== 'PRACTICE' && z > 40 && Math.random() < (0.2 + progressFactor * 0.3);
+    let jumper: JumperAnimal | null = null;
+
+    if (hasJumper) {
+      const types: ('fox' | 'wolf' | 'bear')[] = ['fox', 'wolf', 'bear'];
+      const animalType = types[Math.floor(Math.random() * types.length)];
+      const animalGroup = this.createAnimalModel(animalType);
+      animalGroup.name = 'jumper';
+      
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      const startX = dir * sideOffset;
+      animalGroup.position.set(startX - xPos, 0.1, 0);
+      animalGroup.rotation.y = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
+      step.add(animalGroup);
+
+      jumper = {
+        mesh: animalGroup,
+        startX: startX - xPos,
+        direction: -dir,
+        isJumping: false,
+        jumpProgress: 0
+      };
+    }
     
     // Add side decorations (non-interactive)
     const sideWidth = 6;
     const sideGeo = new THREE.BoxGeometry(sideWidth, this.stepThickness, this.stepDepth);
     const sideMat = new THREE.MeshStandardMaterial({ color: 0x66bb6a, roughness: 0.9 });
-    const sideOffset = 18; // Distance from center where player can't reach
     
     const leftSide = new THREE.Mesh(sideGeo, sideMat);
     leftSide.position.set(-sideOffset - xPos, 0, 0);
@@ -240,6 +288,7 @@ export class GameManager {
     treeR.position.y = this.stepThickness / 2;
     rightSide.add(treeR);
 
+    step.userData = { isDanger, z, jumper };
     this.stepsGroup.add(step);
     this.steps.push(step);
   }
@@ -251,8 +300,8 @@ export class GameManager {
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
 
-    const speeds = { PRACTICE: 0.12, BEGINNER: 0.15, EASY: 0.18, HARD: 0.25, HARD_CORE: 0.35, INSANE: 0.35 };
-    this.forwardSpeed = speeds[difficulty] || 0.18;
+    const speeds = { PRACTICE: 0.12, BEGINNER: 0.15, EASY: 0.18, HARD: 0.25, INSANE: 0.35 };
+    this.forwardSpeed = (speeds as any)[difficulty] || 0.18;
     
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
     this.baseStepSpacing = this.forwardSpeed * bounceTime;
@@ -367,8 +416,46 @@ export class GameManager {
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
 
-    if (this.respawnInvulnerability <= 0) {
-      for (const step of this.steps) {
+    for (const step of this.steps) {
+        const jumper = step.userData.jumper as JumperAnimal | null;
+        if (jumper) {
+          const distToJumperZ = Math.abs(this.ball.position.z - step.position.z);
+          // Trigger jump
+          if (!jumper.isJumping && distToJumperZ < 25) {
+            jumper.isJumping = true;
+          }
+
+          if (jumper.isJumping && jumper.jumpProgress < 1) {
+            jumper.jumpProgress += delta * 0.8; 
+            const totalDistance = 36; // sideOffset * 2
+            const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
+            jumper.mesh.position.x = targetX;
+            // Arc
+            jumper.mesh.position.y = Math.sin(jumper.jumpProgress * Math.PI) * 4 + 0.1;
+          }
+
+          // Collision with jumper
+          if (this.respawnInvulnerability <= 0) {
+            const animalScale = jumper.mesh.scale.x;
+            const hazardRadius = 1.3 * animalScale;
+            const animalGlobalX = step.position.x + jumper.mesh.position.x;
+            const animalGlobalY = step.position.y + jumper.mesh.position.y;
+            const animalGlobalZ = step.position.z + jumper.mesh.position.z;
+
+            const distSq = Math.pow(this.ball.position.x - animalGlobalX, 2) + 
+                         Math.pow(this.ball.position.y - animalGlobalY, 2) + 
+                         Math.pow(this.ball.position.z - animalGlobalZ, 2);
+            
+            const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.6), 2);
+            if (distSq < collisionThreshold) {
+              this.loseLife();
+              return;
+            }
+          }
+        }
+
+        // Static Hazards collision
+        if (this.respawnInvulnerability <= 0) {
           const dz = Math.abs(this.ball.position.z - step.position.z);
           const dy = this.ball.position.y - step.position.y;
 
@@ -376,11 +463,12 @@ export class GameManager {
               const hazardRadius = 1.3; 
               for (const child of step.children) {
                   if (child.name === 'spike') {
+                      const animalScale = child.scale.x;
                       const spikeGlobalX = step.position.x + child.position.x;
                       const spikeGlobalZ = step.position.z + child.position.z;
                       
                       const distSq = Math.pow(this.ball.position.x - spikeGlobalX, 2) + Math.pow(this.ball.position.z - spikeGlobalZ, 2);
-                      const collisionThreshold = Math.pow(hazardRadius + (currentBallRadius * 0.4), 2);
+                      const collisionThreshold = Math.pow((hazardRadius * animalScale) + (currentBallRadius * 0.4), 2);
 
                       if (distSq < collisionThreshold) {
                           this.loseLife();
@@ -389,9 +477,10 @@ export class GameManager {
                   }
               }
           }
-      }
+        }
     }
 
+    // Platform landing
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
