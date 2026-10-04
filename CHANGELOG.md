@@ -3,6 +3,18 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.12.0] - 2025-05-30
+### Added
+- **Lives System**: Implemented a three-lives system to increase player longevity.
+- **Dynamic Hazards**: Predators (Foxes, Wolves, Bears) now jump across the player's path from side platforms.
+- **Patrol AI**: Static hazards on main platforms now patrol laterally, adding a new layer of difficulty.
+- **Environment**: Added decorative side platforms with low-poly trees to create a forest-like atmosphere.
+- **Visuals**: Updated ball to a vibrant "Fox Toy" orange-red appearance.
+
+### Improved
+- **Respawn Logic**: Implemented a "snap and bounce" mechanism that guarantees the ball resets perfectly to the center of the last safe platform.
+- **Physics**: Refined hazard jump arcs and speeds to ensure they pounce through the player's path rather than over it.
+
 ## [1.11.0] - 2025-05-29
 ### Changed
 - **Visuals**: Unified platform colors to a consistent "green grass" theme (0x66bb6a).
@@ -12,67 +24,3 @@ All notable changes to the HelixSmash project will be documented in this file.
 ## [1.10.0] - 2025-05-28
 ### Added
 - **UI Refactoring**: Moved skin selection to a dedicated modal dialog, simplifying the main start screen and improving visual hierarchy.
-
-## [1.9.1] - 2025-05-27
-### Fixed
-- **Yandex Games SDK**: Refined `LoadingAPI.ready()` signaling to ensure it is always called regardless of player authorization status.
-- **TypeScript**: Fixed global `Window` interface declaration in `HelixGame.tsx`.
-
-## [1.9.0] - 2025-05-26
-### Added
-- **Export Script**: Added `export-zip` script to `package.json` to automate building and zipping the web export for Yandex Games.
-
-## [1.8.0] - 2024-05-25
-### Added
-- **Maintenance Docs**: Added an explanation for the `@opentelemetry/exporter-jaeger` deprecation warning in `README.md` to clarify it is harmless.
-
-## [1.7.1] - 2024-05-24
-### Added
-- **Git Troubleshooting**: Added documentation for resolving "Permission Denied" errors when pushing to remote repositories in `README.md`.
-
-## [1.7.0] - 2024-05-23
-### Added
-- **Git Documentation**: Added clear instructions to `README.md` for changing the project's Git remote repository URL.
-
-## [1.6.0] - 2024-05-22
-### Improved
-- **Obstacle Balancing**: Refined spike spawning to start with a single spike per platform at the beginning of the run, gradually increasing density as distance increases to provide a smoother difficulty curve.
-
-## [1.5.0] - 2024-05-21
-### Improved
-- **User Experience**: The game now starts immediately upon selecting a difficulty mode, removing a redundant step from the start screen.
-- **UI Feedback**: Added visual play indicators to difficulty buttons to signal they are interactive start triggers.
-
-## [1.4.0] - 2024-05-20
-### Added
-- **Skin Selection**: Players can now choose between Toxic, Neon, and Aqua skins in the start menu.
-- **Particle System**: High-performance 3D particle effects for bounces, smashed platforms, and level completions.
-- **New Difficulty Modes**: Added 'PRACTICE' (no danger) and 'BEGINNER' (low risk) modes to improve accessibility for new players.
-- **GitHub Workflow**: Added comprehensive instructions to README for staging, committing, and pushing code.
-
-### Improved
-- **Yandex SDK Robustness**: Implemented a retry mechanism for SDK initialization and added player authorization support.
-- **Visual Feedback**: Platform colors and particle effects now sync with the selected ball skin.
-
-## [1.3.4] - 2026-04-17
-### Fixed
-- **Yandex 404 Resolution**: Updated `README.md` with critical instructions for correct ZIP archiving (zipping contents vs zipping the folder).
-- **Deployment Optimization**: Explicitly set `distDir: 'out'` in `next.config.ts` to ensure consistency across different build environments.
-
-## [1.3.3] - 2026-04-16
-### Fixed
-- **SWC Binary Loading**: Added documentation regarding "next/swc" loading errors. These are typically caused by non-standard characters in the project path (e.g., "ƒ"). Moving the project to a standard alphanumeric path resolves this.
-
-## [1.3.2] - 2026-04-15
-### Fixed
-- **Next/Font Compatibility**: Removed relative `assetPrefix` to resolve the "assetPrefix must start with a leading slash" error triggered by the Google Fonts loader.
-
-## [1.3.1] - 2026-04-14
-### Fixed
-- **Turbopack Compatibility**: Removed `--turbopack` from the `dev` script to resolve "turbo.createProject is not supported by the wasm bindings" error in certain environments.
-
-## [1.2.0] - 2024-04-09
-### Added
-- **Insane Difficulty**: A new extreme mode with 50 levels, single-gap platforms, and high danger density.
-- **Localization**: Full support for English and Russian languages with a UI toggle.
-- **Yandex Games SDK**: Integrated SDK initialization, leaderboard submission, and `gameready` signaling.

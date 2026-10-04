@@ -14,36 +14,30 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Executable Export Script**: Ensured the build export script is executable by using the `bash` prefix in `package.json`, bypassing potential permission issues on various operating systems.
 
 ### 🛠 Core Gameplay & Physics
-- **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale. This ensures all ball types (Toxic, Neon, Aqua) touch the platforms perfectly without clipping or floating.
-- **Expanded Platforms**: Platforms are now significantly wider (up to 11 units base width) and are placed randomly across a much wider lane (16 units).
+- **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale.
+- **Expanded Platforms**: Platforms are now significantly wider and placed across a wider lane (16 units).
 - **Collision Robustness**: Refactored the physics engine to prioritize hazard detection and handle the expanded lane dimensions.
-- **Size-Aware Collision**: Updated collision logic to use the ball's effective radius, ensuring all skins have accurate hitboxes.
-- **Gentle Starting Flow**: Initial platforms are 2.5x wider at the start to allow players to adjust to the new lateral speed requirements.
-- **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. 
-- **Bulletproof Respawn Management**: Refactored the respawn system to use a "snap and bounce" mechanism. Instead of dropping the ball from a height (which risked missing platforms at high speeds), the ball now resets precisely to its last successful landing point and triggers an immediate bounce, guaranteed to be on the platform.
-- **Predator Behavior Refinement**: Refactored jumping predators to perform a lower, faster pounce trajectory. They now cross directly through the player's path instead of flying over it, increasing the horizontal challenge.
-- **Predator Patrols**: Static predators (foxes, wolves, bears) on platforms now patrol back and forth across their surface, adding a new layer of dynamic threat.
+- **Three-Lives System**: Implemented a lives system where players have 3 attempts per run.
+- **Bulletproof Respawn**: Developed a "snap and bounce" respawn mechanism that ensures the ball always resets to the exact center of the last safe platform, preventing void falls after losing a life.
+- **Dynamic Predators**: Refactored jumping predators (foxes, wolves, bears) to perform low, fast pounces across the player's path.
+- **Predator Patrols**: Static hazards on platforms now patrol back and forth across their surface.
 
 ### 🦊 Visuals & Aesthetics
-- **Grass Color Uniformity**: All platforms (main path and side decorations) are now a consistent green grass color.
-- **Predator Hazards**: Spikes are replaced with stylized low-poly **Fox**, **Wolf**, and new **Bear** models with glowing hazard rings.
-- **Jumping Hazards**: Predators now cross the player's path by jumping from side forest platforms, adding a dynamic horizontal threat.
-- **Environment Decoration**: Added non-interactive side platforms with low-poly trees on both the left and right sides of the main track, enhancing the visual depth of the forest environment.
+- **Grass Color Uniformity**: All platforms (main path and side decorations) are now a consistent green grass color (0x66bb6a).
+- **Environment Decoration**: Added non-interactive side platforms with low-poly trees on both the left and right sides of the main track.
+- **Fox Toy Ball**: Updated the default ball appearance to an orange-red "toy" style with a smoother, high-visibility material finish.
 - **Camera Adjustments**: Updated the camera to provide a wider field of view, accommodating the increased platform spread.
-- **Font Optimization**: Switched from `next/font` to native system fonts for better performance and simplicity.
 - **Lives HUD**: Added a heart-based lives indicator to the game's header.
 - **Respawn Effects**: Added a visual blinking effect during invulnerability after losing a life.
-- **Ball Refinement**: Updated the default ball appearance to an orange-red "Fox Toy" style with a smoother, toy-like material finish.
 
 ### 📱 User Experience (UX)
 - **Swipeable Onboarding**: Refactored the tutorial into a mobile-friendly carousel that supports touch swipes.
-- **Responsive UI**: Optimized onboarding and game overlays for mobile portrait orientation.
-- **Responsive Start Menu**: Refined the main start menu to be more responsive on small screens, adjusting padding, gaps, and font sizes for portrait mobile devices.
-- **Instructions**: Updated movement labels to reflect both touch and keyboard controls.
-- **Skin Selection Refinement**: Moved the skin selection grid from the main start menu to a dedicated, high-fidelity dialog. The start menu now features a clean preview button that displays the currently active skin and triggers the selection modal.
+- **Responsive Start Menu**: Refined the main start menu for portrait mobile devices.
+- **Instructions**: Updated movement labels for both touch and keyboard controls.
+- **Skin Selection Refinement**: Moved skin selection to a high-fidelity modal dialog with a preview button in the main menu.
 
 ### 🐛 Bug Fixes
-- **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface in `GameManager.ts` to resolve a property literal error in the skin selection UI.
-- **Translation Indexing Fix**: Resolved a TypeScript error where indexing the translation object with broad keys caused a ReactNode mismatch.
-- **Export Script**: Created `scripts/build-export.sh` to handle cleaning and zipping in a single automated step. Updated to support dated filenames and an `archives/` output folder.
-- **Context Menu**: Disabled the global browser context menu to prevent gameplay interruptions.
+- **Respawn Trajectory**: Fixed an issue where high forward velocity caused the ball to overshoot platforms on respawn by implementing the snap-to-center logic.
+- **TypeScript Interface Fix**: Added the missing `hex` property to the `SkinConfig` interface.
+- **Translation Indexing Fix**: Resolved a TypeScript error related to translation object indexing.
+- **Export Script**: Automated the build and cleanup process for static web exports.
