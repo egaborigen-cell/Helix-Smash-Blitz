@@ -3,6 +3,12 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.11.0] - 2025-05-29
+### Changed
+- **Visuals**: Unified platform colors to a consistent "green grass" theme (0x66bb6a).
+- **UI/Onboarding**: Updated instructions and goal descriptions to reflect the new green platform color.
+- **Marketing**: Refreshed promo materials and screenshots descriptions for green aesthetic.
+
 ## [1.10.0] - 2025-05-28
 ### Added
 - **UI Refactoring**: Moved skin selection to a dedicated modal dialog, simplifying the main start screen and improving visual hierarchy.

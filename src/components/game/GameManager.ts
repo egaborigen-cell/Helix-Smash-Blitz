@@ -62,6 +62,7 @@ export class GameManager {
   private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
   private laneWidth: number = 16;
+  private platformColor: number = 0x66bb6a; // Green grass color
 
   private lastSafePosition: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
   private respawnInvulnerability: number = 0;
@@ -209,7 +210,7 @@ export class GameManager {
     const width = Math.min(this.laneWidth + 4, baseWidth * startWidthMultiplier);
     
     const geo = new THREE.BoxGeometry(width, this.stepThickness, this.stepDepth);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xf2cc0d, roughness: 0.5 });
+    const mat = new THREE.MeshStandardMaterial({ color: this.platformColor, roughness: 0.5 });
     
     const step = new THREE.Mesh(geo, mat);
     step.receiveShadow = true;
@@ -268,7 +269,7 @@ export class GameManager {
     // Add side decorations (non-interactive)
     const sideWidth = 6;
     const sideGeo = new THREE.BoxGeometry(sideWidth, this.stepThickness, this.stepDepth);
-    const sideMat = new THREE.MeshStandardMaterial({ color: 0x66bb6a, roughness: 0.9 });
+    const sideMat = new THREE.MeshStandardMaterial({ color: this.platformColor, roughness: 0.9 });
     
     const leftSide = new THREE.Mesh(sideGeo, sideMat);
     leftSide.position.set(-sideOffset - xPos, 0, 0);
@@ -514,7 +515,7 @@ export class GameManager {
     this.lastSafePosition.set(step.position.x, landingY, step.position.z);
     
     this.audio.playBounce();
-    this.particles.emit(this.ball.position, 0xf2cc0d, 15, 0.2);
+    this.particles.emit(this.ball.position, this.platformColor, 15, 0.2);
     
     const newScore = Math.floor(Math.abs(this.ball.position.z));
     if (newScore > this.score) {
