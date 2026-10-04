@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/carousel";
 
 const SKINS: SkinConfig[] = [
-    { id: 'toxic', color: 0xb8f53d, hex: '#b8f53d', gravity: -0.015, bounceStrength: 0.32, scale: 2.0 },
+    { id: 'toy', color: 0xff4500, hex: '#ff4500', gravity: -0.015, bounceStrength: 0.32, scale: 2.0 },
     { id: 'neon', color: 0xff00ff, hex: '#ff00ff', gravity: -0.012, bounceStrength: 0.37, scale: 0.8 },
     { id: 'aqua', color: 0x00ffff, hex: '#00ffff', gravity: -0.018, bounceStrength: 0.30, scale: 1.2 }
 ];
@@ -328,8 +328,8 @@ export default function HelixGame() {
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full shadow-lg border-2 border-white" style={{ backgroundColor: skin.hex }} />
                     <div className="text-left">
-                      <div className="font-bold text-lg">{t.skins[skin.id as 'toxic' | 'neon' | 'aqua']}</div>
-                      <div className="text-xs text-muted-foreground">{t.skins.traits[skin.id as 'toxic' | 'neon' | 'aqua']}</div>
+                      <div className="font-bold text-lg">{t.skins[skin.id as 'toy' | 'neon' | 'aqua']}</div>
+                      <div className="text-xs text-muted-foreground">{t.skins.traits[skin.id as 'toy' | 'neon' | 'aqua']}</div>
                     </div>
                   </div>
                   {selectedSkin.id === skin.id && <div className="w-3 h-3 rounded-full bg-primary" />}
@@ -352,7 +352,7 @@ export default function HelixGame() {
                   <div className="w-8 h-8 rounded-full border border-white/30 shadow-inner" style={{ backgroundColor: selectedSkin.hex }} />
                   <div className="text-left">
                     <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t.selectSkin}</div>
-                    <div className="font-bold text-foreground text-sm sm:text-base">{t.skins[selectedSkin.id as 'toxic' | 'neon' | 'aqua']}</div>
+                    <div className="font-bold text-foreground text-sm sm:text-base">{t.skins[selectedSkin.id as 'toy' | 'neon' | 'aqua']}</div>
                   </div>
                 </div>
                 <Palette className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />

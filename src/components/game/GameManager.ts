@@ -45,7 +45,7 @@ export class GameManager {
   private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
   
-  private ballColor: number = 0xb8f53d;
+  private ballColor: number = 0xff4500; // Default Orange-Red Toy color
   private gravity: number = -0.015;
   private bounceStrength: number = 0.32; 
   private ballScale: number = 1.0;
@@ -98,7 +98,13 @@ export class GameManager {
     this.scene.add(directionalLight);
 
     const ballGeo = new THREE.SphereGeometry(this.baseBallRadius, 32, 32);
-    const ballMat = new THREE.MeshStandardMaterial({ color: this.ballColor, roughness: 0.3, transparent: true });
+    // Toy-like material: lower roughness, slight metallic feel
+    const ballMat = new THREE.MeshStandardMaterial({ 
+      color: this.ballColor, 
+      roughness: 0.2, 
+      metalness: 0.1,
+      transparent: true 
+    });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
     this.ball.castShadow = true;
     this.ball.position.set(0, 2, 0);

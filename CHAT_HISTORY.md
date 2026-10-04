@@ -31,6 +31,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Font Optimization**: Switched from `next/font` to native system fonts for better performance and simplicity.
 - **Lives HUD**: Added a heart-based lives indicator to the game's header.
 - **Respawn Effects**: Added a visual blinking effect during invulnerability after losing a life.
+- **Ball Refinement**: Updated the default ball appearance to an orange-red "Fox Toy" style with a smoother, toy-like material finish.
 
 ### 📱 User Experience (UX)
 - **Swipeable Onboarding**: Refactored the tutorial into a mobile-friendly carousel that supports touch swipes.

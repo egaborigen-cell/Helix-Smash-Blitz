@@ -25,11 +25,11 @@ export const translations = {
       gotIt: "GOT IT!"
     },
     skins: {
-      toxic: "Toxic",
+      toy: "Fox Toy",
       neon: "Neon",
       aqua: "Aqua",
       traits: {
-        toxic: "Big & Balanced",
+        toy: "Classic & Balanced",
         neon: "Bouncy & Light",
         aqua: "Fast & Heavy"
       }
@@ -81,11 +81,11 @@ export const translations = {
       gotIt: "ПОНЯТНО!"
     },
     skins: {
-      toxic: "Токсик",
+      toy: "Лисичка",
       neon: "Неон",
       aqua: "Аква",
       traits: {
-        toxic: "Большой и Баланс",
+        toy: "Классика и Баланс",
         neon: "Прыгучий",
         aqua: "Тяжелый"
       }
