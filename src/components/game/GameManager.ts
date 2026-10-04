@@ -241,6 +241,14 @@ export class GameManager {
         const randomZ = (Math.random() - 0.5) * 1.2;
         animalGroup.position.set(randomX, 0.1, randomZ);
         animalGroup.rotation.y = Math.random() * Math.PI;
+
+        // Initialize patrol data
+        animalGroup.userData = {
+          patrolRange: (width - 2.5) / 2,
+          patrolSpeed: 1.0 + Math.random() * 1.5,
+          patrolOffset: Math.random() * Math.PI * 2
+        };
+
         step.add(animalGroup);
       }
     }
@@ -420,8 +428,21 @@ export class GameManager {
     this.ball.position.y += this.ballVelocityY;
 
     const currentBallRadius = this.baseBallRadius * this.ballScale;
+    const time = this.clock.getElapsedTime();
 
     for (const step of this.steps) {
+        // Update patrolling animals
+        for (const child of step.children) {
+          if (child.name === 'spike' && child.userData.patrolRange) {
+            const { patrolRange, patrolSpeed, patrolOffset } = child.userData;
+            const prevX = child.position.x;
+            const newX = Math.sin(time * patrolSpeed + patrolOffset) * patrolRange;
+            child.position.x = newX;
+            // Face the direction of movement
+            child.rotation.y = (newX > prevX ? -Math.PI / 2 : Math.PI / 2);
+          }
+        }
+
         const jumper = step.userData.jumper as JumperAnimal | null;
         if (jumper) {
           const distToJumperZ = Math.abs(this.ball.position.z - step.position.z);

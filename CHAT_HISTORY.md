@@ -22,6 +22,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **Lives System & Respawn**: Implemented a three-lives system with refined respawn logic. 
 - **Bulletproof Respawn Management**: Refactored the respawn system to use a "snap and bounce" mechanism. Instead of dropping the ball from a height (which risked missing platforms at high speeds), the ball now resets precisely to its last successful landing point and triggers an immediate bounce, guaranteed to be on the platform.
 - **Predator Behavior Refinement**: Refactored jumping predators to perform a lower, faster pounce trajectory. They now cross directly through the player's path instead of flying over it, increasing the horizontal challenge.
+- **Predator Patrols**: Static predators (foxes, wolves, bears) on platforms now patrol back and forth across their surface, adding a new layer of dynamic threat.
 
 ### 🦊 Visuals & Aesthetics
 - **Grass Color Uniformity**: All platforms (main path and side decorations) are now a consistent green grass color.
