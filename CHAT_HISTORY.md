@@ -6,6 +6,7 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ## 🚀 Key Improvements & Features
 
 ### 📡 Documentation
+- **Troubleshooting**: Added a dedicated section to `README.md` for resolving common Git credential and environment issues.
 - **Version History**: Created `VERSION_HISTORY.md` to track major milestones and evolutionary steps of the project.
 - **Logs**: Updated `CHANGELOG.md` to reflect the latest gameplay refactors.
 

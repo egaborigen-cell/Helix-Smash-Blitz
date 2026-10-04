@@ -34,7 +34,13 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
 - **Styling**: Tailwind CSS & ShadCN UI
 - **AI Integration**: Genkit (Configured for future expansion)
 
-## 🛠 Maintenance & Known Warnings
+## 🔧 Troubleshooting
+
+### Git Credential Errors (VS Code)
+If you see an error like `connect ECONNREFUSED /tmp/vscode-git-...sock`:
+1.  **Restart VS Code**: This is the most reliable fix to reset the Git bridge.
+2.  **Unset AskPass**: Run `unset GIT_ASKPASS` in your terminal to bypass the broken VS Code credential helper.
+3.  **Check 2FA**: If you lost GitHub access, ensure you are using a **Personal Access Token (PAT)** or SSH keys, as standard passwords are no longer supported for Git operations.
 
 ### NPM Deprecation Warnings
 You may see a warning like: `npm warn deprecated @opentelemetry/exporter-jaeger@1.30.1: Package no longer supported`.
