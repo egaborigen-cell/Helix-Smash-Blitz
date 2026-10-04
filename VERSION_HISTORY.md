@@ -2,6 +2,10 @@
 
 This document tracks the major milestones and evolutionary steps of the HelixSmash project.
 
+## [1.13.0] - 2025-06-01
+### Skyline Enhancement
+- **Lush Forest**: Increased tree height on side platforms and introduced random height multipliers to create a more dynamic and organic forest environment.
+
 ## [1.12.0] - 2025-05-30
 ### Gameplay Revolution: The Forest & The Lives
 - **Survival Mechanics**: Introduced a robust Three-Lives system.

@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.13.0] - 2025-06-01
+### Improved
+- **Environment**: Increased the height of trees on side platforms and added random vertical scaling to create a more immersive and varied forest skyline.
+
 ## [1.12.0] - 2025-05-30
 ### Added
 - **Lives System**: Implemented a three-lives system to increase player longevity.

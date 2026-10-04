@@ -124,13 +124,18 @@ export class GameManager {
     const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.8 });
     const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32, roughness: 0.8 });
 
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 0.8, 8), trunkMat);
-    trunk.position.y = 0.4;
+    // Random height factor for variety
+    const heightFactor = 1.8 + Math.random() * 2.5;
+    
+    const trunkHeight = 0.8 * heightFactor;
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, trunkHeight, 8), trunkMat);
+    trunk.position.y = trunkHeight / 2;
     trunk.castShadow = true;
     group.add(trunk);
 
-    const leaves = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 8), leavesMat);
-    leaves.position.y = 1.2;
+    const leavesHeight = 1.2 * heightFactor;
+    const leaves = new THREE.Mesh(new THREE.ConeGeometry(0.5 * (1 + heightFactor * 0.1), leavesHeight, 8), leavesMat);
+    leaves.position.y = trunkHeight + (leavesHeight / 2);
     leaves.castShadow = true;
     group.add(leaves);
 
