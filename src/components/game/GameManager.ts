@@ -98,7 +98,6 @@ export class GameManager {
     this.scene.add(directionalLight);
 
     const ballGeo = new THREE.SphereGeometry(this.baseBallRadius, 32, 32);
-    // Toy-like material: lower roughness, slight metallic feel
     const ballMat = new THREE.MeshStandardMaterial({ 
       color: this.ballColor, 
       roughness: 0.2, 
@@ -272,7 +271,6 @@ export class GameManager {
       };
     }
     
-    // Add side decorations (non-interactive)
     const sideWidth = 6;
     const sideGeo = new THREE.BoxGeometry(sideWidth, this.stepThickness, this.stepDepth);
     const sideMat = new THREE.MeshStandardMaterial({ color: this.platformColor, roughness: 0.9 });
@@ -433,12 +431,12 @@ export class GameManager {
           }
 
           if (jumper.isJumping && jumper.jumpProgress < 1) {
-            jumper.jumpProgress += delta * 0.8; 
+            jumper.jumpProgress += delta * 1.2; // Faster pounce speed
             const totalDistance = 36; // sideOffset * 2
             const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
             jumper.mesh.position.x = targetX;
-            // Arc
-            jumper.mesh.position.y = Math.sin(jumper.jumpProgress * Math.PI) * 4 + 0.1;
+            // Lower arc: pounce through the path rather than fly over
+            jumper.mesh.position.y = Math.sin(jumper.jumpProgress * Math.PI) * 1.5 + 0.1;
           }
 
           // Collision with jumper
