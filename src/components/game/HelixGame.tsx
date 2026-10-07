@@ -380,15 +380,40 @@ export default function HelixGame() {
         )}
 
         {showGameOverUI && (
-          <div className="flex flex-col items-center gap-4 sm:gap-6 bg-white/80 backdrop-blur-xl p-6 sm:p-10 rounded-3xl border border-destructive/20 shadow-2xl animate-in fade-in zoom-in-95 pointer-events-auto max-w-[90vw]">
-            <div className="bg-destructive/10 p-3 rounded-full"><RefreshCcw className="w-10 h-10 sm:w-12 sm:h-12 text-destructive" /></div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground text-center">{t.gameOver}</h2>
-            <div className="text-center">
-                <p className="text-xs sm:text-sm text-muted-foreground">{t.finalScore}</p>
-                <p className="text-4xl sm:text-5xl font-black text-accent">{score}m</p>
+          <div className="flex flex-col items-center gap-6 sm:gap-8 bg-white/95 backdrop-blur-2xl p-8 sm:p-12 rounded-[2.5rem] border-4 border-destructive/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in fade-in zoom-in-95 pointer-events-auto max-w-[90vw] w-full sm:max-w-md text-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-destructive/20 blur-2xl rounded-full" />
+              <div className="relative bg-destructive/10 p-4 rounded-3xl border-2 border-destructive/20">
+                <RefreshCcw className="w-12 h-12 text-destructive animate-spin-slow" />
+              </div>
             </div>
-            <Button size="lg" onClick={() => handleStart()} className="h-14 sm:h-16 px-8 sm:px-10 text-lg sm:text-xl rounded-full bg-primary hover:bg-primary/80 text-primary-foreground shadow-xl w-full">{t.tryAgain}</Button>
-            <Button variant="ghost" onClick={() => setGameState('START')} className="text-muted-foreground text-sm">{t.backToMenu}</Button>
+            
+            <div className="space-y-2">
+              <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tighter uppercase">{t.gameOver}</h2>
+              <div className="h-1 w-20 bg-destructive/30 mx-auto rounded-full" />
+            </div>
+
+            <div className="w-full bg-muted/30 p-6 rounded-[2rem] border border-white/50 space-y-1 shadow-inner">
+                <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em]">{t.finalScore}</p>
+                <p className="text-5xl sm:text-7xl font-black text-accent drop-shadow-sm tracking-tighter">{score}<span className="text-2xl sm:text-3xl ml-1 text-accent/70">m</span></p>
+            </div>
+
+            <div className="flex flex-col gap-3 w-full">
+              <Button 
+                size="lg" 
+                onClick={() => handleStart()} 
+                className="h-16 px-10 text-xl font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_0_rgb(var(--primary-foreground)/0.2)] active:translate-y-1 active:shadow-none transition-all w-full uppercase tracking-tighter"
+              >
+                {t.tryAgain}
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => setGameState('START')} 
+                className="h-12 text-muted-foreground font-bold hover:bg-muted/50 rounded-xl"
+              >
+                {t.backToMenu}
+              </Button>
+            </div>
           </div>
         )}
 
