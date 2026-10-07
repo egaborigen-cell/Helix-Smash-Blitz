@@ -146,19 +146,19 @@ export class GameManager {
 
   private createAnimalModel(type: 'fox' | 'wolf' | 'bear') {
     const group = new THREE.Group();
-    let color = 0xd1d8e0; // Light Grey (Wolf)
+    let color = 0xf5f6fa; // Lighter palette
     let accentColor = 0xffffff;
     let scale = 1.0;
 
     if (type === 'fox') {
-      color = 0xffa45c; // Light Orange
+      color = 0xffbe76; // Light Peach/Orange
       accentColor = 0xffffff;
     } else if (type === 'wolf') {
-      color = 0xe0e0e0; // Silver/Light Grey
-      accentColor = 0x333333;
+      color = 0xdcdde1; // Light Cloud Grey
+      accentColor = 0x2f3640;
     } else if (type === 'bear') {
-      color = 0xad8b73; // Light Cinnamon Brown
-      accentColor = 0x5d4037;
+      color = 0xe67e22; // Light Carrot Brown
+      accentColor = 0x8e44ad;
       scale = 1.35;
     }
     
@@ -212,6 +212,7 @@ export class GameManager {
     legPositions.forEach(pos => {
         const leg = new THREE.Mesh(legGeo, bodyMat);
         leg.position.set(pos[0], pos[1], pos[2]);
+        leg.castShadow = true;
         group.add(leg);
     });
 
@@ -222,6 +223,7 @@ export class GameManager {
     );
     tail.position.set(0, 0.6, 0.7);
     tail.rotation.x = 0.2;
+    tail.castShadow = true;
     group.add(tail);
 
     // Hazard Ring
@@ -288,7 +290,7 @@ export class GameManager {
         // Initialize patrol data
         animalGroup.userData = {
           patrolRange: (width - 2.5) / 2,
-          patrolSpeed: 0.6 + Math.random() * 0.8,
+          patrolSpeed: 0.4 + Math.random() * 0.5, // Reduced speed
           patrolOffset: Math.random() * Math.PI * 2
         };
 
@@ -498,11 +500,13 @@ export class GameManager {
           }
 
           if (jumper.isJumping && jumper.jumpProgress < 1) {
-            jumper.jumpProgress += delta * 0.8; 
+            jumper.jumpProgress += delta * 0.6; // Slightly slower jump
             const totalDistance = 36; // sideOffset * 2
             const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
             jumper.mesh.position.x = targetX;
-            jumper.mesh.position.y = Math.sin(jumper.jumpProgress * Math.PI) * 1.5 + 0.1;
+            
+            // Refined double-hop trajectory: lands mid-way (p=0.5) on the central platform
+            jumper.mesh.position.y = Math.abs(Math.sin(jumper.jumpProgress * Math.PI * 2)) * 1.5 + 0.1;
           }
 
           // Collision with jumper

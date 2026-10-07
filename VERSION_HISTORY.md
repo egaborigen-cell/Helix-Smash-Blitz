@@ -2,6 +2,11 @@
 
 This document tracks the major milestones and evolutionary steps of the HelixSmash project.
 
+## [1.18.0] - 2025-06-06
+### Predator Pouncing Refinement
+- **Double-Hop Mechanics**: Jumping predators now land mid-way on the central platform. This creates two distinct threat zones during their jump and forces the player to time their lateral movement more carefully.
+- **Lighter Visuals**: Optimized animal skin colors for higher contrast and better visibility in dense forest sections.
+
 ## [1.17.0] - 2025-06-05
 ### Dynamic Platform Scaling
 - **Fair Density**: Automatically increased the width of platforms containing multiple predators (2 or 3) by up to 70%. This ensures that even high-difficulty steps remain fair and navigable for the player.
@@ -27,19 +32,3 @@ This document tracks the major milestones and evolutionary steps of the HelixSma
 - **Patrol AI**: Static hazards on the main path now move laterally to intercept the player.
 - **Environment**: Added non-collidable side platforms with low-poly trees to create a forest aesthetic.
 - **Visuals**: Updated default ball to an orange-red "Fox Toy" style.
-
-## [1.11.0] - 2025-05-29
-### Visual Consolidation
-- **Grass Aesthetic**: Unified all platform colors to a consistent green (0x66bb6a).
-- **Onboarding Update**: Refined the tutorial to focus on landing on the new green platforms.
-
-## [1.10.0] - 2025-05-28
-### UI & Performance
-- **Skin Selection**: Moved skin management to a dedicated modal dialog.
-- **Static Export**: Finalized the build scripts for standalone web deployment.
-
-## [1.0.0] - 2025-05-25
-### Initial Prototype
-- Core Three.js engine implementation.
-- Procedural step generation.
-- Basic movement and score tracking.

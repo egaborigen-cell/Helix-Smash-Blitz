@@ -3,6 +3,11 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.18.0] - 2025-06-06
+### Improved
+- **Predator AI**: Refined jumping predators (Foxes, Wolves, Bears) to use a double-hop trajectory. They now land mid-way on the central platform during their jump, significantly increasing hazard presence on the main path.
+- **Visuals**: Updated predator models with lighter, higher-contrast colors for better readability against the green forest environment.
+
 ## [1.17.0] - 2025-06-05
 ### Improved
 - **Level Design**: Platforms containing 2 or 3 static predators are now significantly wider. This adjustment provides more safe landing area on high-density hazard steps, improving overall gameplay balance and fairness.
@@ -38,12 +43,3 @@ All notable changes to the HelixSmash project will be documented in this file.
 - **Respawn Logic**: Implemented a "snap and bounce" mechanism that guarantees the ball resets perfectly to the center of the last safe platform.
 - **Physics**: Refined hazard jump arcs and speeds to ensure they pounce through the player's path rather than over it.
 - **Documentation**: Created `VERSION_HISTORY.md` for better project tracking.
-
-## [1.11.0] - 2025-05-29
-### Changed
-- **Visuals**: Unified platform colors to a consistent "green grass" theme (0x66bb6a).
-- **UI/Onboarding**: Updated instructions and goal descriptions to reflect the new green platform color.
-
-## [1.10.0] - 2025-05-28
-### Added
-- **UI Refactoring**: Moved skin selection to a dedicated modal dialog.
