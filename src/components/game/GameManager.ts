@@ -217,9 +217,23 @@ export class GameManager {
   private createStep(z: number) {
     const progressFactor = Math.min(this.score / 500, 1);
     
-    const baseWidth = this.difficulty === 'INSANE' ? 6.0 : this.difficulty === 'HARD' ? 8.5 : 11.0;
+    // Determine the number of predators first to adjust platform width
+    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
+    let numHazards = 0;
+    if (isDanger) {
+      numHazards = 1;
+      if (z > 150) numHazards = 1 + Math.floor(Math.random() * 2);
+      if (z > 400) numHazards = 2 + Math.floor(Math.random() * 2);
+    }
+
+    let baseWidth = this.difficulty === 'INSANE' ? 6.0 : this.difficulty === 'HARD' ? 8.5 : 11.0;
+    
+    // Dynamically increase width for platforms with more predators to keep them fair
+    if (numHazards === 2) baseWidth *= 1.35;
+    if (numHazards >= 3) baseWidth *= 1.7;
+
     const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
-    const width = Math.min(this.laneWidth + 4, baseWidth * startWidthMultiplier);
+    const width = Math.min(this.laneWidth + 8, baseWidth * startWidthMultiplier);
     
     const geo = new THREE.BoxGeometry(width, this.stepThickness, this.stepDepth);
     const mat = new THREE.MeshStandardMaterial({ color: this.platformColor, roughness: 0.5 });
@@ -231,13 +245,8 @@ export class GameManager {
     const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
     step.position.set(xPos, 0, -z);
 
-    // Static Hazards
-    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
+    // Add Static Hazards
     if (isDanger) {
-      let numHazards = 1;
-      if (z > 150) numHazards = 1 + Math.floor(Math.random() * 2);
-      if (z > 400) numHazards = 2 + Math.floor(Math.random() * 2);
-      
       for (let i = 0; i < numHazards; i++) {
         const types: ('fox' | 'wolf' | 'bear')[] = ['fox', 'wolf', 'bear'];
         const animalType = types[Math.floor(Math.random() * types.length)];
@@ -249,7 +258,7 @@ export class GameManager {
         animalGroup.position.set(randomX, 0.1, randomZ);
         animalGroup.rotation.y = Math.random() * Math.PI;
 
-        // Initialize patrol data - Slower speeds for better balance
+        // Initialize patrol data
         animalGroup.userData = {
           patrolRange: (width - 2.5) / 2,
           patrolSpeed: 0.6 + Math.random() * 0.8,
@@ -286,6 +295,7 @@ export class GameManager {
       };
     }
     
+    // Decorative forest environment
     const sideWidth = 6;
     const sideGeo = new THREE.BoxGeometry(sideWidth, this.stepThickness, this.stepDepth);
     const sideMat = new THREE.MeshStandardMaterial({ color: this.platformColor, roughness: 0.9 });
@@ -461,12 +471,10 @@ export class GameManager {
           }
 
           if (jumper.isJumping && jumper.jumpProgress < 1) {
-            // Slower pounce speed for better balance
             jumper.jumpProgress += delta * 0.8; 
             const totalDistance = 36; // sideOffset * 2
             const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
             jumper.mesh.position.x = targetX;
-            // Lower arc: pounce through the path rather than fly over
             jumper.mesh.position.y = Math.sin(jumper.jumpProgress * Math.PI) * 1.5 + 0.1;
           }
 
@@ -557,7 +565,7 @@ export class GameManager {
         if (this.lives < 5) {
           this.lives++;
           this.options.onLivesUpdate(this.lives);
-          this.audio.playWin(); // Success sound for life gain
+          this.audio.playWin(); 
         }
         this.platformsSinceLastLife = 0;
       }
@@ -579,7 +587,7 @@ export class GameManager {
     if (this.gameState !== 'PLAYING' || this.respawnInvulnerability > 0) return;
     
     this.lives--;
-    this.platformsSinceLastLife = 0; // Reset progress toward next life on failure
+    this.platformsSinceLastLife = 0; 
     this.options.onLivesUpdate(this.lives);
     this.particles.emit(this.ball.position, 0xff0000, 50, 0.6);
 

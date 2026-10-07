@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.17.0] - 2025-06-05
+### Improved
+- **Level Design**: Platforms containing 2 or 3 static predators are now significantly wider. This adjustment provides more safe landing area on high-density hazard steps, improving overall gameplay balance and fairness.
+
 ## [1.16.0] - 2025-06-04
 ### Improved
 - **AI Balance**: Reduced predator movement speeds. Patrolling hazards and jumping animals now move a little slower, improving game balance and reactability.

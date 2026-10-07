@@ -2,6 +2,10 @@
 
 This document tracks the major milestones and evolutionary steps of the HelixSmash project.
 
+## [1.17.0] - 2025-06-05
+### Dynamic Platform Scaling
+- **Fair Density**: Automatically increased the width of platforms containing multiple predators (2 or 3) by up to 70%. This ensures that even high-difficulty steps remain fair and navigable for the player.
+
 ## [1.15.0] - 2025-06-03
 ### Physics Optimization
 - **Neon Stability**: Fixed an issue where the Neon skin would drift off-track after multiple bounces by recalibrating its gravity-to-bounce ratio and increasing its physical scale to match the landing detection window better.
