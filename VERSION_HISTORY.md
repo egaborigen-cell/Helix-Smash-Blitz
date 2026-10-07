@@ -2,6 +2,10 @@
 
 This document tracks the major milestones and evolutionary steps of the HelixSmash project.
 
+## [1.15.0] - 2025-06-03
+### Physics Optimization
+- **Neon Stability**: Fixed an issue where the Neon skin would drift off-track after multiple bounces by recalibrating its gravity-to-bounce ratio and increasing its physical scale to match the landing detection window better.
+
 ## [1.14.0] - 2025-06-02
 ### Mastery Rewards
 - **Life Gain Mechanic**: Introduced a new rule where landing on 10 consecutive new platforms grants an extra life.

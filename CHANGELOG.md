@@ -3,6 +3,11 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.15.0] - 2025-06-03
+### Refactored
+- **Skins**: Re-tuned Neon skin physics to resolve trajectory drift. Increased scale and normalized gravity/bounce ratios for 100% landing reliability.
+- **Physics**: Improved landing stability across all skins by adjusting scale-to-gravity proportions.
+
 ## [1.14.0] - 2025-06-02
 ### Added
 - **Game Rule**: Players now earn one extra life for every 10 new platforms they successfully land on (capped at 5 lives total).
