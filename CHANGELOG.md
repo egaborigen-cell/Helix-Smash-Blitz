@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.16.0] - 2025-06-04
+### Improved
+- **AI Balance**: Reduced predator movement speeds. Patrolling hazards and jumping animals now move a little slower, improving game balance and reactability.
+
 ## [1.15.0] - 2025-06-03
 ### Refactored
 - **Skins**: Re-tuned Neon skin physics to resolve trajectory drift. Increased scale and normalized gravity/bounce ratios for 100% landing reliability.

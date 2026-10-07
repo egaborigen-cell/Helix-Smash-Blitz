@@ -249,10 +249,10 @@ export class GameManager {
         animalGroup.position.set(randomX, 0.1, randomZ);
         animalGroup.rotation.y = Math.random() * Math.PI;
 
-        // Initialize patrol data
+        // Initialize patrol data - Slower speeds for better balance
         animalGroup.userData = {
           patrolRange: (width - 2.5) / 2,
-          patrolSpeed: 1.0 + Math.random() * 1.5,
+          patrolSpeed: 0.6 + Math.random() * 0.8,
           patrolOffset: Math.random() * Math.PI * 2
         };
 
@@ -461,7 +461,8 @@ export class GameManager {
           }
 
           if (jumper.isJumping && jumper.jumpProgress < 1) {
-            jumper.jumpProgress += delta * 1.2; // Faster pounce speed
+            // Slower pounce speed for better balance
+            jumper.jumpProgress += delta * 0.8; 
             const totalDistance = 36; // sideOffset * 2
             const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
             jumper.mesh.position.x = targetX;

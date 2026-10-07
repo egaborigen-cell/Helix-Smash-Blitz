@@ -8,9 +8,10 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 ### 📡 Documentation
 - **Troubleshooting**: Added a dedicated section to `README.md` for resolving common Git credential and environment issues.
 - **Version History**: Created `VERSION_HISTORY.md` to track major milestones and evolutionary steps of the project.
-- **Logs**: Updated `CHANGELOG.md` to reflect the latest gameplay refactors and Neon skin stability fixes.
+- **Logs**: Updated `CHANGELOG.md` to reflect the latest predator speed adjustments and Neon skin stability fixes.
 
 ### 🛠 Core Gameplay & Physics
+- **AI Balancing**: Reduced the movement speed of patrolling and jumping predators to make the game more accessible and balanced.
 - **Neon Skin Refactor**: Stabilized the floaty Neon skin by recalibrating its gravity-to-bounce ratio, preventing it from falling between platforms after multiple landings.
 - **Precision Bouncing**: Refactored the physics engine to dynamically calculate ball landing positions based on skin scale.
 - **Expanded Platforms**: Platforms are now significantly wider and placed across a wider lane (16 units).
