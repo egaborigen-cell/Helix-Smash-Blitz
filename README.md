@@ -14,7 +14,7 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
   - **Hard**: Fast speed and narrow platforms.
   - **Insane**: Extreme speed with tiny steps for the pros.
 - **Skin Customization**: 
-  - **Toxic**: Balanced physics (Green).
+  - **Toy**: Balanced physics (Orange-Red).
   - **Neon**: Light and high-bouncing (Pink).
   - **Aqua**: Fast and heavy (Cyan).
 - **Cross-Platform**: Optimized for both high-end desktop browsers and mobile touch devices.
@@ -40,9 +40,13 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
 If you see an error like `connect ECONNREFUSED /tmp/vscode-git-...sock`:
 1.  **Restart VS Code**: This is the most reliable fix to reset the Git bridge.
 2.  **Unset AskPass**: Run `unset GIT_ASKPASS` in your terminal to bypass the broken VS Code credential helper.
-3.  **Check 2FA**: If you lost GitHub access, ensure you are using a **Personal Access Token (PAT)** or SSH keys, as standard passwords are no longer supported for Git operations.
+
+### Console Error: `.reset in derived store is deprecated`
+If you see this error in the console after publishing (often in a file named `error_monitoring.isolated...js`):
+- **Reason**: This is a deprecation warning from a transitive dependency or a platform-injected monitoring script (e.g., Yandex Games SDK or Sentry).
+- **Impact**: **None.** It does not affect game physics, scoring, or rendering. You can safely ignore this warning.
 
 ### NPM Deprecation Warnings
 You may see a warning like: `npm warn deprecated @opentelemetry/exporter-jaeger@1.30.1: Package no longer supported`.
 - **Reason**: This is a transitive dependency used by the Genkit telemetry system.
-- **Impact**: **None.** This warning is informational and does not affect the game's build, performance, or functionality. You can safely ignore it.
+- **Impact**: **None.** This warning is informational and does not affect the game's functionality.
