@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -209,15 +210,22 @@ export default function HelixGame() {
                 </div>
                 <div className="flex flex-col items-start gap-1">
                     <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.lives}</div>
-                    <div className="flex gap-1 items-center h-8 sm:h-10">
+                    <div className="flex gap-1.5 items-center h-8 sm:h-10">
                         {heartIndices.map((heart) => (
-                            <Heart 
-                                key={heart} 
-                                className={cn(
-                                    "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300", 
-                                    heart <= lives ? "text-red-500 fill-red-500" : "text-white/20 fill-none scale-90"
-                                )} 
-                            />
+                            <div key={heart} className="relative transition-all duration-500 ease-out">
+                              <Heart 
+                                  className={cn(
+                                      "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-500", 
+                                      heart <= lives 
+                                        ? "text-red-500 fill-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-in zoom-in-50 duration-300" 
+                                        : "text-white/10 fill-none scale-50 opacity-0 -translate-y-2 rotate-12 pointer-events-none",
+                                      heart === 1 && lives === 1 && gameState === 'PLAYING' && "animate-heart-beat"
+                                  )} 
+                              />
+                              {heart <= lives && (
+                                <div className="absolute inset-0 bg-red-500/10 blur-xl rounded-full animate-pulse pointer-events-none" />
+                              )}
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -426,3 +434,4 @@ export default function HelixGame() {
     </div>
   );
 }
+
