@@ -2,6 +2,11 @@
 
 This document tracks the major milestones and evolutionary steps of the HelixSmash project.
 
+## [1.14.0] - 2025-06-02
+### Mastery Rewards
+- **Life Gain Mechanic**: Introduced a new rule where landing on 10 consecutive new platforms grants an extra life.
+- **Dynamic Life UI**: The top-HUD heart counter now adjusts to show up to 5 lives visually.
+
 ## [1.13.0] - 2025-06-01
 ### Skyline Enhancement
 - **Lush Forest**: Increased tree height on side platforms and introduced random height multipliers to create a more dynamic and organic forest environment.

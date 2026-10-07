@@ -194,6 +194,9 @@ export default function HelixGame() {
 
   const toggleLang = () => setLang(prev => prev === 'en' ? 'ru' : 'en');
 
+  // Generate an array of indices for hearts based on current lives, min 3
+  const heartIndices = Array.from({ length: Math.max(3, lives) }, (_, i) => i + 1);
+
   return (
     <div className="game-container touch-none select-none relative overflow-hidden bg-background">
       <div ref={containerRef} className="w-full h-full relative z-10" />
@@ -207,7 +210,7 @@ export default function HelixGame() {
                 <div className="flex flex-col items-start gap-1">
                     <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase">{t.lives}</div>
                     <div className="flex gap-1 items-center h-8 sm:h-10">
-                        {[1, 2, 3].map((heart) => (
+                        {heartIndices.map((heart) => (
                             <Heart 
                                 key={heart} 
                                 className={cn(

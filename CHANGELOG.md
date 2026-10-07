@@ -3,6 +3,12 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.14.0] - 2025-06-02
+### Added
+- **Game Rule**: Players now earn one extra life for every 10 new platforms they successfully land on (capped at 5 lives total).
+- **UI**: The heart display now dynamically scales to show earned lives beyond the initial three.
+- **Audio**: Added a victory sound feedback when a player earns an extra life.
+
 ## [1.13.0] - 2025-06-01
 ### Improved
 - **Environment**: Increased the height of trees on side platforms and added random vertical scaling to create a more immersive and varied forest skyline.

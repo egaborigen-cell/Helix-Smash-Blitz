@@ -41,6 +41,8 @@ export class GameManager {
 
   private score: number = 0;
   private lives: number = 3;
+  private platformsSinceLastLife: number = 0;
+  private lastBouncedStepId: string | null = null;
   private gameState: GameState = 'START';
   private difficulty: Difficulty = 'EASY';
   private options: GameOptions;
@@ -335,6 +337,8 @@ export class GameManager {
     this.options.onScoreUpdate(this.score);
     
     this.lives = 3;
+    this.platformsSinceLastLife = 0;
+    this.lastBouncedStepId = null;
     this.options.onLivesUpdate(this.lives);
     this.respawnInvulnerability = 0;
     
@@ -542,6 +546,22 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
+    // Check if it's a new platform for life-gain progress
+    if (this.lastBouncedStepId !== step.uuid) {
+      this.lastBouncedStepId = step.uuid;
+      this.platformsSinceLastLife++;
+      
+      // Earn a life every 10 new platforms (capped at 5 for balance)
+      if (this.platformsSinceLastLife >= 10) {
+        if (this.lives < 5) {
+          this.lives++;
+          this.options.onLivesUpdate(this.lives);
+          this.audio.playWin(); // Success sound for life gain
+        }
+        this.platformsSinceLastLife = 0;
+      }
+    }
+
     this.lastSafePosition.set(step.position.x, landingY, step.position.z);
     
     this.audio.playBounce();
@@ -558,6 +578,7 @@ export class GameManager {
     if (this.gameState !== 'PLAYING' || this.respawnInvulnerability > 0) return;
     
     this.lives--;
+    this.platformsSinceLastLife = 0; // Reset progress toward next life on failure
     this.options.onLivesUpdate(this.lives);
     this.particles.emit(this.ball.position, 0xff0000, 50, 0.6);
 
