@@ -146,68 +146,95 @@ export class GameManager {
 
   private createAnimalModel(type: 'fox' | 'wolf' | 'bear') {
     const group = new THREE.Group();
-    let color = 0x4a4a4a;
+    let color = 0xd1d8e0; // Light Grey (Wolf)
     let accentColor = 0xffffff;
     let scale = 1.0;
 
     if (type === 'fox') {
-      color = 0xff8c00;
+      color = 0xffa45c; // Light Orange
       accentColor = 0xffffff;
     } else if (type === 'wolf') {
-      color = 0x4a4a4a;
-      accentColor = 0xff0000;
+      color = 0xe0e0e0; // Silver/Light Grey
+      accentColor = 0x333333;
     } else if (type === 'bear') {
-      color = 0x3d2b1f;
-      accentColor = 0x000000;
-      scale = 1.4;
+      color = 0xad8b73; // Light Cinnamon Brown
+      accentColor = 0x5d4037;
+      scale = 1.35;
     }
     
     const bodyMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.7 });
     const accentMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.7 });
     const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.0), bodyMat);
-    body.position.y = 0.4;
+    // Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), bodyMat);
+    body.position.y = 0.5;
     body.castShadow = true;
     group.add(body);
 
+    // Head
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), bodyMat);
-    head.position.set(0, 0.8, -0.6);
+    head.position.set(0, 0.9, -0.6);
     head.castShadow = true;
     group.add(head);
 
-    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.3), type === 'fox' ? accentMat : bodyMat);
-    snout.position.set(0, 0.7, -0.9);
+    // Snout
+    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.4), type === 'fox' ? accentMat : bodyMat);
+    snout.position.set(0, 0.8, -0.95);
     group.add(snout);
 
-    const earGeo = new THREE.ConeGeometry(0.15, 0.3, 4);
+    // Ears
+    const earGeo = new THREE.ConeGeometry(0.15, 0.35, 4);
     const earL = new THREE.Mesh(earGeo, bodyMat);
-    earL.position.set(-0.2, 1.15, -0.6);
+    earL.position.set(-0.25, 1.25, -0.6);
     group.add(earL);
 
     const earR = new THREE.Mesh(earGeo, bodyMat);
-    earR.position.set(0.2, 1.15, -0.6);
+    earR.position.set(0.25, 1.25, -0.6);
     group.add(earR);
 
-    const eyeGeo = new THREE.SphereGeometry(0.06, 8, 8);
-    const eyeL = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff0000 }) : eyeMat);
-    eyeL.position.set(-0.15, 0.85, -0.85);
+    // Eyes
+    const eyeGeo = new THREE.SphereGeometry(0.07, 8, 8);
+    const eyeL = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff3333 }) : eyeMat);
+    eyeL.position.set(-0.18, 0.95, -0.85);
     group.add(eyeL);
 
-    const eyeR = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff0000 }) : eyeMat);
-    eyeR.position.set(0.15, 0.85, -0.85);
+    const eyeR = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff3333 }) : eyeMat);
+    eyeR.position.set(0.18, 0.95, -0.85);
     group.add(eyeR);
 
-    const ringGeo = new THREE.RingGeometry(1.0, 1.3, 32);
+    // Legs
+    const legGeo = new THREE.BoxGeometry(0.18, 0.4, 0.18);
+    const legPositions = [
+        [-0.25, 0.2, -0.4], [0.25, 0.2, -0.4],
+        [-0.25, 0.2, 0.4], [0.25, 0.2, 0.4]
+    ];
+    legPositions.forEach(pos => {
+        const leg = new THREE.Mesh(legGeo, bodyMat);
+        leg.position.set(pos[0], pos[1], pos[2]);
+        group.add(leg);
+    });
+
+    // Tail
+    const tail = new THREE.Mesh(
+        new THREE.BoxGeometry(0.2, 0.2, 0.5), 
+        type === 'fox' ? accentMat : bodyMat
+    );
+    tail.position.set(0, 0.6, 0.7);
+    tail.rotation.x = 0.2;
+    group.add(tail);
+
+    // Hazard Ring
+    const ringGeo = new THREE.RingGeometry(1.2, 1.4, 32);
     const ringMat = new THREE.MeshBasicMaterial({ 
       color: 0xff0000, 
       transparent: true, 
-      opacity: 0.8, 
+      opacity: 0.6, 
       side: THREE.DoubleSide 
     });
     const hazardRing = new THREE.Mesh(ringGeo, ringMat);
     hazardRing.rotation.x = -Math.PI / 2;
-    hazardRing.position.y = 0.05;
+    hazardRing.position.y = 0.02;
     group.add(hazardRing);
 
     group.scale.setScalar(scale);
