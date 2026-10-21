@@ -53,7 +53,7 @@ export class GameManager {
   private ballScale: number = 1.0;
   private baseBallRadius: number = 0.3;
   private stepThickness: number = 0.3;
-  private stepDepth: number = 2.5;
+  private stepDepth: number = 3.5; // Increased depth for safer landings
 
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
@@ -270,7 +270,7 @@ export class GameManager {
         animalGroup.name = 'spike'; 
 
         const randomX = (Math.random() - 0.5) * (width - 2.5);
-        const randomZ = (Math.random() - 0.5) * 1.2;
+        const randomZ = (Math.random() - 0.5) * 1.5;
         animalGroup.position.set(randomX, 0.1, randomZ);
         animalGroup.rotation.y = Math.random() * Math.PI;
 
@@ -349,7 +349,8 @@ export class GameManager {
     else this.difficulty = 'INSANE';
     
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
-    this.baseStepSpacing = this.forwardSpeed * bounceTime;
+    // Use a safety multiplier to keep platforms slightly closer for overlap
+    this.baseStepSpacing = this.forwardSpeed * bounceTime * 0.98;
   }
 
   public startGame(skin: SkinConfig) {
@@ -360,7 +361,7 @@ export class GameManager {
 
     this.forwardSpeed = 0.15;
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
-    this.baseStepSpacing = this.forwardSpeed * bounceTime;
+    this.baseStepSpacing = this.forwardSpeed * bounceTime * 0.98;
     
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
@@ -559,15 +560,15 @@ export class GameManager {
         const targetLandingY = surfaceY + currentBallRadius;
         
         // Window scales with velocity to prevent skipping at high speeds
-        const velocityBuffer = Math.abs(this.ballVelocityY) * 2.0; // Increased buffer
+        const velocityBuffer = Math.abs(this.ballVelocityY) * 2.0;
         const landingThreshold = Math.max(0.8, velocityBuffer); 
 
         // Check if ball intersected the platform surface during this frame
         const pathIntersected = prevY >= targetLandingY && this.ball.position.y <= targetLandingY + 0.2;
 
         if (this.ballVelocityY < 0 && 
-            dz < (this.stepDepth / 2) + 1.2 && // Even wider Z window for extreme speed
-            dx < (width / 2) + (currentBallRadius * 0.9) && // Magnetic landing feel
+            dz < (this.stepDepth / 2) + 2.0 && // Significantly widened Z window for high-speed safety
+            dx < (width / 2) + (currentBallRadius * 0.9) && 
             (this.ball.position.y < targetLandingY + landingThreshold || pathIntersected) && 
             this.ball.position.y > surfaceY - 1.0) {
             
