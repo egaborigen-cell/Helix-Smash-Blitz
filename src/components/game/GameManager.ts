@@ -57,21 +57,21 @@ export class GameManager {
   
   // Physics Settings (Overwritten by skins)
   private ballColor: number = 0xff4500;
-  private gravity: number = -0.015;
-  private bounceStrength: number = 0.32; 
+  private gravity: number = -0.012;
+  private bounceStrength: number = 0.30; 
   private ballScale: number = 1.0;
   
   // Constants
   private readonly BASE_BALL_RADIUS = 0.3;
-  private readonly STEP_THICKNESS = 0.3;
-  private readonly STEP_DEPTH = 10.0; // Deep platforms for a zero-gap experience
+  private readonly STEP_THICKNESS = 0.4;
+  private readonly STEP_DEPTH = 12.0; // Increased depth for massive overlap
   private readonly LANE_WIDTH = 16;
   private readonly PLATFORM_COLOR = 0x66bb6a;
 
   // Runtime Physics
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
-  private forwardSpeed: number = 0.15; // Constant speed
+  private forwardSpeed: number = 0.15; 
   private lateralSensitivity: number = 0.05;
   private lastSafePosition: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
   private respawnInvulnerability: number = 0;
@@ -162,7 +162,7 @@ export class GameManager {
 
   private createAnimal(type: 'fox' | 'wolf' | 'bear') {
     const group = new THREE.Group();
-    let color = 0xffbe76; // Default fox
+    let color = 0xffbe76; 
     let scale = 1.0;
 
     if (type === 'wolf') color = 0xdcdde1;
@@ -194,15 +194,13 @@ export class GameManager {
 
   private createStep(z: number) {
     const isFirst = z === 0;
-    
-    // Constant Width and Hazard Probability (No Difficulty Increase)
     let baseWidth = 10;
-    const hazardThreshold = 0.7; // Fixed threshold
+    const hazardThreshold = 0.7; 
     const isDanger = !isFirst && Math.random() > hazardThreshold;
     
     let hazards = 0;
     if (isDanger) {
-      hazards = 1 + (Math.random() > 0.8 ? 1 : 0); // Max 2 hazards for consistency
+      hazards = 1 + (Math.random() > 0.8 ? 1 : 0);
       if (hazards > 1) baseWidth *= 1.3;
     }
     
@@ -266,8 +264,9 @@ export class GameManager {
   }
 
   private updateRhythm() {
+    // Air time in frames
     const airTime = 2 * this.bounceStrength / -this.gravity;
-    // Spacing is perfectly synchronized with the bounce flight time.
+    // Perfect sync: distance traveled in airTime frames
     this.baseStepSpacing = this.forwardSpeed * airTime;
   }
 
@@ -276,7 +275,7 @@ export class GameManager {
     this.gravity = skin.gravity;
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
-    this.forwardSpeed = 0.15; // Reset to base speed
+    this.forwardSpeed = 0.15; 
     
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
@@ -306,6 +305,7 @@ export class GameManager {
     this.ballVelocityX = 0;
     this.respawnInvulnerability = 0;
     this.lastSafePosition.copy(this.ball.position);
+    this.lastBouncedStepId = null;
     
     this.particles.clear();
     this.audio.startMusic();
@@ -353,7 +353,7 @@ export class GameManager {
       if (this.respawnInvulnerability <= 0) (this.ball.material as THREE.MeshStandardMaterial).opacity = 1;
     }
 
-    const prevPos = this.ball.position.clone();
+    const prevY = this.ball.position.y;
     const ballRadius = this.BASE_BALL_RADIUS * this.ballScale;
 
     // Move Ball
@@ -372,23 +372,28 @@ export class GameManager {
 
     const time = this.clock.getElapsedTime();
 
-    // Platform Logic
+    // Continuous Collision Volume (CCV) Logic
     for (const step of this.steps) {
-      const dx = Math.abs(this.ball.position.x - step.position.x);
-      const dz = Math.abs(this.ball.position.z - step.position.z);
       const width = (step.geometry as THREE.BoxGeometry).parameters.width;
       const targetY = step.position.y + this.STEP_THICKNESS / 2 + ballRadius;
 
-      // Trajectory Intercept Collision (CCD)
-      const isFalling = this.ballVelocityY < 0;
-      const crossedPlane = prevPos.y >= targetY && this.ball.position.y <= targetY + 0.2;
+      const dx = Math.abs(this.ball.position.x - step.position.x);
+      const dz = Math.abs(this.ball.position.z - step.position.z);
       
-      // Zero-Gap check: we expand the z detection to ensure overlap coverage
-      const isOverPlatform = dx < width / 2 + ballRadius * 0.8 && dz < this.STEP_DEPTH / 2 + 1.5;
+      // Forgiving lateral and longitudinal overlap
+      const isOver = dx < width / 2 + ballRadius * 0.7 && dz < this.STEP_DEPTH / 2 + 1.0;
 
-      if (isFalling && isOverPlatform && (crossedPlane || (this.ball.position.y <= targetY && this.ball.position.y > targetY - 1.5))) {
-        this.handleBounce(step, targetY);
-        return;
+      if (isOver && this.ballVelocityY < 0) {
+        // Safe Landing Window: Expand buffer based on downward velocity
+        const collisionBuffer = Math.abs(this.ballVelocityY) + 0.2;
+        
+        const crossedPlane = prevY >= targetY && this.ball.position.y <= targetY + collisionBuffer;
+        const slightlyInside = this.ball.position.y < targetY && this.ball.position.y > targetY - 1.5;
+
+        if (crossedPlane || slightlyInside) {
+          this.handleBounce(step, targetY);
+          return;
+        }
       }
 
       // Hazard Collision
@@ -398,7 +403,7 @@ export class GameManager {
             const worldX = step.position.x + child.position.x;
             const worldZ = step.position.z + child.position.z;
             const dist = Math.sqrt(Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2));
-            if (dist < 1.4 * child.scale.x) {
+            if (dist < 1.3 * child.scale.x) {
               this.loseLife();
               return;
             }
