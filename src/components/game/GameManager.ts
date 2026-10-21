@@ -556,13 +556,13 @@ export class GameManager {
 
         const surfaceY = step.position.y + this.stepThickness / 2;
         const targetLandingY = surfaceY + currentBallRadius;
-        const landingThreshold = 0.35; 
+        const landingThreshold = 0.5; // Increased for high-speed stability
 
         if (this.ballVelocityY < 0 && 
-            dz < this.stepDepth / 2 && 
-            dx < width / 2 + (currentBallRadius * 0.4) &&
+            dz < this.stepDepth / 2 + 0.2 && 
+            dx < width / 2 + (currentBallRadius * 0.6) && // More generous magnetic landing
             this.ball.position.y < targetLandingY + landingThreshold && 
-            this.ball.position.y > surfaceY - 0.2) {
+            this.ball.position.y > surfaceY - 0.4) {
             
             this.performBounce(step, targetLandingY);
             return;

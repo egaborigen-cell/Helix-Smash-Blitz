@@ -3,6 +3,11 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.20.0] - 2025-06-08
+### Fixed
+- **Physics**: Major overhaul of ball physics and collision detection. Increased ball scale for all skins and widened the landing detection window to prevent "tunneling" (falling between platforms) at high speeds.
+- **Stability**: Calibrated gravity and bounce strength for Fox Toy, Neon, and Aqua skins to ensure predictable trajectories.
+
 ## [1.19.0] - 2025-06-07
 ### Improved
 - **Environment**: Moved side platforms closer to the center track. This creates a denser forest atmosphere and makes jumping predators more dangerous due to their reduced travel distance.
@@ -11,39 +16,3 @@ All notable changes to the HelixSmash project will be documented in this file.
 ### Improved
 - **Predator AI**: Refined jumping predators (Foxes, Wolves, Bears) to use a double-hop trajectory. They now land mid-way on the central platform during their jump, significantly increasing hazard presence on the main path.
 - **Visuals**: Updated predator models with lighter, higher-contrast colors for better readability against the green forest environment.
-
-## [1.17.0] - 2025-06-05
-### Improved
-- **Level Design**: Platforms containing 2 or 3 static predators are now significantly wider. This adjustment provides more safe landing area on high-density hazard steps, improving overall gameplay balance and fairness.
-
-## [1.16.0] - 2025-06-04
-### Improved
-- **AI Balance**: Reduced predator movement speeds. Patrolling hazards and jumping animals now move a little slower, improving game balance and reactability.
-
-## [1.15.0] - 2025-06-03
-### Refactored
-- **Skins**: Re-tuned Neon skin physics to resolve trajectory drift. Increased scale and normalized gravity/bounce ratios for 100% landing reliability.
-- **Physics**: Improved landing stability across all skins by adjusting scale-to-gravity proportions.
-
-## [1.14.0] - 2025-06-02
-### Added
-- **Game Rule**: Players now earn one extra life for every 10 new platforms they successfully land on (capped at 5 lives total).
-- **UI**: The heart display now dynamically scales to show earned lives beyond the initial three.
-- **Audio**: Added a victory sound feedback when a player earns an extra life.
-
-## [1.13.0] - 2025-06-01
-### Improved
-- **Environment**: Increased the height of trees on side platforms and added random vertical scaling to create a more immersive and varied forest skyline.
-
-## [1.12.0] - 2025-05-30
-### Added
-- **Lives System**: Implemented a three-lives system to increase player longevity.
-- **Dynamic Hazards**: Predators (Foxes, Wolves, Bears) now jump across the player's path from side platforms.
-- **Patrol AI**: Static hazards on main platforms now patrol laterally, adding a new layer of difficulty.
-- **Environment**: Added decorative side platforms with low-poly trees to create a forest-like atmosphere.
-- **Visuals**: Updated ball to a vibrant "Fox Toy" orange-red appearance.
-
-### Improved
-- **Respawn Logic**: Implemented a "snap and bounce" mechanism that guarantees the ball resets perfectly to the center of the last safe platform.
-- **Physics**: Refined hazard jump arcs and speeds to ensure they pounce through the player's path rather than over it.
-- **Documentation**: Created `VERSION_HISTORY.md` for better project tracking.
