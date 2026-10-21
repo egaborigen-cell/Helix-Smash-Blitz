@@ -461,6 +461,10 @@ export class GameManager {
       }
     }
 
+    // Capture previous state for path-based collision
+    const prevY = this.ball.position.y;
+    const currentBallRadius = this.baseBallRadius * this.ballScale;
+
     this.ball.position.z -= this.forwardSpeed;
     this.ball.position.x += this.ballVelocityX;
     this.ballVelocityX *= 0.85;
@@ -473,7 +477,6 @@ export class GameManager {
     this.ballVelocityY += this.gravity;
     this.ball.position.y += this.ballVelocityY;
 
-    const currentBallRadius = this.baseBallRadius * this.ballScale;
     const time = this.clock.getElapsedTime();
 
     for (const step of this.steps) {
@@ -546,7 +549,7 @@ export class GameManager {
         }
     }
 
-    // ENHANCED COLLISION DETECTION
+    // ENHANCED CONTINUOUS COLLISION DETECTION (CCD)
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
@@ -556,14 +559,17 @@ export class GameManager {
         const targetLandingY = surfaceY + currentBallRadius;
         
         // Window scales with velocity to prevent skipping at high speeds
-        const velocityBuffer = Math.abs(this.ballVelocityY) * 1.5;
-        const landingThreshold = Math.max(0.6, velocityBuffer); 
+        const velocityBuffer = Math.abs(this.ballVelocityY) * 2.0; // Increased buffer
+        const landingThreshold = Math.max(0.8, velocityBuffer); 
+
+        // Check if ball intersected the platform surface during this frame
+        const pathIntersected = prevY >= targetLandingY && this.ball.position.y <= targetLandingY + 0.2;
 
         if (this.ballVelocityY < 0 && 
-            dz < (this.stepDepth / 2) + 0.8 && // Wider Z window for high forward speed
-            dx < (width / 2) + (currentBallRadius * 0.8) && // More generous magnetic landing
-            this.ball.position.y < targetLandingY + landingThreshold && 
-            this.ball.position.y > surfaceY - 0.5) {
+            dz < (this.stepDepth / 2) + 1.2 && // Even wider Z window for extreme speed
+            dx < (width / 2) + (currentBallRadius * 0.9) && // Magnetic landing feel
+            (this.ball.position.y < targetLandingY + landingThreshold || pathIntersected) && 
+            this.ball.position.y > surfaceY - 1.0) {
             
             this.performBounce(step, targetLandingY);
             return;

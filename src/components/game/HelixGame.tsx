@@ -20,9 +20,9 @@ import {
 } from "@/components/ui/carousel";
 
 const SKINS: SkinConfig[] = [
-    { id: 'toy', color: 0xff4500, hex: '#ff4500', gravity: -0.018, bounceStrength: 0.36, scale: 2.3 },
-    { id: 'neon', color: 0xff00ff, hex: '#ff00ff', gravity: -0.016, bounceStrength: 0.40, scale: 2.0 },
-    { id: 'aqua', color: 0x00ffff, hex: '#00ffff', gravity: -0.022, bounceStrength: 0.34, scale: 2.2 }
+    { id: 'toy', color: 0xff4500, hex: '#ff4500', gravity: -0.018, bounceStrength: 0.36, scale: 2.6 },
+    { id: 'neon', color: 0xff00ff, hex: '#ff00ff', gravity: -0.016, bounceStrength: 0.40, scale: 2.2 },
+    { id: 'aqua', color: 0x00ffff, hex: '#00ffff', gravity: -0.022, bounceStrength: 0.34, scale: 2.4 }
 ];
 
 export default function HelixGame() {
