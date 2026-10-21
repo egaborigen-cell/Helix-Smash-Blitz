@@ -299,7 +299,7 @@ export class GameManager {
     }
 
     // Dynamic Hazards (Jumping Animals)
-    const sideOffset = 18;
+    const sideOffset = 12; // Moved closer from 18
     const hasJumper = this.difficulty !== 'PRACTICE' && z > 40 && Math.random() < (0.2 + progressFactor * 0.3);
     let jumper: JumperAnimal | null = null;
 
@@ -501,7 +501,7 @@ export class GameManager {
 
           if (jumper.isJumping && jumper.jumpProgress < 1) {
             jumper.jumpProgress += delta * 0.6; // Slightly slower jump
-            const totalDistance = 36; // sideOffset * 2
+            const totalDistance = 24; // sideOffset * 2 (12 * 2)
             const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
             jumper.mesh.position.x = targetX;
             

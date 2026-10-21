@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.19.0] - 2025-06-07
+### Improved
+- **Environment**: Moved side platforms closer to the center track. This creates a denser forest atmosphere and makes jumping predators more dangerous due to their reduced travel distance.
+
 ## [1.18.0] - 2025-06-06
 ### Improved
 - **Predator AI**: Refined jumping predators (Foxes, Wolves, Bears) to use a double-hop trajectory. They now land mid-way on the central platform during their jump, significantly increasing hazard presence on the main path.

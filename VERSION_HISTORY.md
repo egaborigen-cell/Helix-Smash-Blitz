@@ -2,6 +2,11 @@
 
 This document tracks the major milestones and evolutionary steps of the HelixSmash project.
 
+## [1.19.0] - 2025-06-07
+### Denser Forest & Faster Jumps
+- **Platform Proximity**: Side platforms are now positioned closer to the main path. This creates a denser, more claustrophobic environment and forces the ball to navigate a narrower "canyon" of trees.
+- **Jump Intensity**: Jumping predators now cover their distance faster, making their timing more critical for the player to dodge.
+
 ## [1.18.0] - 2025-06-06
 ### Predator Pouncing Refinement
 - **Double-Hop Mechanics**: Jumping predators now land mid-way on the central platform. This creates two distinct threat zones during their jump and forces the player to time their lateral movement more carefully.
