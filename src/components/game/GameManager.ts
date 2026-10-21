@@ -245,7 +245,7 @@ export class GameManager {
       if (Math.abs(z) > 400) numHazards = 2 + Math.floor(Math.random() * 2);
     }
 
-    let baseWidth = 11.0 - (progressFactor * 5); // Narrower steps as distance increases
+    let baseWidth = 11.0 - (progressFactor * 5); 
     if (numHazards === 2) baseWidth *= 1.35;
     if (numHazards >= 3) baseWidth *= 1.7;
 
@@ -339,18 +339,15 @@ export class GameManager {
   private updateDifficulty() {
     if (this.gameState !== 'PLAYING') return;
 
-    // Smooth speed progression from 0.15 to 0.4
     const baseSpeed = 0.15;
     const speedInc = Math.min(this.score / 1500, 0.25);
     this.forwardSpeed = baseSpeed + speedInc;
 
-    // Internal difficulty tracking for logic/hazards
     if (this.score < 100) this.difficulty = 'BEGINNER';
     else if (this.score < 250) this.difficulty = 'EASY';
     else if (this.score < 600) this.difficulty = 'HARD';
     else this.difficulty = 'INSANE';
     
-    // Sync jump rhythm
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
     this.baseStepSpacing = this.forwardSpeed * bounceTime;
   }
@@ -549,6 +546,7 @@ export class GameManager {
         }
     }
 
+    // ENHANCED COLLISION DETECTION
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
@@ -556,13 +554,16 @@ export class GameManager {
 
         const surfaceY = step.position.y + this.stepThickness / 2;
         const targetLandingY = surfaceY + currentBallRadius;
-        const landingThreshold = 0.5; // Increased for high-speed stability
+        
+        // Window scales with velocity to prevent skipping at high speeds
+        const velocityBuffer = Math.abs(this.ballVelocityY) * 1.5;
+        const landingThreshold = Math.max(0.6, velocityBuffer); 
 
         if (this.ballVelocityY < 0 && 
-            dz < this.stepDepth / 2 + 0.2 && 
-            dx < width / 2 + (currentBallRadius * 0.6) && // More generous magnetic landing
+            dz < (this.stepDepth / 2) + 0.8 && // Wider Z window for high forward speed
+            dx < (width / 2) + (currentBallRadius * 0.8) && // More generous magnetic landing
             this.ball.position.y < targetLandingY + landingThreshold && 
-            this.ball.position.y > surfaceY - 0.4) {
+            this.ball.position.y > surfaceY - 0.5) {
             
             this.performBounce(step, targetLandingY);
             return;
