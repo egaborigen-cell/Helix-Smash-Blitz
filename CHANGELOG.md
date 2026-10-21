@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.26.0] - 2025-06-14
+### Refactored
+- **Simplified Progression**: Removed dynamic difficulty scaling. Speed, platform width, and hazard density are now constant for a more consistent gameplay experience.
+
 ## [1.25.0] - 2025-06-13
 ### Refactored
 - **Core Engine Remake**: Rewrote `GameManager` from scratch to implement a Trajectory-Intercept Collision System. This resolves all "falling through platform" issues by calculating frame-independent intercepts.

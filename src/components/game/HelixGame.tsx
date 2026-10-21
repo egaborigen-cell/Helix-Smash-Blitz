@@ -342,8 +342,6 @@ export default function HelixGame() {
                 <ArrowRight className="w-8 h-8" />
               </Button>
             </div>
-
-            <p className="text-xs text-white/40 font-bold uppercase tracking-widest animate-pulse">Reach 100m for higher speed!</p>
           </div>
         )}
 

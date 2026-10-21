@@ -53,7 +53,6 @@ export class GameManager {
   private platformsSinceLastLife: number = 0;
   private lastBouncedStepId: string | null = null;
   private gameState: GameState = 'START';
-  private difficulty: Difficulty = 'BEGINNER';
   private options: GameOptions;
   
   // Physics Settings (Overwritten by skins)
@@ -72,7 +71,7 @@ export class GameManager {
   // Runtime Physics
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
-  private forwardSpeed: number = 0.15;
+  private forwardSpeed: number = 0.15; // Constant speed
   private lateralSensitivity: number = 0.05;
   private lastSafePosition: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
   private respawnInvulnerability: number = 0;
@@ -194,16 +193,17 @@ export class GameManager {
   }
 
   private createStep(z: number) {
-    const progress = Math.min(Math.abs(z) / 1000, 1);
     const isFirst = z === 0;
     
-    // Width logic
-    let baseWidth = 12 - (progress * 6);
-    const isDanger = !isFirst && Math.random() > (0.7 - progress * 0.3);
+    // Constant Width and Hazard Probability (No Difficulty Increase)
+    let baseWidth = 10;
+    const hazardThreshold = 0.7; // Fixed threshold
+    const isDanger = !isFirst && Math.random() > hazardThreshold;
+    
     let hazards = 0;
     if (isDanger) {
-      hazards = 1 + (Math.abs(z) > 200 ? 1 : 0) + (Math.abs(z) > 500 ? 1 : 0);
-      if (hazards > 1) baseWidth *= (1 + (hazards - 1) * 0.3);
+      hazards = 1 + (Math.random() > 0.8 ? 1 : 0); // Max 2 hazards for consistency
+      if (hazards > 1) baseWidth *= 1.3;
     }
     
     const width = Math.min(this.LANE_WIDTH + 4, baseWidth);
@@ -249,7 +249,7 @@ export class GameManager {
 
     // Jumper Animal
     let jumper: JumperAnimal | null = null;
-    if (!isFirst && Math.random() < 0.25) {
+    if (!isFirst && Math.random() < 0.20) {
       const animal = this.createAnimal('fox');
       animal.name = 'jumper';
       const dir = Math.random() > 0.5 ? 1 : -1;
@@ -275,7 +275,7 @@ export class GameManager {
     this.gravity = skin.gravity;
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
-    this.forwardSpeed = 0.15;
+    this.forwardSpeed = 0.15; // Reset to base speed
     
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
@@ -322,7 +322,6 @@ export class GameManager {
     
     if (this.gameState === 'PLAYING') {
       this.updatePhysics(dt);
-      this.updateDifficulty();
       this.manageSteps();
     }
     
@@ -330,11 +329,6 @@ export class GameManager {
     this.updateCamera();
     this.renderer.render(this.scene, this.camera);
   };
-
-  private updateDifficulty() {
-    this.forwardSpeed = 0.15 + Math.min(this.score / 2000, 0.25);
-    this.updateRhythm();
-  }
 
   private manageSteps() {
     if (Math.abs(this.ball.position.z) + 100 > this.nextStepZ) {
