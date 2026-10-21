@@ -27,6 +27,31 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
     ```
 2.  **Open the game**: Navigate to `http://localhost:9002`.
 
+## 📦 How to Make a Release
+
+To release a new version on GitHub:
+
+1.  **Prepare the Version**: Update the version number in `package.json` and add the latest changes to `CHANGELOG.md`.
+2.  **Create an Export**: Run the build script to generate a deployment-ready ZIP file:
+    ```bash
+    npm run export-zip
+    ```
+    This will create a new archive in the `archives/` directory.
+3.  **Push to GitHub**: Commit your changes and push to your main branch.
+4.  **Create a Tag**: Create a git tag for your version:
+    ```bash
+    git tag -a v1.28.0 -m "Release version 1.28.0"
+    git push origin v1.28.0
+    ```
+5.  **Draft Release**: 
+    - Go to your repository on GitHub.
+    - Click **Releases** > **Draft a new release**.
+    - Select the tag you just pushed.
+    - Title the release (e.g., `v1.28.0 - Stability Update`).
+    - Copy the relevant notes from `CHANGELOG.md` into the description.
+    - **Attach the ZIP**: Drag and drop the generated `.zip` file from your `archives/` folder into the binaries section.
+6.  **Publish**: Click **Publish release**.
+
 ## 🛠 Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
@@ -42,11 +67,5 @@ If you see an error like `connect ECONNREFUSED /tmp/vscode-git-...sock`:
 2.  **Unset AskPass**: Run `unset GIT_ASKPASS` in your terminal to bypass the broken VS Code credential helper.
 
 ### Console Error: `.reset in derived store is deprecated`
-If you see this error in the console after publishing (often in a file named `error_monitoring.isolated...js`):
-- **Reason**: This is a deprecation warning from a transitive dependency or a platform-injected monitoring script (e.g., Yandex Games SDK or Sentry).
-- **Impact**: **None.** It does not affect game physics, scoring, or rendering. You can safely ignore this warning.
-
-### NPM Deprecation Warnings
-You may see a warning like: `npm warn deprecated @opentelemetry/exporter-jaeger@1.30.1: Package no longer supported`.
-- **Reason**: This is a transitive dependency used by the Genkit telemetry system.
-- **Impact**: **None.** This warning is informational and does not affect the game's functionality.
+If you see this error in the console after publishing:
+- **Reason**: This is a deprecation warning from a monitoring script. It is harmless and can be ignored.
