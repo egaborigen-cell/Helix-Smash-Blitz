@@ -44,10 +44,10 @@ export class GameManager {
   private platformsSinceLastLife: number = 0;
   private lastBouncedStepId: string | null = null;
   private gameState: GameState = 'START';
-  private difficulty: Difficulty = 'EASY';
+  private difficulty: Difficulty = 'BEGINNER';
   private options: GameOptions;
   
-  private ballColor: number = 0xff4500; // Default Orange-Red Toy color
+  private ballColor: number = 0xff4500;
   private gravity: number = -0.015;
   private bounceStrength: number = 0.32; 
   private ballScale: number = 1.0;
@@ -64,7 +64,7 @@ export class GameManager {
   private baseStepSpacing: number = 4;
   private nextStepZ: number = 0;
   private laneWidth: number = 16;
-  private platformColor: number = 0x66bb6a; // Green grass color
+  private platformColor: number = 0x66bb6a;
 
   private lastSafePosition: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
   private respawnInvulnerability: number = 0;
@@ -126,7 +126,6 @@ export class GameManager {
     const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.8 });
     const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32, roughness: 0.8 });
 
-    // Random height factor for variety
     const heightFactor = 1.8 + Math.random() * 2.5;
     
     const trunkHeight = 0.8 * heightFactor;
@@ -146,18 +145,18 @@ export class GameManager {
 
   private createAnimalModel(type: 'fox' | 'wolf' | 'bear') {
     const group = new THREE.Group();
-    let color = 0xf5f6fa; // Lighter palette
+    let color = 0xf5f6fa;
     let accentColor = 0xffffff;
     let scale = 1.0;
 
     if (type === 'fox') {
-      color = 0xffbe76; // Light Peach/Orange
+      color = 0xffbe76;
       accentColor = 0xffffff;
     } else if (type === 'wolf') {
-      color = 0xdcdde1; // Light Cloud Grey
+      color = 0xdcdde1;
       accentColor = 0x2f3640;
     } else if (type === 'bear') {
-      color = 0xe67e22; // Light Carrot Brown
+      color = 0xe67e22;
       accentColor = 0x8e44ad;
       scale = 1.35;
     }
@@ -166,24 +165,20 @@ export class GameManager {
     const accentMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.7 });
     const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-    // Body
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), bodyMat);
     body.position.y = 0.5;
     body.castShadow = true;
     group.add(body);
 
-    // Head
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), bodyMat);
     head.position.set(0, 0.9, -0.6);
     head.castShadow = true;
     group.add(head);
 
-    // Snout
     const snout = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.4), type === 'fox' ? accentMat : bodyMat);
     snout.position.set(0, 0.8, -0.95);
     group.add(snout);
 
-    // Ears
     const earGeo = new THREE.ConeGeometry(0.15, 0.35, 4);
     const earL = new THREE.Mesh(earGeo, bodyMat);
     earL.position.set(-0.25, 1.25, -0.6);
@@ -193,7 +188,6 @@ export class GameManager {
     earR.position.set(0.25, 1.25, -0.6);
     group.add(earR);
 
-    // Eyes
     const eyeGeo = new THREE.SphereGeometry(0.07, 8, 8);
     const eyeL = new THREE.Mesh(eyeGeo, type === 'wolf' ? new THREE.MeshBasicMaterial({ color: 0xff3333 }) : eyeMat);
     eyeL.position.set(-0.18, 0.95, -0.85);
@@ -203,7 +197,6 @@ export class GameManager {
     eyeR.position.set(0.18, 0.95, -0.85);
     group.add(eyeR);
 
-    // Legs
     const legGeo = new THREE.BoxGeometry(0.18, 0.4, 0.18);
     const legPositions = [
         [-0.25, 0.2, -0.4], [0.25, 0.2, -0.4],
@@ -216,7 +209,6 @@ export class GameManager {
         group.add(leg);
     });
 
-    // Tail
     const tail = new THREE.Mesh(
         new THREE.BoxGeometry(0.2, 0.2, 0.5), 
         type === 'fox' ? accentMat : bodyMat
@@ -226,7 +218,6 @@ export class GameManager {
     tail.castShadow = true;
     group.add(tail);
 
-    // Hazard Ring
     const ringGeo = new THREE.RingGeometry(1.2, 1.4, 32);
     const ringMat = new THREE.MeshBasicMaterial({ 
       color: 0xff0000, 
@@ -244,24 +235,21 @@ export class GameManager {
   }
 
   private createStep(z: number) {
-    const progressFactor = Math.min(this.score / 500, 1);
+    const progressFactor = Math.min(Math.abs(z) / 1000, 1);
     
-    // Determine the number of predators first to adjust platform width
-    const isDanger = this.difficulty === 'PRACTICE' ? false : (z < 20 ? false : (Math.random() > (0.8 - progressFactor * 0.2)));
+    const isDanger = z > 20 && Math.random() > (0.8 - progressFactor * 0.4);
     let numHazards = 0;
     if (isDanger) {
       numHazards = 1;
-      if (z > 150) numHazards = 1 + Math.floor(Math.random() * 2);
-      if (z > 400) numHazards = 2 + Math.floor(Math.random() * 2);
+      if (Math.abs(z) > 150) numHazards = 1 + Math.floor(Math.random() * 2);
+      if (Math.abs(z) > 400) numHazards = 2 + Math.floor(Math.random() * 2);
     }
 
-    let baseWidth = this.difficulty === 'INSANE' ? 6.0 : this.difficulty === 'HARD' ? 8.5 : 11.0;
-    
-    // Dynamically increase width for platforms with more predators to keep them fair
+    let baseWidth = 11.0 - (progressFactor * 5); // Narrower steps as distance increases
     if (numHazards === 2) baseWidth *= 1.35;
     if (numHazards >= 3) baseWidth *= 1.7;
 
-    const startWidthMultiplier = Math.max(1, 2.5 - (z / 60) * 1.5);
+    const startWidthMultiplier = Math.max(1, 2.5 - (Math.abs(z) / 60) * 1.5);
     const width = Math.min(this.laneWidth + 8, baseWidth * startWidthMultiplier);
     
     const geo = new THREE.BoxGeometry(width, this.stepThickness, this.stepDepth);
@@ -274,7 +262,6 @@ export class GameManager {
     const xPos = z === 0 ? 0 : (Math.random() - 0.5) * range;
     step.position.set(xPos, 0, -z);
 
-    // Add Static Hazards
     if (isDanger) {
       for (let i = 0; i < numHazards; i++) {
         const types: ('fox' | 'wolf' | 'bear')[] = ['fox', 'wolf', 'bear'];
@@ -287,10 +274,9 @@ export class GameManager {
         animalGroup.position.set(randomX, 0.1, randomZ);
         animalGroup.rotation.y = Math.random() * Math.PI;
 
-        // Initialize patrol data
         animalGroup.userData = {
           patrolRange: (width - 2.5) / 2,
-          patrolSpeed: 0.4 + Math.random() * 0.5, // Reduced speed
+          patrolSpeed: 0.4 + Math.random() * 0.5,
           patrolOffset: Math.random() * Math.PI * 2
         };
 
@@ -298,9 +284,8 @@ export class GameManager {
       }
     }
 
-    // Dynamic Hazards (Jumping Animals)
-    const sideOffset = 12; // Moved closer from 18
-    const hasJumper = this.difficulty !== 'PRACTICE' && z > 40 && Math.random() < (0.2 + progressFactor * 0.3);
+    const sideOffset = 12;
+    const hasJumper = Math.abs(z) > 40 && Math.random() < (0.2 + progressFactor * 0.4);
     let jumper: JumperAnimal | null = null;
 
     if (hasJumper) {
@@ -324,7 +309,6 @@ export class GameManager {
       };
     }
     
-    // Decorative forest environment
     const sideWidth = 6;
     const sideGeo = new THREE.BoxGeometry(sideWidth, this.stepThickness, this.stepDepth);
     const sideMat = new THREE.MeshStandardMaterial({ color: this.platformColor, roughness: 0.9 });
@@ -352,16 +336,32 @@ export class GameManager {
     this.steps.push(step);
   }
 
-  public startGame(difficulty: Difficulty = 'EASY', skin: SkinConfig) {
-    this.difficulty = difficulty;
+  private updateDifficulty() {
+    if (this.gameState !== 'PLAYING') return;
+
+    // Smooth speed progression from 0.15 to 0.4
+    const baseSpeed = 0.15;
+    const speedInc = Math.min(this.score / 1500, 0.25);
+    this.forwardSpeed = baseSpeed + speedInc;
+
+    // Internal difficulty tracking for logic/hazards
+    if (this.score < 100) this.difficulty = 'BEGINNER';
+    else if (this.score < 250) this.difficulty = 'EASY';
+    else if (this.score < 600) this.difficulty = 'HARD';
+    else this.difficulty = 'INSANE';
+    
+    // Sync jump rhythm
+    const bounceTime = 2 * this.bounceStrength / -this.gravity;
+    this.baseStepSpacing = this.forwardSpeed * bounceTime;
+  }
+
+  public startGame(skin: SkinConfig) {
     this.ballColor = skin.color;
     this.gravity = skin.gravity;
     this.bounceStrength = skin.bounceStrength;
     this.ballScale = skin.scale;
 
-    const speeds = { PRACTICE: 0.12, BEGINNER: 0.15, EASY: 0.18, HARD: 0.25, INSANE: 0.35 };
-    this.forwardSpeed = (speeds as any)[difficulty] || 0.18;
-    
+    this.forwardSpeed = 0.15;
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
     this.baseStepSpacing = this.forwardSpeed * bounceTime;
     
@@ -420,6 +420,7 @@ export class GameManager {
     requestAnimationFrame(this.animate);
     
     if (this.gameState === 'PLAYING') {
+      this.updateDifficulty();
       this.updatePhysics(delta);
       this.spawnSteps();
     }
@@ -479,14 +480,12 @@ export class GameManager {
     const time = this.clock.getElapsedTime();
 
     for (const step of this.steps) {
-        // Update patrolling animals
         for (const child of step.children) {
           if (child.name === 'spike' && child.userData.patrolRange) {
             const { patrolRange, patrolSpeed, patrolOffset } = child.userData;
             const prevX = child.position.x;
             const newX = Math.sin(time * patrolSpeed + patrolOffset) * patrolRange;
             child.position.x = newX;
-            // Face the direction of movement
             child.rotation.y = (newX > prevX ? -Math.PI / 2 : Math.PI / 2);
           }
         }
@@ -494,22 +493,18 @@ export class GameManager {
         const jumper = step.userData.jumper as JumperAnimal | null;
         if (jumper) {
           const distToJumperZ = Math.abs(this.ball.position.z - step.position.z);
-          // Trigger jump
           if (!jumper.isJumping && distToJumperZ < 25) {
             jumper.isJumping = true;
           }
 
           if (jumper.isJumping && jumper.jumpProgress < 1) {
-            jumper.jumpProgress += delta * 0.6; // Slightly slower jump
-            const totalDistance = 24; // sideOffset * 2 (12 * 2)
+            jumper.jumpProgress += delta * 0.6;
+            const totalDistance = 24;
             const targetX = jumper.startX + jumper.direction * totalDistance * jumper.jumpProgress;
             jumper.mesh.position.x = targetX;
-            
-            // Refined double-hop trajectory: lands mid-way (p=0.5) on the central platform
             jumper.mesh.position.y = Math.abs(Math.sin(jumper.jumpProgress * Math.PI * 2)) * 1.5 + 0.1;
           }
 
-          // Collision with jumper
           if (this.respawnInvulnerability <= 0) {
             const animalScale = jumper.mesh.scale.x;
             const hazardRadius = 1.3 * animalScale;
@@ -529,7 +524,6 @@ export class GameManager {
           }
         }
 
-        // Static Hazards collision
         if (this.respawnInvulnerability <= 0) {
           const dz = Math.abs(this.ball.position.z - step.position.z);
           const dy = this.ball.position.y - step.position.y;
@@ -555,7 +549,6 @@ export class GameManager {
         }
     }
 
-    // Platform landing
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
@@ -586,12 +579,10 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.ball.position.y = landingY;
     
-    // Check if it's a new platform for life-gain progress
     if (this.lastBouncedStepId !== step.uuid) {
       this.lastBouncedStepId = step.uuid;
       this.platformsSinceLastLife++;
       
-      // Earn a life every 10 new platforms (capped at 5 for balance)
       if (this.platformsSinceLastLife >= 10) {
         if (this.lives < 5) {
           this.lives++;

@@ -1,10 +1,9 @@
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { GameManager, GameState, Difficulty, SkinConfig } from './GameManager';
+import { GameManager, GameState, SkinConfig } from './GameManager';
 import { Button } from '@/components/ui/button';
-import { RefreshCcw, Play, Zap, Shield, Volume2, VolumeX, Skull, Languages, Palette, Baby, Smile, MoveHorizontal, Smartphone, Info, CircleAlert, ChevronRight, Heart } from 'lucide-react';
+import { RefreshCcw, Play, Volume2, VolumeX, Languages, Palette, MoveHorizontal, Smartphone, Info, CircleAlert, ChevronRight, Heart, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { translations, Language } from '@/app/lib/translations';
 import {
@@ -33,7 +32,6 @@ export default function HelixGame() {
   const [lives, setLives] = useState(3);
   const [gameState, setGameState] = useState<GameState>('START');
   const [showGameOverUI, setShowGameOverUI] = useState(false);
-  const [difficulty, setDifficulty] = useState<Difficulty>('EASY');
   const [selectedSkin, setSelectedSkin] = useState(SKINS[0]);
   const [isMuted, setIsMuted] = useState(false);
   const [lang, setLang] = useState<Language>('ru');
@@ -57,7 +55,6 @@ export default function HelixGame() {
       setShowOnboarding(true);
     }
     
-    // Disable context menu globally
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     window.addEventListener('contextmenu', handleContextMenu);
     return () => window.removeEventListener('contextmenu', handleContextMenu);
@@ -180,10 +177,10 @@ export default function HelixGame() {
     };
   }, [gameState, showGameOverUI, showOnboarding, showSkinDialog]);
 
-  const handleStart = (diff: Difficulty = difficulty) => {
+  const handleStart = () => {
     const manager = managerRef.current;
     if (!manager) return;
-    manager.startGame(diff, selectedSkin);
+    manager.startGame(selectedSkin);
   };
 
   const toggleMute = () => {
@@ -194,8 +191,6 @@ export default function HelixGame() {
   };
 
   const toggleLang = () => setLang(prev => prev === 'en' ? 'ru' : 'en');
-
-  // Generate an array of indices for hearts based on current lives, min 3
   const heartIndices = Array.from({ length: Math.max(3, lives) }, (_, i) => i + 1);
 
   return (
@@ -242,15 +237,12 @@ export default function HelixGame() {
               <div className="bg-primary/20 p-3 rounded-full"><Info className="w-8 h-8 text-primary" /></div>
               <DialogTitle className="text-2xl font-black text-primary uppercase tracking-tighter text-center">{t.onboarding.title}</DialogTitle>
             </DialogHeader>
-            
             <div className="relative">
               <Carousel setApi={setOnboardingApi} className="w-full">
                 <CarouselContent>
                   <CarouselItem className="flex flex-col items-center text-center px-2">
                     <div className="w-full flex flex-col items-center gap-4 py-4">
-                      <div className="bg-primary/10 p-4 rounded-3xl border border-primary/20">
-                        <Play className="w-10 h-10 text-primary" />
-                      </div>
+                      <div className="bg-primary/10 p-4 rounded-3xl border border-primary/20"><Play className="w-10 h-10 text-primary" /></div>
                       <div>
                         <h4 className="font-bold text-xl mb-2">{t.onboarding.welcome}</h4>
                         <p className="text-sm text-muted-foreground leading-relaxed">{t.onboarding.goal}</p>
@@ -259,9 +251,7 @@ export default function HelixGame() {
                   </CarouselItem>
                   <CarouselItem className="flex flex-col items-center text-center px-2">
                     <div className="w-full flex flex-col items-center gap-4 py-4">
-                      <div className="bg-destructive/10 p-4 rounded-3xl border border-destructive/20">
-                        <CircleAlert className="w-10 h-10 text-destructive" />
-                      </div>
+                      <div className="bg-destructive/10 p-4 rounded-3xl border border-destructive/20"><CircleAlert className="w-10 h-10 text-destructive" /></div>
                       <div>
                         <h4 className="font-bold text-xl mb-2 text-destructive">{t.onboarding.hazardTitle}</h4>
                         <p className="text-sm text-muted-foreground leading-relaxed">{t.onboarding.hazardDesc}</p>
@@ -270,9 +260,7 @@ export default function HelixGame() {
                   </CarouselItem>
                   <CarouselItem className="flex flex-col items-center text-center px-2">
                     <div className="w-full flex flex-col items-center gap-4 py-4">
-                      <div className="bg-accent/10 p-4 rounded-3xl border border-accent/20">
-                        <MoveHorizontal className="w-10 h-10 text-accent" />
-                      </div>
+                      <div className="bg-accent/10 p-4 rounded-3xl border border-accent/20"><MoveHorizontal className="w-10 h-10 text-accent" /></div>
                       <div>
                         <h4 className="font-bold text-xl mb-2">{t.instructions}</h4>
                         <p className="text-sm text-muted-foreground leading-relaxed">{t.onboarding.controls}</p>
@@ -281,35 +269,17 @@ export default function HelixGame() {
                   </CarouselItem>
                 </CarouselContent>
               </Carousel>
-              
               <div className="flex justify-center gap-2 mt-6">
                 {[0, 1, 2].map((i) => (
-                  <div 
-                    key={i} 
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-all duration-300", 
-                      currentSlide === i ? "bg-primary w-6" : "bg-primary/20"
-                    )} 
-                  />
+                  <div key={i} className={cn("w-2 h-2 rounded-full transition-all duration-300", currentSlide === i ? "bg-primary w-6" : "bg-primary/20")} />
                 ))}
               </div>
             </div>
-
             <div className="mt-8 flex gap-3">
               {currentSlide < 2 ? (
-                <Button 
-                  onClick={() => onboardingApi?.scrollNext()} 
-                  className="h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
-                >
-                  NEXT <ChevronRight className="w-5 h-5" />
-                </Button>
+                <Button onClick={() => onboardingApi?.scrollNext()} className="h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2">NEXT <ChevronRight className="w-5 h-5" /></Button>
               ) : (
-                <Button 
-                  onClick={closeOnboarding} 
-                  className="h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-lg hover:bg-primary/90 animate-in zoom-in-95 duration-300"
-                >
-                  {t.onboarding.gotIt}
-                </Button>
+                <Button onClick={closeOnboarding} className="h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black text-lg shadow-lg hover:bg-primary/90 animate-in zoom-in-95 duration-300">{t.onboarding.gotIt}</Button>
               )}
             </div>
           </DialogContent>
@@ -329,12 +299,7 @@ export default function HelixGame() {
                     setSelectedSkin(skin);
                     setShowSkinDialog(false);
                   }} 
-                  className={cn(
-                    "flex items-center justify-between p-4 rounded-2xl border-2 transition-all group", 
-                    selectedSkin.id === skin.id 
-                      ? "bg-primary/10 border-primary shadow-md" 
-                      : "bg-white border-transparent hover:border-muted"
-                  )}
+                  className={cn("flex items-center justify-between p-4 rounded-2xl border-2 transition-all group", selectedSkin.id === skin.id ? "bg-primary/10 border-primary shadow-md" : "bg-white border-transparent hover:border-muted")}
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full shadow-lg border-2 border-white" style={{ backgroundColor: skin.hex }} />
@@ -351,39 +316,34 @@ export default function HelixGame() {
         </Dialog>
 
         {gameState === 'START' && (
-          <div className="flex flex-col items-center gap-4 sm:gap-6 bg-white/10 backdrop-blur-md p-6 sm:p-10 rounded-3xl border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full overflow-y-auto max-h-[85vh]">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-primary tracking-tighter text-center">{t.title}</h1>
+          <div className="flex flex-col items-center gap-6 sm:gap-8 bg-white/10 backdrop-blur-xl p-8 sm:p-12 rounded-[2.5rem] border border-white/20 shadow-2xl animate-in zoom-in-95 duration-500 pointer-events-auto max-w-sm w-full">
+            <h1 className="text-4xl sm:text-6xl font-black text-primary tracking-tighter text-center drop-shadow-sm uppercase">{t.title}</h1>
             
-            <div className="w-full">
+            <div className="w-full space-y-4">
               <button 
                 onClick={() => setShowSkinDialog(true)}
-                className="w-full flex items-center justify-between p-3 sm:p-4 rounded-2xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all pointer-events-auto group"
+                className="w-full flex items-center justify-between p-4 rounded-3xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full border border-white/30 shadow-inner" style={{ backgroundColor: selectedSkin.hex }} />
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg" style={{ backgroundColor: selectedSkin.hex }} />
                   <div className="text-left">
                     <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t.selectSkin}</div>
-                    <div className="font-bold text-foreground text-sm sm:text-base">{t.skins[selectedSkin.id as 'toy' | 'neon' | 'aqua']}</div>
+                    <div className="font-bold text-foreground text-lg">{t.skins[selectedSkin.id as 'toy' | 'neon' | 'aqua']}</div>
                   </div>
                 </div>
-                <Palette className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <Palette className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" />
               </button>
+
+              <Button 
+                onClick={() => handleStart()} 
+                className="w-full h-20 text-2xl font-black rounded-3xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_10px_0_rgb(var(--primary-foreground)/0.2)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-3 uppercase tracking-tighter"
+              >
+                {t.play}
+                <ArrowRight className="w-8 h-8" />
+              </Button>
             </div>
 
-            <div className="flex flex-col gap-2 sm:gap-3 w-full">
-                {['PRACTICE', 'BEGINNER', 'EASY', 'HARD', 'INSANE'].map((mode) => (
-                  <button key={mode} onClick={() => { setDifficulty(mode as Difficulty); handleStart(mode as Difficulty); }} className={cn("flex items-center justify-between p-3 sm:p-4 rounded-2xl border-2 transition-all group", difficulty === mode ? "bg-primary/20 border-primary shadow-lg" : "bg-white/5 border-transparent opacity-60 hover:opacity-100")}>
-                      <div className="flex items-center gap-3">
-                          {mode === 'PRACTICE' ? <Baby className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" /> : mode === 'BEGINNER' ? <Smile className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-500" /> : mode === 'EASY' ? <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-primary" /> : mode === 'HARD' ? <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" /> : <Skull className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />}
-                          <div className="text-left">
-                              <div className="font-bold text-sm sm:text-base">{t.difficulty[mode as keyof typeof t.difficulty].name}</div>
-                              <div className="text-[10px] sm:text-xs opacity-70">{t.difficulty[mode as keyof typeof t.difficulty].desc}</div>
-                          </div>
-                      </div>
-                      <Play className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-                  </button>
-                ))}
-            </div>
+            <p className="text-xs text-white/40 font-bold uppercase tracking-widest animate-pulse">Reach 100m for higher speed!</p>
           </div>
         )}
 
@@ -407,20 +367,8 @@ export default function HelixGame() {
             </div>
 
             <div className="flex flex-col gap-3 w-full">
-              <Button 
-                size="lg" 
-                onClick={() => handleStart()} 
-                className="h-16 px-10 text-xl font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_0_rgb(var(--primary-foreground)/0.2)] active:translate-y-1 active:shadow-none transition-all w-full uppercase tracking-tighter"
-              >
-                {t.tryAgain}
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => setGameState('START')} 
-                className="h-12 text-muted-foreground font-bold hover:bg-muted/50 rounded-xl"
-              >
-                {t.backToMenu}
-              </Button>
+              <Button size="lg" onClick={() => handleStart()} className="h-16 px-10 text-xl font-black rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_8px_0_rgb(var(--primary-foreground)/0.2)] active:translate-y-1 active:shadow-none transition-all w-full uppercase tracking-tighter">{t.tryAgain}</Button>
+              <Button variant="ghost" onClick={() => setGameState('START')} className="h-12 text-muted-foreground font-bold hover:bg-muted/50 rounded-xl">{t.backToMenu}</Button>
             </div>
           </div>
         )}
@@ -434,4 +382,3 @@ export default function HelixGame() {
     </div>
   );
 }
-
