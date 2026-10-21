@@ -53,7 +53,7 @@ export class GameManager {
   private ballScale: number = 1.0;
   private baseBallRadius: number = 0.3;
   private stepThickness: number = 0.3;
-  private stepDepth: number = 3.5; // Increased depth for safer landings
+  private stepDepth: number = 4.5; // Further increased depth for maximum safety
 
   private ballVelocityY: number = 0;
   private ballVelocityX: number = 0;
@@ -348,9 +348,13 @@ export class GameManager {
     else if (this.score < 600) this.difficulty = 'HARD';
     else this.difficulty = 'INSANE';
     
+    // RHYTHM CALIBRATION: Distance = Speed * TimeInAir
+    // TimeInAir = 2 * (InitialVelocity / Gravity)
     const bounceTime = 2 * this.bounceStrength / -this.gravity;
-    // Use a safety multiplier to keep platforms slightly closer for overlap
-    this.baseStepSpacing = this.forwardSpeed * bounceTime * 0.98;
+    
+    // We use a safety multiplier (0.95) to ensure platforms are slightly closer than the exact bounce distance.
+    // This creates a safe overlap where the ball lands comfortably on the platform.
+    this.baseStepSpacing = this.forwardSpeed * bounceTime * 0.95;
   }
 
   public startGame(skin: SkinConfig) {
@@ -360,8 +364,7 @@ export class GameManager {
     this.ballScale = skin.scale;
 
     this.forwardSpeed = 0.15;
-    const bounceTime = 2 * this.bounceStrength / -this.gravity;
-    this.baseStepSpacing = this.forwardSpeed * bounceTime * 0.98;
+    this.updateDifficulty();
     
     (this.ball.material as THREE.MeshStandardMaterial).color.setHex(this.ballColor);
     this.ball.scale.setScalar(this.ballScale);
@@ -385,6 +388,7 @@ export class GameManager {
     this.steps = [];
     this.nextStepZ = 0;
     
+    // Start with platforms at a fixed rhythm
     for (let i = 0; i < 20; i++) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
@@ -438,14 +442,14 @@ export class GameManager {
   };
 
   private spawnSteps() {
-    if (Math.abs(this.ball.position.z) + 60 > this.nextStepZ) {
+    if (Math.abs(this.ball.position.z) + 100 > this.nextStepZ) {
         this.createStep(this.nextStepZ);
         this.nextStepZ += this.baseStepSpacing;
     }
 
-    if (this.steps.length > 50) {
+    if (this.steps.length > 60) {
         const first = this.steps[0];
-        const threshold = Math.max(this.ball.position.z, this.lastSafePosition.z) + 30;
+        const threshold = Math.max(this.ball.position.z, this.lastSafePosition.z) + 40;
         if (first.position.z > threshold) {
             this.stepsGroup.remove(first);
             this.steps.shift();
@@ -462,7 +466,6 @@ export class GameManager {
       }
     }
 
-    // Capture previous state for path-based collision
     const prevY = this.ball.position.y;
     const currentBallRadius = this.baseBallRadius * this.ballScale;
 
@@ -470,7 +473,7 @@ export class GameManager {
     this.ball.position.x += this.ballVelocityX;
     this.ballVelocityX *= 0.85;
     
-    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 3.0) {
+    if (Math.abs(this.ball.position.x) > this.laneWidth / 2 + 4.0) {
         this.loseLife();
         return;
     }
@@ -529,7 +532,7 @@ export class GameManager {
           const dz = Math.abs(this.ball.position.z - step.position.z);
           const dy = this.ball.position.y - step.position.y;
 
-          if (step.userData.isDanger && dz < this.stepDepth / 2 + 0.5 && dy < 1.8 && dy > -0.8) {
+          if (step.userData.isDanger && dz < this.stepDepth / 2 + 1.0 && dy < 1.8 && dy > -1.0) {
               const hazardRadius = 1.3; 
               for (const child of step.children) {
                   if (child.name === 'spike') {
@@ -550,7 +553,7 @@ export class GameManager {
         }
     }
 
-    // ENHANCED CONTINUOUS COLLISION DETECTION (CCD)
+    // ENHANCED CCD & SPACING STABILITY
     for (const step of this.steps) {
         const dx = Math.abs(this.ball.position.x - step.position.x);
         const dz = Math.abs(this.ball.position.z - step.position.z);
@@ -559,25 +562,25 @@ export class GameManager {
         const surfaceY = step.position.y + this.stepThickness / 2;
         const targetLandingY = surfaceY + currentBallRadius;
         
-        // Window scales with velocity to prevent skipping at high speeds
-        const velocityBuffer = Math.abs(this.ballVelocityY) * 2.0;
-        const landingThreshold = Math.max(0.8, velocityBuffer); 
+        // Dynamic velocity buffer ensures detection at high speeds
+        const velocityBuffer = Math.abs(this.ballVelocityY) * 2.5;
+        const landingThreshold = Math.max(1.2, velocityBuffer); 
 
-        // Check if ball intersected the platform surface during this frame
-        const pathIntersected = prevY >= targetLandingY && this.ball.position.y <= targetLandingY + 0.2;
+        // Check if ball passed through the platform surface this frame
+        const pathIntersected = prevY >= targetLandingY && this.ball.position.y <= targetLandingY + 0.3;
 
         if (this.ballVelocityY < 0 && 
-            dz < (this.stepDepth / 2) + 2.0 && // Significantly widened Z window for high-speed safety
-            dx < (width / 2) + (currentBallRadius * 0.9) && 
+            dz < (this.stepDepth / 2) + 2.5 && // Generous Z overlap for constant stability
+            dx < (width / 2) + (currentBallRadius * 0.95) && 
             (this.ball.position.y < targetLandingY + landingThreshold || pathIntersected) && 
-            this.ball.position.y > surfaceY - 1.0) {
+            this.ball.position.y > surfaceY - 1.5) {
             
             this.performBounce(step, targetLandingY);
             return;
         }
     }
 
-    if (this.ball.position.y < -15) {
+    if (this.ball.position.y < -20) {
         this.loseLife();
         return;
     }
