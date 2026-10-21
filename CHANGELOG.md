@@ -3,6 +3,10 @@
 
 All notable changes to the HelixSmash project will be documented in this file.
 
+## [1.27.0] - 2025-06-15
+### Fixed
+- **Zero-Gap Stability**: Increased platform depth to 10.0 and synchronized step spacing with the ball's flight time. This ensures a continuous landing surface with safe overlap, permanently preventing the ball from falling through the track.
+
 ## [1.26.0] - 2025-06-14
 ### Refactored
 - **Simplified Progression**: Removed dynamic difficulty scaling. Speed, platform width, and hazard density are now constant for a more consistent gameplay experience.

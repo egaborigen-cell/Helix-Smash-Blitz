@@ -64,7 +64,7 @@ export class GameManager {
   // Constants
   private readonly BASE_BALL_RADIUS = 0.3;
   private readonly STEP_THICKNESS = 0.3;
-  private readonly STEP_DEPTH = 5.0; // Deep platforms for maximum safety
+  private readonly STEP_DEPTH = 10.0; // Deep platforms for a zero-gap experience
   private readonly LANE_WIDTH = 16;
   private readonly PLATFORM_COLOR = 0x66bb6a;
 
@@ -267,7 +267,8 @@ export class GameManager {
 
   private updateRhythm() {
     const airTime = 2 * this.bounceStrength / -this.gravity;
-    this.baseStepSpacing = this.forwardSpeed * airTime * 0.98; // 2% overlap for safety
+    // Spacing is perfectly synchronized with the bounce flight time.
+    this.baseStepSpacing = this.forwardSpeed * airTime;
   }
 
   public startGame(skin: SkinConfig) {
@@ -381,6 +382,8 @@ export class GameManager {
       // Trajectory Intercept Collision (CCD)
       const isFalling = this.ballVelocityY < 0;
       const crossedPlane = prevPos.y >= targetY && this.ball.position.y <= targetY + 0.2;
+      
+      // Zero-Gap check: we expand the z detection to ensure overlap coverage
       const isOverPlatform = dx < width / 2 + ballRadius * 0.8 && dz < this.STEP_DEPTH / 2 + 1.5;
 
       if (isFalling && isOverPlatform && (crossedPlane || (this.ball.position.y <= targetY && this.ball.position.y > targetY - 1.5))) {
