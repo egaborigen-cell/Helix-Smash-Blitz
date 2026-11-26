@@ -64,7 +64,7 @@ export class GameManager {
   // Constants
   private readonly BASE_BALL_RADIUS = 0.3;
   private readonly STEP_THICKNESS = 0.4;
-  private readonly STEP_DEPTH = 12.0; // Increased depth for massive overlap
+  private readonly STEP_DEPTH = 10.0; 
   private readonly LANE_WIDTH = 16;
   private readonly PLATFORM_COLOR = 0x66bb6a;
 
@@ -163,10 +163,10 @@ export class GameManager {
   private createAnimal(type: 'fox' | 'wolf' | 'bear') {
     const group = new THREE.Group();
     let color = 0xffbe76; 
-    let scale = 1.0;
+    let baseScale = 1.0;
 
     if (type === 'wolf') color = 0xdcdde1;
-    if (type === 'bear') { color = 0xe67e22; scale = 1.4; }
+    if (type === 'bear') { color = 0xe67e22; baseScale = 1.4; }
 
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), new THREE.MeshStandardMaterial({ color }));
     body.position.y = 0.5;
@@ -188,7 +188,10 @@ export class GameManager {
     ring.position.y = 0.05;
     group.add(ring);
 
-    group.scale.setScalar(scale);
+    group.scale.setScalar(baseScale);
+    group.userData.baseScale = baseScale;
+    group.userData.startleTime = 0;
+    
     return group;
   }
 
@@ -224,6 +227,7 @@ export class GameManager {
         const hZ = (Math.random() - 0.5) * (this.STEP_DEPTH - 2);
         animal.position.set(hX, 0.1, hZ);
         animal.userData = {
+          ...animal.userData,
           patrolRange: (width - 2.5) / 2,
           patrolSpeed: 0.5 + Math.random() * 0.5,
           patrolOffset: Math.random() * Math.PI * 2
@@ -264,9 +268,7 @@ export class GameManager {
   }
 
   private updateRhythm() {
-    // Air time in frames
     const airTime = 2 * this.bounceStrength / -this.gravity;
-    // Perfect sync: distance traveled in airTime frames
     this.baseStepSpacing = this.forwardSpeed * airTime;
   }
 
@@ -372,7 +374,6 @@ export class GameManager {
 
     const time = this.clock.getElapsedTime();
 
-    // Continuous Collision Volume (CCV) Logic
     for (const step of this.steps) {
       const width = (step.geometry as THREE.BoxGeometry).parameters.width;
       const targetY = step.position.y + this.STEP_THICKNESS / 2 + ballRadius;
@@ -380,13 +381,10 @@ export class GameManager {
       const dx = Math.abs(this.ball.position.x - step.position.x);
       const dz = Math.abs(this.ball.position.z - step.position.z);
       
-      // Forgiving lateral and longitudinal overlap
       const isOver = dx < width / 2 + ballRadius * 0.7 && dz < this.STEP_DEPTH / 2 + 1.0;
 
       if (isOver && this.ballVelocityY < 0) {
-        // Safe Landing Window: Expand buffer based on downward velocity
         const collisionBuffer = Math.abs(this.ballVelocityY) + 0.2;
-        
         const crossedPlane = prevY >= targetY && this.ball.position.y <= targetY + collisionBuffer;
         const slightlyInside = this.ball.position.y < targetY && this.ball.position.y > targetY - 1.5;
 
@@ -396,34 +394,62 @@ export class GameManager {
         }
       }
 
-      // Hazard Collision
-      if (this.respawnInvulnerability <= 0) {
-        for (const child of step.children) {
-          if (child.name === 'spike') {
-            const worldX = step.position.x + child.position.x;
-            const worldZ = step.position.z + child.position.z;
-            const dist = Math.sqrt(Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2));
-            if (dist < 1.3 * child.scale.x) {
-              this.loseLife();
-              return;
+      // Hazards Update & Collision
+      for (const child of step.children) {
+        if (child.name === 'spike' || child.name === 'jumper') {
+          // Smash Startle Animation
+          if (child.userData.startleTime > 0) {
+            child.userData.startleTime -= dt;
+            const progress = child.userData.startleTime / 0.5; // duration is 0.5s
+            const squash = 1 + Math.sin(progress * Math.PI * 4) * 0.3 * progress;
+            child.scale.set(
+              child.userData.baseScale * (2 - squash),
+              child.userData.baseScale * squash,
+              child.userData.baseScale * (2 - squash)
+            );
+            child.position.y = Math.max(0.1, 0.1 + Math.sin(progress * Math.PI) * 0.5);
+          } else {
+            child.scale.setScalar(child.userData.baseScale);
+            // position.y is handled below for jumper/patrol
+          }
+
+          if (this.respawnInvulnerability <= 0) {
+            // Collision Logic
+            if (child.name === 'spike') {
+              const worldX = step.position.x + child.position.x;
+              const worldZ = step.position.z + child.position.z;
+              const dist = Math.sqrt(Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2));
+              if (dist < 1.3 * child.scale.x) {
+                this.loseLife();
+                return;
+              }
             }
-            // Patrol
-            const { patrolRange, patrolSpeed, patrolOffset } = child.userData;
-            const pX = Math.sin(time * patrolSpeed + patrolOffset) * patrolRange;
-            child.position.x = pX;
-            child.rotation.y = pX > child.position.x ? -Math.PI / 2 : Math.PI / 2;
           }
         }
-        // Jumper
-        const jumper = step.userData.jumper as JumperAnimal | null;
-        if (jumper) {
-          if (!jumper.isJumping && Math.abs(this.ball.position.z - step.position.z) < 20) jumper.isJumping = true;
-          if (jumper.isJumping && jumper.jumpProgress < 1) {
-            jumper.jumpProgress += dt * 0.7;
-            const totalDist = 24;
-            jumper.mesh.position.x = jumper.startX + jumper.direction * totalDist * jumper.jumpProgress;
+
+        if (child.name === 'spike') {
+          const { patrolRange, patrolSpeed, patrolOffset } = child.userData;
+          const pX = Math.sin(time * patrolSpeed + patrolOffset) * patrolRange;
+          child.position.x = pX;
+          child.rotation.y = pX > child.position.x ? -Math.PI / 2 : Math.PI / 2;
+        }
+      }
+
+      // Jumper specific update
+      const jumper = step.userData.jumper as JumperAnimal | null;
+      if (jumper) {
+        if (!jumper.isJumping && Math.abs(this.ball.position.z - step.position.z) < 20) jumper.isJumping = true;
+        if (jumper.isJumping && jumper.jumpProgress < 1) {
+          jumper.jumpProgress += dt * 0.7;
+          const totalDist = 24;
+          jumper.mesh.position.x = jumper.startX + jumper.direction * totalDist * jumper.jumpProgress;
+          // Only set Y if not startled to avoid conflict
+          if (jumper.mesh.userData.startleTime <= 0) {
             jumper.mesh.position.y = Math.abs(Math.sin(jumper.jumpProgress * Math.PI * 2)) * 2 + 0.1;
           }
+        }
+        
+        if (this.respawnInvulnerability <= 0) {
           const jWorldX = step.position.x + jumper.mesh.position.x;
           const jWorldY = step.position.y + jumper.mesh.position.y;
           const jWorldZ = step.position.z + jumper.mesh.position.z;
@@ -445,6 +471,13 @@ export class GameManager {
     this.lastSafePosition.copy(this.ball.position);
     this.audio.playBounce();
     this.particles.emit(this.ball.position, this.PLATFORM_COLOR, 12, 0.15);
+
+    // Startle enemies on this platform
+    step.children.forEach(child => {
+      if (child.name === 'spike' || child.name === 'jumper') {
+        child.userData.startleTime = 0.5;
+      }
+    });
 
     if (this.lastBouncedStepId !== step.uuid) {
       this.lastBouncedStepId = step.uuid;
