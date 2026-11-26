@@ -1,4 +1,6 @@
-import * as THREE from 'three';
+import * as THREE from 'whiteboard-three';
+import * as THREE_ORIGINAL from 'three';
+const THREE = THREE_ORIGINAL;
 import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
 
@@ -67,6 +69,7 @@ export class GameManager {
   private readonly STEP_DEPTH = 10.0; 
   private readonly LANE_WIDTH = 16;
   private readonly PLATFORM_COLOR = 0x66bb6a;
+  private readonly VISION_RANGE = 12.0;
 
   // Runtime Physics
   private ballVelocityY: number = 0;
@@ -397,6 +400,17 @@ export class GameManager {
       // Hazards Update & Collision
       for (const child of step.children) {
         if (child.name === 'spike' || child.name === 'jumper') {
+          const worldX = step.position.x + child.position.x;
+          const worldZ = step.position.z + child.position.z;
+          const distToBallSq = Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2);
+          const isBallClose = distToBallSq < Math.pow(this.VISION_RANGE, 2);
+
+          // Vision/Look-at Logic
+          if (isBallClose) {
+            const angle = Math.atan2(this.ball.position.x - worldX, this.ball.position.z - worldZ);
+            child.rotation.y = angle + Math.PI; // Face the ball
+          }
+
           // Smash Startle Animation
           if (child.userData.startleTime > 0) {
             child.userData.startleTime -= dt;
@@ -410,15 +424,12 @@ export class GameManager {
             child.position.y = Math.max(0.1, 0.1 + Math.sin(progress * Math.PI) * 0.5);
           } else {
             child.scale.setScalar(child.userData.baseScale);
-            // position.y is handled below for jumper/patrol
           }
 
           if (this.respawnInvulnerability <= 0) {
             // Collision Logic
             if (child.name === 'spike') {
-              const worldX = step.position.x + child.position.x;
-              const worldZ = step.position.z + child.position.z;
-              const dist = Math.sqrt(Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2));
+              const dist = Math.sqrt(distToBallSq);
               if (dist < 1.3 * child.scale.x) {
                 this.loseLife();
                 return;
@@ -430,8 +441,16 @@ export class GameManager {
         if (child.name === 'spike') {
           const { patrolRange, patrolSpeed, patrolOffset } = child.userData;
           const pX = Math.sin(time * patrolSpeed + patrolOffset) * patrolRange;
+          const prevPX = child.position.x;
           child.position.x = pX;
-          child.rotation.y = pX > child.position.x ? -Math.PI / 2 : Math.PI / 2;
+          
+          // Only use patrol rotation if ball is NOT close
+          const worldX = step.position.x + child.position.x;
+          const worldZ = step.position.z + child.position.z;
+          const distToBallSq = Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2);
+          if (distToBallSq >= Math.pow(this.VISION_RANGE, 2)) {
+            child.rotation.y = pX > prevPX ? -Math.PI / 2 : Math.PI / 2;
+          }
         }
       }
 
@@ -440,12 +459,24 @@ export class GameManager {
       if (jumper) {
         if (!jumper.isJumping && Math.abs(this.ball.position.z - step.position.z) < 20) jumper.isJumping = true;
         if (jumper.isJumping && jumper.jumpProgress < 1) {
+          const prevJumperX = jumper.mesh.position.x;
           jumper.jumpProgress += dt * 0.7;
           const totalDist = 24;
           jumper.mesh.position.x = jumper.startX + jumper.direction * totalDist * jumper.jumpProgress;
-          // Only set Y if not startled to avoid conflict
+          
           if (jumper.mesh.userData.startleTime <= 0) {
             jumper.mesh.position.y = Math.abs(Math.sin(jumper.jumpProgress * Math.PI * 2)) * 2 + 0.1;
+          }
+
+          // Rotation logic for jumper
+          const worldX = step.position.x + jumper.mesh.position.x;
+          const worldZ = step.position.z + jumper.mesh.position.z;
+          const distToBallSq = Math.pow(this.ball.position.x - worldX, 2) + Math.pow(this.ball.position.z - worldZ, 2);
+          if (distToBallSq >= Math.pow(this.VISION_RANGE, 2)) {
+            jumper.mesh.rotation.y = jumper.mesh.position.x > prevJumperX ? -Math.PI / 2 : Math.PI / 2;
+          } else {
+            const angle = Math.atan2(this.ball.position.x - worldX, this.ball.position.z - worldZ);
+            jumper.mesh.rotation.y = angle + Math.PI;
           }
         }
         

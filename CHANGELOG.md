@@ -3,6 +3,10 @@
 
 All notable changes to the Step Smash project will be documented in this file.
 
+## [1.29.0] - 2025-06-17
+### Added
+- **AI Awareness**: Implemented a "vision" system for enemies. Predators now turn to track the ball's position when it enters their proximity, making the game world feel more reactive and alive.
+
 ## [1.28.0] - 2025-06-16
 ### Added
 - **Multi-Platform Config**: Implemented `src/lib/config.ts` for environment-based builds.

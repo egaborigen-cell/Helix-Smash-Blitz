@@ -12,9 +12,10 @@ This document serves as a record of the changes, bug fixes, and feature implemen
 - **GitHub Release Guide**: Added a step-by-step release workflow to `README.md`.
 
 ### 🛠 Core Gameplay & Physics
+- **AI Awareness (Vision)**: Predators now "see" the ball. They will turn to face the player when the ball enters their vision range, stop patrolling, and focus on the threat.
 - **Trajectory Stability**: Implemented a Continuous Collision Volume (CCV) system. The game now tracks the ball's path between frames to prevent "falling through platforms" at any speed.
 - **Zero-Gap Track**: Refactored platform geometry with a depth of 10.0 and rhythmic spacing to create a 100% reliable landing surface.
-- **Dynamic Progression**: Refactored the title menu to remove manual level choice. Difficulty now evolves naturally based on distance.
 
 ### 🦊 Visuals & Aesthetics
 - **HUD Overhaul**: Rebuilt the `HelixGame` UI with smooth heart animations, a polished skin selection dialog, and a high-fidelity onboarding tutorial.
+- **Reactive Environment**: Added a "startle" effect where enemies jump slightly when the ball smashes onto their platform.
