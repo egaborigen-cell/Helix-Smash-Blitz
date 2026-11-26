@@ -1,7 +1,7 @@
 
 # Yandex Games Promo Materials - Helix Smash
 
-This document contains the localized text and graphic requirements for publishing **Helix Smash** on the Yandex Games console.
+This document contains the localized text, graphic requirements, and a final quality audit for publishing **Helix Smash** on the Yandex Games console.
 
 ---
 
@@ -11,7 +11,7 @@ This document contains the localized text and graphic requirements for publishin
 **Step Smash: 3D Endless Runner**
 
 ### Short Description (Max 50 chars)
-Smash through steps! Avoid the spikes!
+Smash through steps! Avoid the predators!
 
 ### Full Description
 Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball across floating platforms in a procedural endless world. Smash through vibrant green grass platforms, but be careful — avoid the deadly predators! With 5 unique difficulty modes, there's a challenge for everyone from beginners to insane pros!
@@ -19,9 +19,9 @@ Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball acro
 **Features:**
 - 🌀 **Procedural Levels:** No two runs are the same!
 - 🎨 **Skin System:** Choose between Toxic, Neon, and Aqua styles with unique physics.
-- 🔥 **5 Difficulty Modes:** Practice, Beginner, Easy, Hard, and Insane.
+- 🔥 **Rhythmic Gameplay:** Perfectly synchronized bounce physics.
 - ✨ **Dynamic Particles:** Satisfying smash and bounce effects.
-- 🏆 **Global Leaderboards:** Compete for the top score on Yandex Games.
+- 🏆 **Global Leaderboards:** Compete for the top score.
 
 ### Instructions / Controls
 - **Desktop:** Click and drag horizontally OR use **Arrow Keys / A-D** to move the ball.
@@ -39,14 +39,14 @@ Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball acro
 Разбивай шаги! Избегай хищников!
 
 ### Полное описание
-Погрузитесь в захватывающее 3D-приключение! Управляйте прыгающим шаром, спускаясь по бесконечным парящим платформам. Разбивайте яркие зеленые ступени, но будьте осторожны — избегайте смертельных лесных хищников! С 5 режимами сложности игра подойдет как новичкам, так и настоящим мастерам.
+Погрузитесь в захватывающее 3D-приключение! Управляйте прыгающим шаром, спускаясь по бесконечным парящим платформам. Разбивайте яркие зеленые ступени, но будьте осторожны — избегайте смертельных лесных хищников! С 3 уникальными скинами и бесконечной трассой игра подойдет как новичкам, так и настоящим мастерам.
 
 **Особенности игры:**
 - 🌀 **Процедурные уровни:** Каждая трасса уникальна!
 - 🎨 **Система скинов:** Выбирайте стили Toxic, Neon или Aqua с разной физикой.
-- 🔥 **5 уровней сложности:** Практика, Новичок, Легко, Сложно и Безумие.
+- 🔥 **Ритмичный геймплей:** Синхронизированная физика прыжков.
 - ✨ **Динамические эффекты:** Сочные частицы при каждом ударе.
-- 🏆 **Таблицы лидеров:** Станьте лучшим игроком в Yandex Games.
+- 🏆 **Таблицы лидеров:** Станьте лучшим игроком.
 
 ### Как играть
 - **ПК:** Зажмите левую кнопку мыши и тяните ИЛИ используйте **стрелки / A-D** для движения шара.
@@ -58,15 +58,16 @@ Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball acro
 ## 🎨 Graphics Suggestions
 
 ### Icon (512x512)
-*Focus on a high-contrast shot of the ball bouncing near sharp spikes.*
-**AI Prompt:** `High-quality 3D render of a neon green glowing ball about to land on a green grass platform with sharp red spikes, vibrant lighting, mobile game icon style, clean background --v 6.0`
+**AI Prompt:** `High-quality 3D render of a neon orange glowing ball about to land on a green grass platform, vibrant lighting, mobile game icon style, clean background, high contrast --v 6.0`
 
 ### Cover / Banner (1920x1080)
-*Action-oriented shot showing the endless path of steps.*
 **AI Prompt:** `Cinematic 3D view of an endless path of floating green steps in a blue sky, bouncing ball, jumping foxes, motion blur, colorful platforms, floating particles, hyper-realistic, 8k resolution, stylized arcade aesthetic --ar 16:9`
 
-### Screenshots
-1. **Start Screen:** Show off the difficulty selection menu and skins.
-2. **Gameplay (Action):** Capture a moment where the ball is bouncing on a safe green step next to a jumping hazard.
-3. **Danger Zone:** Show an "Insane" level with high density of predators.
-4. **Game Over:** Show the ball bursting into red particles after hitting a predator.
+---
+
+## ✅ Final Quality Audit (Pre-Publishing)
+- [x] **Zero-Gap Stability**: Ball does not fall through platforms.
+- [x] **Localization**: Both EN and RU languages fully supported.
+- [x] **UX**: Onboarding tutorial present and mobile-ready.
+- [x] **Aesthetics**: Animated HUD (hearts) and high-quality particles.
+- [x] **Performance**: Optimized for web and mobile browsers.
