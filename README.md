@@ -19,13 +19,20 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
   - **Aqua**: Fast and heavy (Cyan).
 - **Cross-Platform**: Optimized for both high-end desktop browsers and mobile touch devices.
 
-## 🚀 Getting Started
+## 🚀 Multi-Platform Builds
 
-1.  **Start the development server**:
+To build for a specific platform using environment variables:
+
+1.  **Create a local env file**: Copy `.env.example` to `.env.local`.
+2.  **Run a platform build**:
     ```bash
-    npm run dev
+    # For Yandex Games
+    NEXT_PUBLIC_PLATFORM_NAME=YANDEX npm run build
+    
+    # For CrazyGames
+    NEXT_PUBLIC_PLATFORM_NAME=CRAZYGAMES npm run build
     ```
-2.  **Open the game**: Navigate to `http://localhost:9002`.
+The `NEXT_PUBLIC_` prefix ensures the variables are available in the browser-side code after the static export.
 
 ## 📦 How to Make a Release
 
