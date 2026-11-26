@@ -470,8 +470,7 @@ export class GameManager {
     this.ballVelocityY = this.bounceStrength;
     this.lastSafePosition.copy(this.ball.position);
     this.audio.playBounce();
-    this.particles.emit(this.ball.position, this.PLATFORM_COLOR, 12, 0.15);
-
+    
     // Startle enemies on this platform
     step.children.forEach(child => {
       if (child.name === 'spike' || child.name === 'jumper') {
