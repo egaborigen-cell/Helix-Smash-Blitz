@@ -1,6 +1,4 @@
-import * as THREE from 'whiteboard-three';
-import * as THREE_ORIGINAL from 'three';
-const THREE = THREE_ORIGINAL;
+import * as THREE from 'three';
 import { AudioManager } from './AudioManager';
 import { ParticleSystem } from './ParticleSystem';
 
@@ -167,25 +165,72 @@ export class GameManager {
     const group = new THREE.Group();
     let color = 0xffbe76; 
     let baseScale = 1.0;
+    let eyeColor = 0xff0000;
 
-    if (type === 'wolf') color = 0xdcdde1;
-    if (type === 'bear') { color = 0xe67e22; baseScale = 1.4; }
+    if (type === 'wolf') {
+      color = 0x7f8c8d;
+      eyeColor = 0xffff00;
+      baseScale = 1.1;
+    }
+    if (type === 'bear') { 
+      color = 0x5d4037; 
+      eyeColor = 0xff3300;
+      baseScale = 1.5; 
+    }
 
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), new THREE.MeshStandardMaterial({ color }));
+    const mat = new THREE.MeshStandardMaterial({ color });
+
+    // Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.7, 1.3), mat);
     body.position.y = 0.5;
     group.add(body);
 
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), new THREE.MeshStandardMaterial({ color }));
-    head.position.set(0, 0.9, -0.6);
+    // Head Base
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), mat);
+    head.position.set(0, 0.95, -0.4);
     group.add(head);
 
-    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.5), new THREE.MeshStandardMaterial({ color }));
+    // Muzzle (The conic part)
+    const muzzleLength = type === 'bear' ? 0.5 : 0.8;
+    const muzzleRadius = type === 'bear' ? 0.25 : 0.15;
+    const muzzleGeo = new THREE.ConeGeometry(muzzleRadius, muzzleLength, 4);
+    const muzzle = new THREE.Mesh(muzzleGeo, mat);
+    muzzle.rotation.x = -Math.PI / 2;
+    muzzle.position.set(0, 0.9, -0.85);
+    group.add(muzzle);
+
+    // Ears (Pointy)
+    const earGeo = new THREE.ConeGeometry(0.15, 0.35, 3);
+    const leftEar = new THREE.Mesh(earGeo, mat);
+    leftEar.position.set(-0.2, 1.3, -0.4);
+    group.add(leftEar);
+
+    const rightEar = new THREE.Mesh(earGeo, mat);
+    rightEar.position.set(0.2, 1.3, -0.4);
+    group.add(rightEar);
+
+    // Eyes (Glowing)
+    const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: eyeColor });
+    
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.18, 1.05, -0.7);
+    group.add(leftEye);
+
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.18, 1.05, -0.7);
+    group.add(rightEye);
+
+    // Tail
+    const tail = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.7), mat);
     tail.position.set(0, 0.6, 0.8);
+    tail.rotation.x = -Math.PI / 6;
     group.add(tail);
 
+    // Danger Zone Ring
     const ring = new THREE.Mesh(
       new THREE.RingGeometry(1.2, 1.4, 32),
-      new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5, side: THREE.DoubleSide })
+      new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.3, side: THREE.DoubleSide })
     );
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.05;
