@@ -115,7 +115,7 @@ export class GameManager {
     sun.shadow.camera.bottom = -20;
     this.scene.add(sun);
 
-    // Ball
+    // Ball Character with simplistic traits
     const ballGeo = new THREE.SphereGeometry(this.BASE_BALL_RADIUS, 32, 32);
     const ballMat = new THREE.MeshStandardMaterial({ 
       color: this.ballColor, 
@@ -125,6 +125,38 @@ export class GameManager {
     });
     this.ball = new THREE.Mesh(ballGeo, ballMat);
     this.ball.castShadow = true;
+
+    // Eyes
+    const eyeGeo = new THREE.SphereGeometry(0.06, 16, 16);
+    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.12, 0.08, -0.22);
+    this.ball.add(leftEye);
+
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.12, 0.08, -0.22);
+    this.ball.add(rightEye);
+
+    // Pupils
+    const pupilGeo = new THREE.SphereGeometry(0.03, 8, 8);
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const leftPupil = new THREE.Mesh(pupilGeo, pupilMat);
+    leftPupil.position.set(0, 0, -0.04);
+    leftEye.add(leftPupil);
+    
+    const rightPupil = new THREE.Mesh(pupilGeo, pupilMat);
+    rightPupil.position.set(0, 0, -0.04);
+    rightEye.add(rightPupil);
+
+    // Headband
+    const bandGeo = new THREE.TorusGeometry(0.3, 0.04, 8, 32);
+    const bandMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const band = new THREE.Mesh(bandGeo, bandMat);
+    band.rotation.x = Math.PI / 2;
+    band.position.y = 0.1;
+    this.ball.add(band);
+
     this.scene.add(this.ball);
 
     // Platform Group
@@ -351,6 +383,7 @@ export class GameManager {
     }
 
     this.ball.position.set(0, 2, 0);
+    this.ball.rotation.set(0, 0, 0);
     this.ballVelocityY = this.bounceStrength;
     this.ballVelocityX = 0;
     this.respawnInvulnerability = 0;
@@ -409,6 +442,11 @@ export class GameManager {
     // Move Ball
     this.ball.position.z -= this.forwardSpeed;
     this.ball.position.x += this.ballVelocityX;
+    
+    // Humanoid Trait: Tilt in direction of movement
+    this.ball.rotation.z = -this.ballVelocityX * 2.0;
+    this.ball.rotation.y = this.ballVelocityX * 0.5;
+
     this.ballVelocityX *= 0.85;
 
     this.ballVelocityY += this.gravity;
