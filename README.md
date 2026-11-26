@@ -21,29 +21,29 @@ Step Smash is a high-octane hyper-casual 3D endless runner built with Next.js, T
 
 ## 🚀 Multi-Platform Builds
 
-To build for a specific platform using environment variables:
+To build and package the game for a specific platform:
 
-1.  **Create a local env file**: Copy `.env.example` to `.env.local`.
-2.  **Run a platform build**:
+1.  **For Yandex Games**:
     ```bash
-    # For Yandex Games
-    NEXT_PUBLIC_PLATFORM_NAME=YANDEX npm run build
-    
-    # For CrazyGames
-    NEXT_PUBLIC_PLATFORM_NAME=CRAZYGAMES npm run build
+    npm run export:yandex
     ```
-The `NEXT_PUBLIC_` prefix ensures the variables are available in the browser-side code after the static export.
+2.  **For CrazyGames**:
+    ```bash
+    npm run export:crazy
+    ```
+3.  **For GamePush**:
+    ```bash
+    npm run export:gamepush
+    ```
+
+The generated `.zip` file will be located in the `archives/` directory, formatted as `step-smash-<platform>-<date>.zip`.
 
 ## 📦 How to Make a Release
 
 To release a new version on GitHub:
 
 1.  **Prepare the Version**: Update the version number in `package.json` and add the latest changes to `CHANGELOG.md`.
-2.  **Create an Export**: Run the build script to generate a deployment-ready ZIP file:
-    ```bash
-    npm run export-zip
-    ```
-    This will create a new archive in the `archives/` directory.
+2.  **Create an Export**: Run one of the export commands (e.g., `npm run export:yandex`).
 3.  **Push to GitHub**: Commit your changes and push to your main branch.
 4.  **Create a Tag**: Create a git tag for your version:
     ```bash
