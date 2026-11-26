@@ -14,7 +14,7 @@ This document contains the localized text, graphic requirements, and a final qua
 Smash through steps! Avoid the predators!
 
 ### Full Description
-Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball across floating platforms in a procedural endless world. Smash through vibrant green grass platforms, but be careful — avoid the deadly predators! With 5 unique difficulty modes, there's a challenge for everyone from beginners to insane pros!
+Dive into the ultimate 3D step-smashing adventure! Guide your bouncing ball across floating platforms in a procedural endless world. Smash through vibrant green grass platforms, but be careful — avoid the deadly predators! With a focused, rhythmic experience, there's a challenge for everyone!
 
 **Features:**
 - 🌀 **Procedural Levels:** No two runs are the same!

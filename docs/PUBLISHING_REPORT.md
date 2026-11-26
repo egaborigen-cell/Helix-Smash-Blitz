@@ -26,7 +26,7 @@ Step Smash meets all core requirements for a "High Quality" casual game. It feat
 - **Improvement Idea**: Future updates could add environment-themed levels (Winter, Desert).
 
 ### 4. Localization (Score: 10/10)
-- **Languages**: Full Russian and English support (Title, UI, Descriptions, Instructions). This is a critical requirement for Yandex Games.
+- **Languages**: Full Russian and English support (Title, UI, Descriptions, Instructions). This is a critical requirement for international game portals.
 
 ---
 
@@ -34,7 +34,7 @@ Step Smash meets all core requirements for a "High Quality" casual game. It feat
 Before uploading to a console:
 1. [ ] **Verify Static Export**: Run `npm run export-zip` and test the index.html locally.
 2. [ ] **Asset Generation**: Use the AI prompts in `yandex-promo.md` to generate the 512x512 icon and 1920x1080 banner.
-3. [ ] **Platform SDKs**: If publishing to Yandex, consider adding the `YaGames` SDK for cloud saves and global leaderboards.
+3. [ ] **Cross-Browser Test**: Ensure the game runs smoothly in Chrome, Safari, and Firefox.
 
 ## 📈 Verdict
 The game is in a "Gold" state for a v1.0 release. It is professionally polished and ready to be submitted to major web game portals.
