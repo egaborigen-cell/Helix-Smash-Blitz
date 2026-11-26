@@ -9,6 +9,7 @@
     "build": "next build",
     "build:yandex": "NEXT_PUBLIC_PLATFORM_NAME=YANDEX next build",
     "build:crazy": "NEXT_PUBLIC_PLATFORM_NAME=CRAZYGAMES next build",
+    "build:gamepush": "NEXT_PUBLIC_PLATFORM_NAME=GAMEPUSH NEXT_PUBLIC_USE_GAMEPUSH=true next build",
     "export-zip": "bash scripts/build-export.sh",
     "start": "next start",
     "lint": "next lint",

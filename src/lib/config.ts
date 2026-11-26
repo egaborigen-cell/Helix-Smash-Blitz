@@ -10,6 +10,12 @@ export const CONFIG = {
   features: {
     showLeaderboards: process.env.NEXT_PUBLIC_SHOW_LEADERBOARDS === 'true',
     showExternalLinks: process.env.NEXT_PUBLIC_SHOW_EXTERNAL_LINKS === 'true',
+    useGamePush: process.env.NEXT_PUBLIC_USE_GAMEPUSH === 'true',
+  },
+
+  gamepush: {
+    id: process.env.NEXT_PUBLIC_GAMEPUSH_ID || '',
+    token: process.env.NEXT_PUBLIC_GAMEPUSH_TOKEN || '',
   },
 
   analytics: {
